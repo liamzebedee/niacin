@@ -10,7 +10,7 @@ Inspirations: Synthetix v2 deployer, Synthetix v3 Store pattern, tBTC Factories
 
 ## Deployer.
 
-The deployer is designed to remove the hassle of smart contract deployments.
+The deployer is designed to remove the hassle of smart contract deployments. _Works natively with Foundry_.
 
 **Zero-config setup**. Deployer scans your `src/` for `*.sol`, and automatically deploys your contracts. Contracts contained in directories starting with `lib/` or `interfaces/` are ignored.
 
