@@ -4,6 +4,7 @@ vercel3-tools
 This repo contains the CLI tooling necessary to enable vercel3:
 
  * **deployer**.
+ * **generate-npm-package**. Autogenerate an `index.js` with your contract deployments, usable in Next.js and the wider JS ecosystem.
 
 Inspirations: Synthetix v2 deployer, Synthetix v3 Store pattern, tBTC Factories
 
@@ -26,6 +27,12 @@ The deployer is designed to remove the hassle of smart contract deployments.
 Coming soon:
 
  - [ ] System-wide pausing for contracts.
+
+### Usage.
+
+```sh
+node build/index.js deploy --project-dir ./contracts
+```
 
 ### Example.
 
@@ -75,3 +82,21 @@ mkdir: path already exists: .vercel3
 mkdir: path already exists: .vercel3/deployments
 mkdir: path already exists: .vercel3/deployments/localhost
 ```
+
+## `generate-npm-package`
+
+Autogenerate an `index.js` which is importable in Next.js (since JSON loading isn't supported by default), and usable in other tooling (Telegram bots).
+
+```sh
+node build/index.js generate-npm-pkg --manifest-path contracts/.vercel3/deployments/localhost/manifest.json --out index.js
+```
+
+```js
+const contracts = require('./index')
+const TakeMarketShares = new ethers.Contract(
+  contracts.TakeMarketShares.address, 
+  contracts.TakeMarketShares.ABI
+)
+```
+
+![Imgur](https://imgur.com/MwcEVbR)

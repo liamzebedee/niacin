@@ -1,5 +1,7 @@
 const glob = require('glob')
 const fs = require('node:fs')
+import { join } from 'path'
+import { resolve } from 'path'
 
 interface DeployArgs {
     projectType: string
@@ -12,7 +14,7 @@ import { ethers } from 'ethers'
 import * as shell from 'shelljs'
 
 async function deploy(argv: DeployArgs) {
-    const { projectType, projectDir, outDir } = argv
+    const { projectType, projectDir } = argv
 
     shell.cd(projectDir)
     console.log(`Project directory: ${shell.pwd()}`)
@@ -75,6 +77,7 @@ async function deploy(argv: DeployArgs) {
     // 1. Deploy AddressResolver
     const AddressResolver = new ethers.ContractFactory(addressResolver_Artifact.abi, addressResolver_Artifact.bytecode.object, signer)
     const addressResolver = await AddressResolver.deploy(account)
+    addressResolver.deployTransaction.blockNumber = await (await provider.getTransactionReceipt(addressResolver.deployTransaction.hash)).blockNumber
     console.log()
     console.log(`AddressResolver deployed at ${addressResolver.address}`)
 
@@ -92,11 +95,13 @@ async function deploy(argv: DeployArgs) {
         console.log(`Deploying Proxy${contractName}`)
         const Proxy = new ethers.ContractFactory(proxy_Artifact.abi, proxy_Artifact.bytecode.object, signer)
         const proxy = await Proxy.deploy(addressResolver.address)
+        proxy.deployTransaction.blockNumber = await (await provider.getTransactionReceipt(proxy.deployTransaction.hash)).blockNumber
 
         // 2.2 Deploy implementation.
         console.log(`Deploying ${contractName} (impl)`)
         const Implementation = new ethers.ContractFactory(artifact.abi, artifact.bytecode.object, signer)
         const implementation = await Implementation.deploy(addressResolver.address)
+        implementation.deployTransaction.blockNumber = await (await provider.getTransactionReceipt(implementation.deployTransaction.hash)).blockNumber
 
         // 2.3 Upgrade.
         console.log(`Upgrading Proxy${contractName}`)
@@ -164,6 +169,8 @@ async function deploy(argv: DeployArgs) {
             deployTx,
             abi,
             address,
+            proxy: address,
+            impl: address,
         }
     }
 
@@ -185,6 +192,34 @@ async function deploy(argv: DeployArgs) {
     // Now test creating a new take shares market.
     // const takeMarket = contractsForResolver.filter(contract => contract.name == 'TakeMarket')[0].impl.contract
     // await takeMarket.getOrCreateTakeSharesContract(2);
+}
+
+interface GenerateNPMPackageArgs {
+    manifestPath: string,
+    out: string
+}
+
+async function generateNPMPackage(argv: GenerateNPMPackageArgs) {
+    const { manifestPath } = argv
+    const manifest = require(resolve(manifestPath))
+
+    const entries = manifest.reduce((acc: any, entry: any) => {
+        console.log(entry)
+        acc = {
+            ...acc,
+            [entry.name]: {
+                abi: entry.abi,
+                address: entry.proxy,
+                deployBlock: entry.deployTx.blockNumber,
+            }
+        }
+        return acc
+    }, {})
+
+    // Write to index.js
+    const outfilePath = resolve(join(argv.out))
+    console.log(outfilePath)
+    fs.writeFileSync(outfilePath, `module.exports = ${JSON.stringify(entries, null, 4)}`)
 }
 
 const yargs = require('yargs/yargs')
@@ -216,5 +251,17 @@ yargs(hideBin(process.argv))
             })
             .demandOption(['project-dir'], '')
     }, deploy)
+    .command('generate-npm-pkg', 'generate an NPM package from a deployment manifest', (yargs: any) => {
+        return yargs
+            .option('manifest-path', {
+                type: 'string',
+                description: 'The path to the manifest.json',
+            })
+            .option('out', {
+                type: 'string',
+                description: 'The output path for the index.js file',
+            })
+            .demandOption(['manifest-path'], '')
+    }, generateNPMPackage)
     .help()
     .parse()
