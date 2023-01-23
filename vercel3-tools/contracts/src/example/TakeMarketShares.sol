@@ -12,7 +12,7 @@ contract TakeMarketShares is
 
     constructor(address _resolver) MixinResolverStatic(_resolver) {
         // Instantiate the default template.
-        instantiate(address(1));
+        configureInstance(address(1));
     }
 
     function initialize(

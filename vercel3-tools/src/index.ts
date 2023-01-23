@@ -6,19 +6,70 @@ import { resolve } from 'path'
 interface DeployArgs {
     projectType: string
     projectDir: string
-    out: string
-    dataDir: string
+    inputManifest: string
+    outputManifest: string
 }
 
 import { ethers } from 'ethers'
 import * as shell from 'shelljs'
 
+// Use .pop to get the latest.
+const MANIFEST_VERSIONS = [
+    '0.1.0'
+]
+
+interface Manifest {
+    version: string
+    deployments: ContractDeployment[]
+}
+
+const EMPTY_MANIFEST: Manifest = {
+    "version": "0.1.0",
+    "deployments": []
+}
+
+interface ContractInfo {
+    version: number
+    address: string
+    abi: ethers.utils.Fragment[]
+    bytecode: {
+        object: string
+        sourceMap: string
+        linkReferences: any
+    }
+    metadata: any
+}
+interface ContractDeployment {
+    name: string
+    proxy: ContractInfo
+    impl: ContractInfo
+    deployTx: ethers.Transaction & { blockNumber: number }
+    abi: ethers.utils.Fragment[]
+}
+
+const DEPLOY_TRANSACTION_KEY = 'deployTransaction2'
+
 async function deploy(argv: DeployArgs) {
-    const { projectType, projectDir } = argv
+    let { RPC_URL: rpcUrl, PRIVATE_KEY: privateKey } = process.env
+    const {
+        projectType, 
+        projectDir
+    } = argv
+
+    let inputManifest: Manifest
+    try {
+        inputManifest = require(resolve(join(process.cwd(), "/", argv.inputManifest))) as Manifest
+    } catch(err) {
+        throw new Error("Can't find input manifest: " + err)
+    }
 
     shell.cd(projectDir)
     console.log(`Project directory: ${shell.pwd()}`)
-    console.log(`forge build`)
+    console.log(`Project type: ${projectType}`)
+    console.log(`Input manifest: `)
+    console.log(`> forge build`)
+
+    
 
     // Run `forge build`.
     if (shell.exec('forge build').code !== 0) {
@@ -42,7 +93,9 @@ async function deploy(argv: DeployArgs) {
         return true
     })
 
-    console.log(contractsForDeploy)
+    console.debug()
+    console.debug(`Contracts detected:`)
+    console.debug(contractsForDeploy)
 
     // Collect artifacts.
     const artifacts = []
@@ -61,25 +114,92 @@ async function deploy(argv: DeployArgs) {
         'src/Proxy.sol',
         'src/AddressResolver.sol',
     ]
-    const artifacts2 = artifacts.filter(artifact => !systemContracts.includes(artifact.ast.absolutePath))
+    const artifacts2 = artifacts
+        // Filter: not system contracts.
+        .filter(artifact => !systemContracts.includes(artifact.ast.absolutePath))
+        // Filter: only contracts with changed bytecode.
+        .filter(artifact => {
+            const contractFilename = artifact.ast.absolutePath.split('/').pop().split('.')[0]
+            const previous = inputManifest.deployments.find(deployment => deployment.name == contractFilename)
+            if (previous == null) {
+                return true
+            }
+            return previous.impl.bytecode.object != artifact.bytecode.object
+        });
+    
+    console.log()
+    console.log(`Contracts for deployment:`)
+    console.log(artifacts2.map(artifact => artifact.ast.absolutePath))
 
 
     // Now deploy.
     // 
+
+    // Get the latest deployment info if from a previous run.
+    const prevDeployments = inputManifest.deployments
+
+    const getOrDeploy = async (args: {
+        name: string, 
+        abi: ethers.utils.Fragment[], 
+        bytecode: string,
+        constructorArgs: any[],
+        overwrite: boolean,
+        proxy: boolean
+    }) => {
+        const { abi, bytecode, constructorArgs } = args
+        const previous = prevDeployments.find(deployment => deployment.name == args.name)
+        const yy = args.proxy ? 'proxy' : 'impl'
+        const name = args.proxy ? `Proxy${args.name}` : args.name
+
+        if (previous != null && previous[yy] != null && !args.overwrite) {
+            console.log(`Loaded ${name} (v${previous[yy].version})`)
+            const contract = new ethers.Contract(previous[yy].address, abi, signer)
+            // @ts-ignore
+            contract[DEPLOY_TRANSACTION_KEY] = previous.deployTx
+            return contract
+        }
+
+        if (args.overwrite) {
+            // Deploy.
+            const version = 1 + (previous ? previous[yy].version : 0)
+            console.log(`Deploying ${name} (v${version})`)
+            const Contract = new ethers.ContractFactory(abi, bytecode, signer)
+            const contract = await Contract.deploy(...constructorArgs)
+            contract.deployTransaction.blockNumber = await (await provider.getTransactionReceipt(contract.deployTransaction.hash)).blockNumber
+            // @ts-ignore
+            contract[DEPLOY_TRANSACTION_KEY] = contract.deployTransaction
+            return contract
+        }
+
+        throw new Error("Unexpected")
+    }
+
+    // Build the signer, provider, system contracts.
     const proxy_Artifact = artifacts.filter(artifact => artifact.ast.absolutePath == 'src/Proxy.sol')[0]
     const addressResolver_Artifact = artifacts.filter(artifact => artifact.ast.absolutePath == 'src/AddressResolver.sol')[0]
 
-    const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545')
-    const signer = new ethers.Wallet("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80", provider)
+    if(projectType == 'foundry' && !rpcUrl) {
+        rpcUrl = 'http://localhost:8545'
+        privateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    }
+    const provider = new ethers.providers.JsonRpcProvider()
+    const signer = new ethers.Wallet(privateKey, provider)
     const account = await signer.getAddress()
+    console.log()
+    console.log(`RPC URL: ${rpcUrl}`)
     console.log(`Deploying from account: ${account}`)
+    console.log()
     
     // 1. Deploy AddressResolver
-    const AddressResolver = new ethers.ContractFactory(addressResolver_Artifact.abi, addressResolver_Artifact.bytecode.object, signer)
-    const addressResolver = await AddressResolver.deploy(account)
-    addressResolver.deployTransaction.blockNumber = await (await provider.getTransactionReceipt(addressResolver.deployTransaction.hash)).blockNumber
-    console.log()
-    console.log(`AddressResolver deployed at ${addressResolver.address}`)
+    const addressResolver = await getOrDeploy({
+        name: 'AddressResolver',
+        abi: addressResolver_Artifact.abi,
+        bytecode: addressResolver_Artifact.bytecode.object,
+        constructorArgs: [account],
+        overwrite: false,
+        proxy: false
+    })
+    console.log(`AddressResolver is at ${addressResolver.address}`)
 
     const contractsForResolver = []
 
@@ -92,20 +212,30 @@ async function deploy(argv: DeployArgs) {
 
         console.log(`[${artifact.ast.absolutePath}]`)
         // 2.1 Deploy Proxy.
-        console.log(`Deploying Proxy${contractName}`)
-        const Proxy = new ethers.ContractFactory(proxy_Artifact.abi, proxy_Artifact.bytecode.object, signer)
-        const proxy = await Proxy.deploy(addressResolver.address)
-        proxy.deployTransaction.blockNumber = await (await provider.getTransactionReceipt(proxy.deployTransaction.hash)).blockNumber
+        const proxy = await getOrDeploy({
+            name: `${contractName}`,
+            abi: proxy_Artifact.abi,
+            bytecode: proxy_Artifact.bytecode.object,
+            constructorArgs: [addressResolver.address],
+            overwrite: false,
+            proxy: true
+        })
 
         // 2.2 Deploy implementation.
-        console.log(`Deploying ${contractName} (impl)`)
-        const Implementation = new ethers.ContractFactory(artifact.abi, artifact.bytecode.object, signer)
-        const implementation = await Implementation.deploy(addressResolver.address)
-        implementation.deployTransaction.blockNumber = await (await provider.getTransactionReceipt(implementation.deployTransaction.hash)).blockNumber
+        const impl = await getOrDeploy({
+            name: `${contractName}`,
+            abi: artifact.abi,
+            bytecode: artifact.bytecode.object,
+            constructorArgs: [addressResolver.address],
+            overwrite: true,
+            proxy: false
+        })
 
         // 2.3 Upgrade.
-        console.log(`Upgrading Proxy${contractName}`)
-        const tx = await proxy.upgrade(implementation.address)
+        const previous = prevDeployments.find(deployment => deployment.name == contractName)
+        const version = 1 + (previous ? previous['impl'].version : 0)
+        console.log(`Upgrading Proxy${contractName} to implementation v${version}`)
+        const tx = await proxy.upgrade(impl.address)
 
         // Queue for resolver.
         // get the name of the contract from the artifact.
@@ -115,11 +245,15 @@ async function deploy(argv: DeployArgs) {
                 contract: proxy,
                 address: proxy.address,
                 abi: proxy_Artifact.abi,
+                bytecode: artifact.bytecode,
+                metadata: artifact.metadata,
             },
             impl: {
-                contract: implementation,
-                address: implementation.address,
+                contract: impl,
+                address: impl.address,
                 abi: artifact.abi,
+                bytecode: artifact.bytecode,
+                metadata: artifact.metadata,
             },
             path: artifact.ast.absolutePath,
             address: proxy.address,
@@ -147,47 +281,74 @@ async function deploy(argv: DeployArgs) {
         }
     }
     console.log('Done rebuilding caches')
-    
-    // Now save the deployment info.
-    shell.mkdir('.vercel3')
-    shell.mkdir('.vercel3/deployments')
-    shell.mkdir('.vercel3/deployments/localhost')
 
-    const makeDeploymentEntry = (name: string, proxy: ethers.Contract, impl: ethers.Contract, abi: any[], deployTx: ethers.Transaction) => {
-        return {
+    const makeDeploymentEntry = (name: string, proxy: ethers.Contract, impl: ethers.Contract, abi: any[], bytecode: any, metadata: any, deployTx: ethers.Transaction) => {
+        // TODO: CODE SMELL.
+        const previous = prevDeployments.find(deployment => deployment.name == name)
+
+        const entry: ContractDeployment = {
             name,
-            proxy: proxy.address,
-            impl: impl.address,
+            proxy: null,
+            impl: {
+                // autoinc version.
+                version: 1 + (previous ? previous.impl.version : 0),
+                address: impl.address,
+                abi: abi,
+                bytecode: bytecode,
+                metadata: metadata,
+            },
+            // @ts-ignore this blockNumber is set above.
             deployTx,
             abi,
         }
-    }
 
-    const makeSpecialDeploymentEntry = ({ name, abi, address, deployTx } : { name: string, abi: any[], address: string, deployTx: ethers.Transaction }) => {
-        return {
-            name,
-            deployTx,
-            abi,
-            address,
-            proxy: address,
-            impl: address,
-        }
-    }
-
-    const manifest = []
-        .concat(contractsForResolver.map(entry => {
-            return makeDeploymentEntry(entry.name, entry.proxy.contract, entry.impl.contract, entry.impl.abi, entry.impl.contract.deployTransaction)
-        }))
-        .concat([
-            {
-                name: 'AddressResolver',
-                address: addressResolver.address,
-                abi: addressResolver_Artifact.abi,
-                deployTx: addressResolver.deployTransaction,
+        if(proxy != null) {
+            entry.proxy = {
+                version: 1,
+                address: proxy.address,
+                abi: proxy_Artifact.abi,
+                bytecode: bytecode,
+                metadata: metadata,
             }
-        ].map(makeSpecialDeploymentEntry))
+        }
+        return entry
+    }
+
+    const newDeployments = []
+        .concat(contractsForResolver.map(entry => {
+            return makeDeploymentEntry(
+                entry.name, 
+                entry.proxy.contract, 
+                entry.impl.contract, 
+                entry.impl.abi, 
+                entry.impl.bytecode,
+                entry.impl.metadata,
+                entry.impl.contract[DEPLOY_TRANSACTION_KEY]
+            )
+        }))
+        .concat(
+            addressResolver.deployTransaction 
+                ? [makeDeploymentEntry('AddressResolver', null, addressResolver, addressResolver_Artifact.abi, addressResolver_Artifact.bytecode.object, addressResolver_Artifact.metadata, addressResolver.deployTransaction)]
+                : []
+        );
     
-    fs.writeFileSync('.vercel3/deployments/localhost/manifest.json', JSON.stringify(manifest, null, 2))
+    // Merge with previous inputManifest.deployments
+    const deployments = inputManifest.deployments
+        .filter((entry: ContractDeployment) => {
+            return !newDeployments.map(entry => entry.name).includes(entry.name)
+        })
+        .concat(newDeployments)
+    
+
+    const manifest = {
+        version: MANIFEST_VERSIONS.pop(),
+        deployments,
+    }
+
+    fs.writeFileSync(
+        '.vercel3/deployments/localhost/manifest.json', 
+        JSON.stringify(manifest, null, 2)
+    )
 
     // Now test creating a new take shares market.
     // const takeMarket = contractsForResolver.filter(contract => contract.name == 'TakeMarket')[0].impl.contract
@@ -203,7 +364,9 @@ async function generateNPMPackage(argv: GenerateNPMPackageArgs) {
     const { manifestPath } = argv
     const manifest = require(resolve(manifestPath))
 
-    const entries = manifest.reduce((acc: any, entry: any) => {
+    // TODO check version.
+
+    const entries = manifest.deployments.reduce((acc: any, entry: any) => {
         console.log(entry)
         acc = {
             ...acc,
@@ -237,19 +400,19 @@ yargs(hideBin(process.argv))
             })
             .option('project-dir', {
                 type: 'string',
-                description: 'The project directory',
+                description: 'The contracts project directory (ie. Foundry, Hardhat project)',
             })
-            .option('data-dir', {
+            .option('input-manifest', {
                 type: 'string',
-                description: 'The data directory for the project',
+                description: 'The manifest.json of previous deployments',
                 default: '.vercel3',
             })
-            .option('out-dir', {
+            .option('output-manifest', {
                 type: 'string',
-                description: 'The output directory for artifacts',
-                default: '.',
+                description: 'Where to write the manifest.json of new deployments',
+                default: '.vercel3',
             })
-            .demandOption(['project-dir'], '')
+            .demandOption(['project-dir', 'input-manifest', 'output-manifest'], '')
     }, deploy)
     .command('generate-npm-pkg', 'generate an NPM package from a deployment manifest', (yargs: any) => {
         return yargs

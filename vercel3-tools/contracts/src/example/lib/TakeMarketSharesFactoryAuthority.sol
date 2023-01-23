@@ -17,7 +17,7 @@ contract TakeMarketSharesFactoryAuthority {
     ///      that should happen in the constructor. In cases where the inheritor
     ///      is instead used via a clone factory, the same function that
     ///      creates a new clone should also trigger initialization.
-    function instantiate(address __factory) public {
+    function configureInstance(address __factory) public {
         require(__factory != address(0), "Factory cannot be the zero address.");
         require(!_initialized, "Factory can only be initialized once.");
 

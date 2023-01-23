@@ -34,7 +34,7 @@ contract TakeMarket is
             instance = Clones.cloneDeterministic(takeMarketShares(), salt);
             TakeMarketShares i = TakeMarketShares(instance);
             // Instantiate template. This permissions only TakeMarket to initialize.
-            i.instantiate(takeMarket());
+            i.configureInstance(takeMarket());
             // Initialize.
             i.initialize(address(resolver), takeId);
         }
