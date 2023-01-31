@@ -1,0 +1,380 @@
+
+
+- txs are free, no MATIC required
+- you don't even need to connect your wallet. if you don't connect one, we make a virtual one for you
+- users can make usernames without ENS (also gas free)
+- make it possible to do anonymous takes
+
+non-l3 version of this:
+- wrap all contract calls in a relayer
+    AA style
+        replace msg.sender with _msgSender()
+        delegate gas payment to a contract
+
+
+- an alternative way to do this without backend code:
+    // custom deploy script
+    npm run deploy
+
+    // do the proxy + other thing
+
+    // convert artifacts into this format:
+    type DeploymentTarget {
+        name: string
+        address: string
+        abi: ABIItem[]
+    }
+
+    // store these in our API
+    // only problem now is that the ABI's can be wrong.
+    // but that's not so bad.
+
+
+    // oh wait.
+    // this means embedding a private key into the github app.
+    // uhhhhhhh.
+
+    // maybe we can do something different:
+    // deploy locally. 
+    // if the contracts are for testnet, then it works!
+    // if it's for production, then whatever
+
+
+    // what problem are we trying to solve?
+    // a simple demo of web3 vercel
+
+    // how can we do this the simplest?
+    // - geth node                                    ......
+    // - one tx account                               ......
+    // - instamine                                    ......
+    // - simple deployment pipeline for foundry       xxxxxx
+    // - output contract artifacts                    xxxxxx
+    // - output deployed from commit                  ......
+    // - upload them to api                           ......
+    // - create new contract NPM package              xxx...
+
+    // and then somehow after all of this:
+    // - deploy -> instantiates geth node
+    // - project -> shows summary
+    //   - rpc url
+    //   - deployments
+    // - make a commit, runs github workflow
+    // - progress shows up on vercel
+    // - artifacts later uploaded, parsed
+    // - shows the contracts deployed and upgraded etc.
+
+
+
+
+
+
+Simple enough demo:
+
+sql schema:
+    Project
+        id
+        repository
+        chain
+        deployments: Deployment[]
+        registry: ContractRegistry
+    Deployment:
+        id
+        chain
+        time
+        commit: Commit
+        build: BuildStage
+        deploy: DeployStage
+    BuildStage:
+        id
+        start_time
+        end_time
+        logs
+        data_s3
+    DeployStage
+        id
+        start_time
+        end_time
+        deployed: 
+        contracts: ContractEVMTarget[]
+    Commit:
+        id
+        hash
+        message
+        branch
+        time
+        authors
+    ContractRegistry:
+        id
+        project: Project
+        targets: ContractEVMTarget[]
+    ContractEVMTarget
+        id
+        name
+        chain
+        proxy_address: string
+        proxy_deploy_tx: EVMTransaction
+        latest: ContractEVMImpl
+        versions: ContractEVMImpl[]
+    ContractEVMImpl
+        id
+        target: ContractEVMTarget
+        name
+        chain
+        version
+        address: string
+        abi: string
+    
+    Chain
+        name
+    ChainEVMChainStorage
+        chain: Chain
+        key:
+        value:
+    ChainEVMChainContracts
+        chain: Chain
+        key:
+        value:
+    ChainEVMAccounts
+        chain: Chain
+        key:
+        value:
+    ChainEVMBlock
+        chain: Chain
+        ...
+    ChainEVMTransaction
+        chain
+        ...
+    ChainEVMContractLogs
+        chain: Chain
+        address: string
+        tx: ChainEVMTransaction
+        log: blob
+
+
+
+
+Very simply:
+    Deployment -> 
+        BuildStage
+        DeployStage
+            ContractEVMTarget
+            ContractEVMImpl
+            Update ContractRegistry
+        
+
+Pages:
+    /projects
+    /projects/{id}
+    /projects/{id}/contracts/
+
+
+
+Flows:
+    onGitPush:
+        load git data
+        startDeployment(repo, gitdata)
+    
+    startDeployment(repo, gitdata):
+        project = Project.find(repo: repo) // repo is user/repo
+        chain = project.chain
+
+        deployment = new Deployment:
+            id
+            chain
+            time
+            commit: Commit
+        
+        buildStage = new BuildStage
+            start_time: now
+            logs: ""
+        buildStage.save()
+
+        // beginBuild
+            send to API endpoint
+                retcode, logs = node_exec
+                    docker build container:
+                        git clone
+                        npm run build
+                        output: ContractArtifacts/
+                            type ContractArtifact {
+                                // foundry artifact structure
+                            }
+                return {
+                    retcode,
+                    logs
+                }
+        
+        status = retcode_to_status(retcode)
+        buildStage =
+            end_time: now
+            logs: logs
+            status: status
+        buildStage.save()
+
+        if status == FAIL {
+            return
+        }
+
+        // build success, continue
+        artifacts_raw = extract_artifacts(buildStage.data_s3)
+        artifacts     = parse_artifacts(artifacts)
+
+        // commence stage 2
+        deploy_stage = DeployStage
+            id
+            start_time: now
+            end_time: null
+            status: IN_PROGRESS
+            contracts: []
+        deploy_stage.save()
+
+        // stage 2.1 - deploy proxies/impls
+        contracts_to_upgrade = []
+
+        for artifact in artifacts:
+            provider = get_provider_url(chain)
+            
+            // get or deploy proxy
+            target = ContractEVMTarget.find_one(name = name)
+            if !target {
+                proxy = new ethers.Contract(proxy.abi, provider)
+                tx1 = proxy.deploy(SYSTEM_ADDRESS, { from: SYSTEM_ADDRESS })
+                const receipt = await tx1.wait(1)
+                proxy_address = receipt.created_address
+                
+                target = ContractEVMTarget
+                    id
+                    name: name
+                    chain: chain
+                    proxy_address: proxy.address
+                    proxy_deploy_tx: tx1.txid
+                    versions: []
+                
+                target.save()
+            }
+            
+            // deploy new impl
+            impl = new ethers.Contract(artifact.abi, provider)
+            tx2 = proxy.deploy(SYSTEM_ADDRESS, { from: SYSTEM_ADDRESS })
+            const receipt = await tx2.wait(1)
+            impl_address = receipt.created_address
+
+        // stage 2.2 - upgrade the contracts in one go
+        contract_evm_impls = contracts_to_upgrade.map(to_upgrade =>
+            [proxy, impl] = to_upgrade
+            [evm_contract, evm_contract_deployment] = to_upgrade
+
+            // upgrade to impl
+            const tx3 = proxy.setImplementation(impl)
+            await tx3.wait(1)
+
+            contract_evm_impl = ContractEVMImpl
+                id
+                name
+                chain
+                version: autoinc
+                address: impl.address
+                abi: impl.abi
+            
+            contract_evm_impl.save()
+
+            return contract_evm_impl
+        )
+
+        deploy_stage = DeployStage
+            id
+            start_time: now
+            end_time: null
+            status: IN_PROGRESS
+            contracts: contract_evm_impls
+
+        deploy_stage.save()
+
+        deployment.save()
+
+
+EVM Upgrade Pattern
+    Proxy (name = EtherWrapperProxy)
+        Owner = System
+        Contract(name = EtherWrapper)
+        setImplementation
+    
+    ContractRegistry
+        mapping(string => Contract) public registry
+
+        event Upgrade(string indexed name, address indexed newimpl);
+
+        struct Contract {
+            address proxy;
+        }
+
+        function upgrade(string name, address impl) {
+            registry[name].proxy.setImplementation(impl)
+            emit Upgrade(name, proxy, newimpl)
+        }
+
+
+EVM
+    JSON-RPC
+        getCode
+        getTransactionByHash
+        eth_getBlockByNumber
+            load all of these from DB
+
+    Node
+        run(tx)
+            gate tx based on token logic
+                for first demo, it is a server token that is given based on idk.
+
+            acquire lock
+
+            run tx in ethereumjs-vm
+                load code/storage/accounts from database
+                execute tx
+                
+                get the new state leaves (code, storage, accounts)
+                make tx receipt
+                get prev block hash
+                make the logs_bloom
+
+                mint a new block (
+                    parent_hash	
+                    fee_recipient
+                    state_root	
+                    receipts_root
+                    logs_bloom	
+                    // prev_randao	
+                    block_number	
+                    gas_limit	
+                    gas_used	
+                    timestamp	
+                    extra_data	arbitrary additional data as raw bytes
+                    base_fee_per_gas	
+                    block_hash	
+                    transactions_root
+                )
+                insert into db
+            
+            release lock
+
+            return tx_receipt
+
+
+
+
+
+            
+            
+
+
+
+
+
+
+
+
+
+Install as part of install workflow
+https://github.com/apps/thedarudedemo/installations/new/permissions?target_id=584141
+
+

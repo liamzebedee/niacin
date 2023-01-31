@@ -1,0 +1,1 @@
+@vercel3=./lib/vercel3-contracts/src/

@@ -1,0 +1,3 @@
+console.log(1)
+require('vercel3-tools')
+require('../build/index.js')
