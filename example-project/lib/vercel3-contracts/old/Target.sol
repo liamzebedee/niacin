@@ -1,5 +1,0 @@
-contract Target is
-    Proxy
-{
-    
-}
