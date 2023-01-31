@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "run": "node build/index.js"
+    "run": "node build/index.js",
+    "sync-contracts": "./scripts/sync-contracts.sh"
   },
   "bin": {
     "aller": "./bin/aller.js"

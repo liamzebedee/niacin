@@ -34,14 +34,14 @@ contract Proxy is
     }
 
     function resolverAddressesRequired() public override pure returns (bytes32[] memory addresses) {
-        bytes32[] memory requiredAddresses = new bytes32[](1);
-        requiredAddresses[0] = bytes32("SystemStatus");
+        bytes32[] memory requiredAddresses = new bytes32[](0);
+        // requiredAddresses[0] = bytes32("SystemStatus");
         return requiredAddresses;
     }
 
-    function systemStatus() internal view returns (SystemStatus) {
-        return SystemStatus(requireAndGetAddress(bytes32("SystemStatus")));
-    }
+    // function systemStatus() internal view returns (SystemStatus) {
+    //     return SystemStatus(requireAndGetAddress(bytes32("SystemStatus")));
+    // }
 
     event Upgraded(address indexed implementation);
     event AdminChanged(address previousAdmin, address newAdmin);

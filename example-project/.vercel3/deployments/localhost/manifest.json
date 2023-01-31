@@ -1,0 +1,2418 @@
+{
+  "version": "0.1.0",
+  "deployments": [
+    {
+      "name": "TakeMarketShares",
+      "proxy": {
+        "version": 1,
+        "address": "0x4A65b9d13908487A1654be48e6aa9Bc701735910",
+        "abi": [
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_resolver",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "previousAdmin",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "newAdmin",
+                "type": "address"
+              }
+            ],
+            "name": "AdminChanged",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "name",
+                "type": "bytes32"
+              },
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "destination",
+                "type": "address"
+              }
+            ],
+            "name": "CacheUpdated",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": true,
+                "internalType": "address",
+                "name": "implementation",
+                "type": "address"
+              }
+            ],
+            "name": "Upgraded",
+            "type": "event"
+          },
+          {
+            "stateMutability": "payable",
+            "type": "fallback"
+          },
+          {
+            "inputs": [],
+            "name": "implementation",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "isResolverCached",
+            "outputs": [
+              {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "proxyAdmin",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "rebuildCache",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "resolver",
+            "outputs": [
+              {
+                "internalType": "contract AddressResolver",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "resolverAddressesRequired",
+            "outputs": [
+              {
+                "internalType": "bytes32[]",
+                "name": "addresses",
+                "type": "bytes32[]"
+              }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_admin",
+                "type": "address"
+              }
+            ],
+            "name": "setProxyAdmin",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_implementation",
+                "type": "address"
+              }
+            ],
+            "name": "upgrade",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "stateMutability": "payable",
+            "type": "receive"
+          }
+        ],
+        "bytecode": {
+          "object": "0x60806040526000805460ff60a01b1916905534801561001d57600080fd5b5060405161056438038061056483398101604081905261003c9161016c565b600080546001600160a01b0319166001600160a01b0383161790556100616001610067565b5061019c565b6001600160a01b0381166100ce5760405162461bcd60e51b815260206004820152602360248201527f466163746f72792063616e6e6f7420626520746865207a65726f20616464726560448201526239b99760e91b60648201526084015b60405180910390fd5b600054600160a01b900460ff16156101365760405162461bcd60e51b815260206004820152602560248201527f466163746f72792063616e206f6e6c7920626520696e697469616c697a65642060448201526437b731b29760d91b60648201526084016100c5565b600180546001600160a01b039092166001600160a01b03199092169190911790556000805460ff60a01b1916600160a01b179055565b60006020828403121561017e57600080fd5b81516001600160a01b038116811461019557600080fd5b9392505050565b6103b9806101ab6000396000f3fe608060405234801561001057600080fd5b50600436106100625760003560e01c806304f3bcec146100675780637418536014610097578063766019b714610099578063899ffef4146100ac578063af640d0f146100bb578063cd6dc687146100d2575b600080fd5b60005461007a906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b005b6100976100a73660046102f3565b6100e5565b606060405161008e9190610315565b6100c460025481565b60405190815260200161008e565b6100976100e0366004610359565b6101ea565b6001600160a01b03811661014c5760405162461bcd60e51b815260206004820152602360248201527f466163746f72792063616e6e6f7420626520746865207a65726f20616464726560448201526239b99760e91b60648201526084015b60405180910390fd5b600054600160a01b900460ff16156101b45760405162461bcd60e51b815260206004820152602560248201527f466163746f72792063616e206f6e6c7920626520696e697469616c697a65642060448201526437b731b29760d91b6064820152608401610143565b600180546001600160a01b039092166001600160a01b03199092169190911790556000805460ff60a01b1916600160a01b179055565b600054600160a01b900460ff166102595760405162461bcd60e51b815260206004820152602d60248201527f466163746f727920696e697469616c697a6174696f6e206d757374206861766560448201526c103132b2b71031b0b63632b21760991b6064820152608401610143565b6001546001600160a01b031633146102b35760405162461bcd60e51b815260206004820152601f60248201527f43616c6c6572206d75737420626520666163746f727920636f6e7472616374006044820152606401610143565b6002819055600080546001600160a01b0319166001600160a01b0384161790555050565b80356001600160a01b03811681146102ee57600080fd5b919050565b60006020828403121561030557600080fd5b61030e826102d7565b9392505050565b6020808252825182820181905260009190848201906040850190845b8181101561034d57835183529284019291840191600101610331565b50909695505050505050565b6000806040838503121561036c57600080fd5b610375836102d7565b94602093909301359350505056fea264697066735822122005e2b69eb2020a177ead412065214cade23aa3fd688579ecf079184b204c6f5964736f6c63430008110033",
+          "sourceMap": "236:453:7:-:0;;;394:5:8;365:34;;-1:-1:-1;;;;365:34:8;;;358:153:7;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;472:8:4;:37;;-1:-1:-1;;;;;;472:37:4;-1:-1:-1;;;;;472:37:4;;;;;475:29:7::1;-1:-1:-1::0;475:17:7::1;:29::i;:::-;358:153:::0;236:453;;991:274:8;-1:-1:-1;;;;;1062:23:8;;1054:71;;;;-1:-1:-1;;;1054:71:8;;511:2:9;1054:71:8;;;493:21:9;550:2;530:18;;;523:30;589:34;569:18;;;562:62;-1:-1:-1;;;640:18:9;;;633:33;683:19;;1054:71:8;;;;;;;;;1144:12;;-1:-1:-1;;;1144:12:8;;;;1143:13;1135:63;;;;-1:-1:-1;;;1135:63:8;;915:2:9;1135:63:8;;;897:21:9;954:2;934:18;;;927:30;993:34;973:18;;;966:62;-1:-1:-1;;;1044:18:9;;;1037:35;1089:19;;1135:63:8;713:401:9;1135:63:8;1209:8;:20;;-1:-1:-1;;;;;1209:20:8;;;-1:-1:-1;;;;;;1209:20:8;;;;;;;;;:8;1239:19;;-1:-1:-1;;;;1239:19:8;-1:-1:-1;;;1239:19:8;;;991:274::o;14:290:9:-;84:6;137:2;125:9;116:7;112:23;108:32;105:52;;;153:1;150;143:12;105:52;179:16;;-1:-1:-1;;;;;224:31:9;;214:42;;204:70;;270:1;267;260:12;204:70;293:5;14:290;-1:-1:-1;;;14:290:9:o;713:401::-;236:453:7;;;;;;",
+          "linkReferences": {}
+        },
+        "metadata": {
+          "compiler": {
+            "version": "0.8.17+commit.8df45f5f"
+          },
+          "language": "Solidity",
+          "output": {
+            "abi": [
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_resolver",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "name",
+                    "type": "bytes32",
+                    "indexed": false
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "destination",
+                    "type": "address",
+                    "indexed": false
+                  }
+                ],
+                "type": "event",
+                "name": "CacheUpdated",
+                "anonymous": false
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "__factory",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "configureInstance"
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "id",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ]
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_resolver",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "_id",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "initialize"
+              },
+              {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "rebuildCache"
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "resolver",
+                "outputs": [
+                  {
+                    "internalType": "contract AddressResolver",
+                    "name": "",
+                    "type": "address"
+                  }
+                ]
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "resolverAddressesRequired",
+                "outputs": [
+                  {
+                    "internalType": "bytes32[]",
+                    "name": "addresses",
+                    "type": "bytes32[]"
+                  }
+                ]
+              }
+            ],
+            "devdoc": {
+              "kind": "dev",
+              "methods": {
+                "configureInstance(address)": {
+                  "details": "Since this function is not access-controlled, it should be called      transactionally with contract instantiation. In cases where a      regular contract directly inherits from DepositFactoryAuthority,      that should happen in the constructor. In cases where the inheritor      is instead used via a clone factory, the same function that      creates a new clone should also trigger initialization."
+                }
+              },
+              "version": 1
+            },
+            "userdoc": {
+              "kind": "user",
+              "methods": {
+                "configureInstance(address)": {
+                  "notice": "Set the address of the System contract on contract         initialization."
+                }
+              },
+              "version": 1
+            }
+          },
+          "settings": {
+            "remappings": [
+              ":@vercel3/=lib/vercel3-contracts/src/",
+              ":ds-test/=lib/forge-std/lib/ds-test/src/",
+              ":forge-std/=lib/forge-std/src/",
+              ":vercel3-contracts/=lib/vercel3-contracts/src/"
+            ],
+            "optimizer": {
+              "enabled": true,
+              "runs": 200
+            },
+            "metadata": {
+              "bytecodeHash": "ipfs"
+            },
+            "compilationTarget": {
+              "src/TakeMarketShares.sol": "TakeMarketShares"
+            },
+            "libraries": {}
+          },
+          "sources": {
+            "lib/vercel3-contracts/src/AddressResolver.sol": {
+              "keccak256": "0xf984fb4672251986b790407039193448bcd4524d8975fd5dd72c23846e15bd14",
+              "urls": [
+                "bzz-raw://949987e882e7d34373a73cbde63d24ab911182d4a3d057c343bd0e5cfa5c1fff",
+                "dweb:/ipfs/QmSThxP5DRyGoGj2jxBtTzjGe4Gs6GXuoLdGU7sLvzKTs2"
+              ],
+              "license": "UNLICENSED"
+            },
+            "lib/vercel3-contracts/src/interfaces/IMixinResolver.sol": {
+              "keccak256": "0xb37456759ab775181d52e39e82bdbaa1a8d5e39344e1e61581f60247b5e66d28",
+              "urls": [
+                "bzz-raw://90272f503e0203eb7eda3765de82ddbf0d5b012ad13a6e0628dd034c8ecd533b",
+                "dweb:/ipfs/Qmf8v7ZSWNWr8JPV1Zq34mD4reR9YB3Qfh9ovyb52mkSwr"
+              ],
+              "license": "UNLICENSED"
+            },
+            "lib/vercel3-contracts/src/lib/MixinResolverStatic.sol": {
+              "keccak256": "0x0b1cf7ed1521785237857492941a2148b9c34183cd4a145e6a735a08d5d30474",
+              "urls": [
+                "bzz-raw://08b3562c85d29650e1a950180b4339d0f476b6702917bf6bba7ad209ed90fbbe",
+                "dweb:/ipfs/QmSX4LrpvTwFe6cMJgGtUfrTRMQXK5U6mN1KrtRxGuYLjQ"
+              ],
+              "license": "LGPL-3.0-only"
+            },
+            "lib/vercel3-contracts/src/lib/Owned.sol": {
+              "keccak256": "0x427ff25db39ee4972af83d3a283d2b024c83c9d5c1ed261bb4a536e8ab7ee193",
+              "urls": [
+                "bzz-raw://d7436473a802101c8c398df9776983c38690b90599d045c4d09804669aaac038",
+                "dweb:/ipfs/QmQPRKZ8FMAibCf3bMLXTPEqh1YsiUMGYf8bybJ7DhABGb"
+              ],
+              "license": "UNLICENSED"
+            },
+            "src/TakeMarketShares.sol": {
+              "keccak256": "0x0f6d46c7398cf7b9ff37a99ff9172e6681092ab433ac1ac90ec03d31a2cc04d3",
+              "urls": [
+                "bzz-raw://bd8216e31f5bb592a107e40e53a680174d9c3a1672cd48077c722670e097dd5f",
+                "dweb:/ipfs/QmNQNT3UK8hiH685PScreeeFWPf1xmHLD2h1rTphyiKztQ"
+              ],
+              "license": "LGPL-3.0-only"
+            },
+            "src/lib/TakeMarketSharesFactoryAuthority.sol": {
+              "keccak256": "0x593cd0535c08d970c5bc54df2b88128e05facf6419f9072e70c53407f7d364d1",
+              "urls": [
+                "bzz-raw://dcfb564c7a99428a5e536c4eb922c13129139c1c36e2b89439c3b6d67a97d478",
+                "dweb:/ipfs/QmWhXRKaUsHu3UQrymRPHxKM53NJAnNh6vq66cuM1gNYM2"
+              ],
+              "license": "LGPL-3.0-only"
+            }
+          },
+          "version": 1
+        }
+      },
+      "impl": {
+        "version": 1,
+        "address": "0x295129609d6876f5ECC62052Ba6bc082139A982c",
+        "abi": [
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_resolver",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "name",
+                "type": "bytes32"
+              },
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "destination",
+                "type": "address"
+              }
+            ],
+            "name": "CacheUpdated",
+            "type": "event"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "__factory",
+                "type": "address"
+              }
+            ],
+            "name": "configureInstance",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "id",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_resolver",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "_id",
+                "type": "uint256"
+              }
+            ],
+            "name": "initialize",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "rebuildCache",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "resolver",
+            "outputs": [
+              {
+                "internalType": "contract AddressResolver",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "resolverAddressesRequired",
+            "outputs": [
+              {
+                "internalType": "bytes32[]",
+                "name": "addresses",
+                "type": "bytes32[]"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          }
+        ],
+        "bytecode": {
+          "object": "0x60806040526000805460ff60a01b1916905534801561001d57600080fd5b5060405161056438038061056483398101604081905261003c9161016c565b600080546001600160a01b0319166001600160a01b0383161790556100616001610067565b5061019c565b6001600160a01b0381166100ce5760405162461bcd60e51b815260206004820152602360248201527f466163746f72792063616e6e6f7420626520746865207a65726f20616464726560448201526239b99760e91b60648201526084015b60405180910390fd5b600054600160a01b900460ff16156101365760405162461bcd60e51b815260206004820152602560248201527f466163746f72792063616e206f6e6c7920626520696e697469616c697a65642060448201526437b731b29760d91b60648201526084016100c5565b600180546001600160a01b039092166001600160a01b03199092169190911790556000805460ff60a01b1916600160a01b179055565b60006020828403121561017e57600080fd5b81516001600160a01b038116811461019557600080fd5b9392505050565b6103b9806101ab6000396000f3fe608060405234801561001057600080fd5b50600436106100625760003560e01c806304f3bcec146100675780637418536014610097578063766019b714610099578063899ffef4146100ac578063af640d0f146100bb578063cd6dc687146100d2575b600080fd5b60005461007a906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b005b6100976100a73660046102f3565b6100e5565b606060405161008e9190610315565b6100c460025481565b60405190815260200161008e565b6100976100e0366004610359565b6101ea565b6001600160a01b03811661014c5760405162461bcd60e51b815260206004820152602360248201527f466163746f72792063616e6e6f7420626520746865207a65726f20616464726560448201526239b99760e91b60648201526084015b60405180910390fd5b600054600160a01b900460ff16156101b45760405162461bcd60e51b815260206004820152602560248201527f466163746f72792063616e206f6e6c7920626520696e697469616c697a65642060448201526437b731b29760d91b6064820152608401610143565b600180546001600160a01b039092166001600160a01b03199092169190911790556000805460ff60a01b1916600160a01b179055565b600054600160a01b900460ff166102595760405162461bcd60e51b815260206004820152602d60248201527f466163746f727920696e697469616c697a6174696f6e206d757374206861766560448201526c103132b2b71031b0b63632b21760991b6064820152608401610143565b6001546001600160a01b031633146102b35760405162461bcd60e51b815260206004820152601f60248201527f43616c6c6572206d75737420626520666163746f727920636f6e7472616374006044820152606401610143565b6002819055600080546001600160a01b0319166001600160a01b0384161790555050565b80356001600160a01b03811681146102ee57600080fd5b919050565b60006020828403121561030557600080fd5b61030e826102d7565b9392505050565b6020808252825182820181905260009190848201906040850190845b8181101561034d57835183529284019291840191600101610331565b50909695505050505050565b6000806040838503121561036c57600080fd5b610375836102d7565b94602093909301359350505056fea264697066735822122005e2b69eb2020a177ead412065214cade23aa3fd688579ecf079184b204c6f5964736f6c63430008110033",
+          "sourceMap": "236:453:7:-:0;;;394:5:8;365:34;;-1:-1:-1;;;;365:34:8;;;358:153:7;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;472:8:4;:37;;-1:-1:-1;;;;;;472:37:4;-1:-1:-1;;;;;472:37:4;;;;;475:29:7::1;-1:-1:-1::0;475:17:7::1;:29::i;:::-;358:153:::0;236:453;;991:274:8;-1:-1:-1;;;;;1062:23:8;;1054:71;;;;-1:-1:-1;;;1054:71:8;;511:2:9;1054:71:8;;;493:21:9;550:2;530:18;;;523:30;589:34;569:18;;;562:62;-1:-1:-1;;;640:18:9;;;633:33;683:19;;1054:71:8;;;;;;;;;1144:12;;-1:-1:-1;;;1144:12:8;;;;1143:13;1135:63;;;;-1:-1:-1;;;1135:63:8;;915:2:9;1135:63:8;;;897:21:9;954:2;934:18;;;927:30;993:34;973:18;;;966:62;-1:-1:-1;;;1044:18:9;;;1037:35;1089:19;;1135:63:8;713:401:9;1135:63:8;1209:8;:20;;-1:-1:-1;;;;;1209:20:8;;;-1:-1:-1;;;;;;1209:20:8;;;;;;;;;:8;1239:19;;-1:-1:-1;;;;1239:19:8;-1:-1:-1;;;1239:19:8;;;991:274::o;14:290:9:-;84:6;137:2;125:9;116:7;112:23;108:32;105:52;;;153:1;150;143:12;105:52;179:16;;-1:-1:-1;;;;;224:31:9;;214:42;;204:70;;270:1;267;260:12;204:70;293:5;14:290;-1:-1:-1;;;14:290:9:o;713:401::-;236:453:7;;;;;;",
+          "linkReferences": {}
+        },
+        "metadata": {
+          "compiler": {
+            "version": "0.8.17+commit.8df45f5f"
+          },
+          "language": "Solidity",
+          "output": {
+            "abi": [
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_resolver",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "name",
+                    "type": "bytes32",
+                    "indexed": false
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "destination",
+                    "type": "address",
+                    "indexed": false
+                  }
+                ],
+                "type": "event",
+                "name": "CacheUpdated",
+                "anonymous": false
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "__factory",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "configureInstance"
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "id",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ]
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_resolver",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "_id",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "initialize"
+              },
+              {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "rebuildCache"
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "resolver",
+                "outputs": [
+                  {
+                    "internalType": "contract AddressResolver",
+                    "name": "",
+                    "type": "address"
+                  }
+                ]
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "resolverAddressesRequired",
+                "outputs": [
+                  {
+                    "internalType": "bytes32[]",
+                    "name": "addresses",
+                    "type": "bytes32[]"
+                  }
+                ]
+              }
+            ],
+            "devdoc": {
+              "kind": "dev",
+              "methods": {
+                "configureInstance(address)": {
+                  "details": "Since this function is not access-controlled, it should be called      transactionally with contract instantiation. In cases where a      regular contract directly inherits from DepositFactoryAuthority,      that should happen in the constructor. In cases where the inheritor      is instead used via a clone factory, the same function that      creates a new clone should also trigger initialization."
+                }
+              },
+              "version": 1
+            },
+            "userdoc": {
+              "kind": "user",
+              "methods": {
+                "configureInstance(address)": {
+                  "notice": "Set the address of the System contract on contract         initialization."
+                }
+              },
+              "version": 1
+            }
+          },
+          "settings": {
+            "remappings": [
+              ":@vercel3/=lib/vercel3-contracts/src/",
+              ":ds-test/=lib/forge-std/lib/ds-test/src/",
+              ":forge-std/=lib/forge-std/src/",
+              ":vercel3-contracts/=lib/vercel3-contracts/src/"
+            ],
+            "optimizer": {
+              "enabled": true,
+              "runs": 200
+            },
+            "metadata": {
+              "bytecodeHash": "ipfs"
+            },
+            "compilationTarget": {
+              "src/TakeMarketShares.sol": "TakeMarketShares"
+            },
+            "libraries": {}
+          },
+          "sources": {
+            "lib/vercel3-contracts/src/AddressResolver.sol": {
+              "keccak256": "0xf984fb4672251986b790407039193448bcd4524d8975fd5dd72c23846e15bd14",
+              "urls": [
+                "bzz-raw://949987e882e7d34373a73cbde63d24ab911182d4a3d057c343bd0e5cfa5c1fff",
+                "dweb:/ipfs/QmSThxP5DRyGoGj2jxBtTzjGe4Gs6GXuoLdGU7sLvzKTs2"
+              ],
+              "license": "UNLICENSED"
+            },
+            "lib/vercel3-contracts/src/interfaces/IMixinResolver.sol": {
+              "keccak256": "0xb37456759ab775181d52e39e82bdbaa1a8d5e39344e1e61581f60247b5e66d28",
+              "urls": [
+                "bzz-raw://90272f503e0203eb7eda3765de82ddbf0d5b012ad13a6e0628dd034c8ecd533b",
+                "dweb:/ipfs/Qmf8v7ZSWNWr8JPV1Zq34mD4reR9YB3Qfh9ovyb52mkSwr"
+              ],
+              "license": "UNLICENSED"
+            },
+            "lib/vercel3-contracts/src/lib/MixinResolverStatic.sol": {
+              "keccak256": "0x0b1cf7ed1521785237857492941a2148b9c34183cd4a145e6a735a08d5d30474",
+              "urls": [
+                "bzz-raw://08b3562c85d29650e1a950180b4339d0f476b6702917bf6bba7ad209ed90fbbe",
+                "dweb:/ipfs/QmSX4LrpvTwFe6cMJgGtUfrTRMQXK5U6mN1KrtRxGuYLjQ"
+              ],
+              "license": "LGPL-3.0-only"
+            },
+            "lib/vercel3-contracts/src/lib/Owned.sol": {
+              "keccak256": "0x427ff25db39ee4972af83d3a283d2b024c83c9d5c1ed261bb4a536e8ab7ee193",
+              "urls": [
+                "bzz-raw://d7436473a802101c8c398df9776983c38690b90599d045c4d09804669aaac038",
+                "dweb:/ipfs/QmQPRKZ8FMAibCf3bMLXTPEqh1YsiUMGYf8bybJ7DhABGb"
+              ],
+              "license": "UNLICENSED"
+            },
+            "src/TakeMarketShares.sol": {
+              "keccak256": "0x0f6d46c7398cf7b9ff37a99ff9172e6681092ab433ac1ac90ec03d31a2cc04d3",
+              "urls": [
+                "bzz-raw://bd8216e31f5bb592a107e40e53a680174d9c3a1672cd48077c722670e097dd5f",
+                "dweb:/ipfs/QmNQNT3UK8hiH685PScreeeFWPf1xmHLD2h1rTphyiKztQ"
+              ],
+              "license": "LGPL-3.0-only"
+            },
+            "src/lib/TakeMarketSharesFactoryAuthority.sol": {
+              "keccak256": "0x593cd0535c08d970c5bc54df2b88128e05facf6419f9072e70c53407f7d364d1",
+              "urls": [
+                "bzz-raw://dcfb564c7a99428a5e536c4eb922c13129139c1c36e2b89439c3b6d67a97d478",
+                "dweb:/ipfs/QmWhXRKaUsHu3UQrymRPHxKM53NJAnNh6vq66cuM1gNYM2"
+              ],
+              "license": "LGPL-3.0-only"
+            }
+          },
+          "version": 1
+        }
+      },
+      "deployTx": {
+        "type": 2,
+        "chainId": 31337,
+        "nonce": 828,
+        "maxPriorityFeePerGas": {
+          "type": "BigNumber",
+          "hex": "0x59682f00"
+        },
+        "maxFeePerGas": {
+          "type": "BigNumber",
+          "hex": "0x59682f00"
+        },
+        "gasPrice": null,
+        "gasLimit": {
+          "type": "BigNumber",
+          "hex": "0x0519ff"
+        },
+        "to": null,
+        "value": {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        "data": "0x60806040526000805460ff60a01b1916905534801561001d57600080fd5b5060405161056438038061056483398101604081905261003c9161016c565b600080546001600160a01b0319166001600160a01b0383161790556100616001610067565b5061019c565b6001600160a01b0381166100ce5760405162461bcd60e51b815260206004820152602360248201527f466163746f72792063616e6e6f7420626520746865207a65726f20616464726560448201526239b99760e91b60648201526084015b60405180910390fd5b600054600160a01b900460ff16156101365760405162461bcd60e51b815260206004820152602560248201527f466163746f72792063616e206f6e6c7920626520696e697469616c697a65642060448201526437b731b29760d91b60648201526084016100c5565b600180546001600160a01b039092166001600160a01b03199092169190911790556000805460ff60a01b1916600160a01b179055565b60006020828403121561017e57600080fd5b81516001600160a01b038116811461019557600080fd5b9392505050565b6103b9806101ab6000396000f3fe608060405234801561001057600080fd5b50600436106100625760003560e01c806304f3bcec146100675780637418536014610097578063766019b714610099578063899ffef4146100ac578063af640d0f146100bb578063cd6dc687146100d2575b600080fd5b60005461007a906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b005b6100976100a73660046102f3565b6100e5565b606060405161008e9190610315565b6100c460025481565b60405190815260200161008e565b6100976100e0366004610359565b6101ea565b6001600160a01b03811661014c5760405162461bcd60e51b815260206004820152602360248201527f466163746f72792063616e6e6f7420626520746865207a65726f20616464726560448201526239b99760e91b60648201526084015b60405180910390fd5b600054600160a01b900460ff16156101b45760405162461bcd60e51b815260206004820152602560248201527f466163746f72792063616e206f6e6c7920626520696e697469616c697a65642060448201526437b731b29760d91b6064820152608401610143565b600180546001600160a01b039092166001600160a01b03199092169190911790556000805460ff60a01b1916600160a01b179055565b600054600160a01b900460ff166102595760405162461bcd60e51b815260206004820152602d60248201527f466163746f727920696e697469616c697a6174696f6e206d757374206861766560448201526c103132b2b71031b0b63632b21760991b6064820152608401610143565b6001546001600160a01b031633146102b35760405162461bcd60e51b815260206004820152601f60248201527f43616c6c6572206d75737420626520666163746f727920636f6e7472616374006044820152606401610143565b6002819055600080546001600160a01b0319166001600160a01b0384161790555050565b80356001600160a01b03811681146102ee57600080fd5b919050565b60006020828403121561030557600080fd5b61030e826102d7565b9392505050565b6020808252825182820181905260009190848201906040850190845b8181101561034d57835183529284019291840191600101610331565b50909695505050505050565b6000806040838503121561036c57600080fd5b610375836102d7565b94602093909301359350505056fea264697066735822122005e2b69eb2020a177ead412065214cade23aa3fd688579ecf079184b204c6f5964736f6c6343000811003300000000000000000000000003f7f064e6ced8e154e3fdaaf92dccc4e818e97b",
+        "accessList": [],
+        "hash": "0xe73565d63a4ee738652f9d3f149f06c8baa042959b20e626e5c9b167348e9df9",
+        "v": 0,
+        "r": "0x814f3e42a2f8f44fbd43a88b8463d43b82c2eb03441e0d2672a0d558d1d507c7",
+        "s": "0x74e2ab787cc31082a91188a6c9aaa7bda60c96c88370b9180368fa13e803e774",
+        "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        "confirmations": 0,
+        "blockNumber": 829
+      },
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_resolver",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "name",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "destination",
+              "type": "address"
+            }
+          ],
+          "name": "CacheUpdated",
+          "type": "event"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "__factory",
+              "type": "address"
+            }
+          ],
+          "name": "configureInstance",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "id",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_resolver",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_id",
+              "type": "uint256"
+            }
+          ],
+          "name": "initialize",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "rebuildCache",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "resolver",
+          "outputs": [
+            {
+              "internalType": "contract AddressResolver",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "resolverAddressesRequired",
+          "outputs": [
+            {
+              "internalType": "bytes32[]",
+              "name": "addresses",
+              "type": "bytes32[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ]
+    },
+    {
+      "name": "AddressResolver",
+      "proxy": null,
+      "impl": {
+        "version": 1,
+        "address": "0x03F7F064E6ceD8e154e3FdAAF92DcCC4e818E97B",
+        "abi": [
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_owner",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "name",
+                "type": "bytes32"
+              },
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "destination",
+                "type": "address"
+              }
+            ],
+            "name": "AddressImported",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "oldOwner",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+              }
+            ],
+            "name": "OwnerChanged",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+              }
+            ],
+            "name": "OwnerNominated",
+            "type": "event"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32[]",
+                "name": "names",
+                "type": "bytes32[]"
+              },
+              {
+                "internalType": "address[]",
+                "name": "destinations",
+                "type": "address[]"
+              }
+            ],
+            "name": "areAddressesImported",
+            "outputs": [
+              {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "name",
+                "type": "bytes32"
+              }
+            ],
+            "name": "getAddress",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32[]",
+                "name": "names",
+                "type": "bytes32[]"
+              },
+              {
+                "internalType": "address[]",
+                "name": "destinations",
+                "type": "address[]"
+              }
+            ],
+            "name": "importAddresses",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "owner",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "contract IMixinResolver[]",
+                "name": "destinations",
+                "type": "address[]"
+              }
+            ],
+            "name": "rebuildCaches",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+              }
+            ],
+            "name": "repository",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "name",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "string",
+                "name": "reason",
+                "type": "string"
+              }
+            ],
+            "name": "requireAndGetAddress",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          }
+        ],
+        "bytecode": "0x608060405234801561001057600080fd5b5060405161081c38038061081c83398101604081905261002f916100e8565b806001600160a01b03811661008a5760405162461bcd60e51b815260206004820152601960248201527f4f776e657220616464726573732063616e6e6f74206265203000000000000000604482015260640160405180910390fd5b600080546001600160a01b0319166001600160a01b03831690811782556040805192835260208301919091527fb532073b38c83145e3e5135377a08bf9aab55bc0fd7c1179cd4fb995d2a5159c910160405180910390a15050610118565b6000602082840312156100fa57600080fd5b81516001600160a01b038116811461011157600080fd5b9392505050565b6106f5806101276000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80638da5cb5b1161005b5780638da5cb5b146101065780639f42102f14610119578063ab0b8f771461013c578063dacb2d011461014f57600080fd5b8063187f79351461008257806321f8a721146100c8578063766f7815146100f1575b600080fd5b6100ab610090366004610488565b6001602052600090815260409020546001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6100ab6100d6366004610488565b6000908152600160205260409020546001600160a01b031690565b6101046100ff3660046104ed565b610162565b005b6000546100ab906001600160a01b031681565b61012c61012736600461052f565b6101fe565b60405190151581526020016100bf565b61010461014a36600461052f565b6102a2565b6100ab61015d36600461059b565b6103d0565b60005b818110156101f95782828281811061017f5761017f610617565b90506020020160208101906101949190610645565b6001600160a01b031663741853606040518163ffffffff1660e01b8152600401600060405180830381600087803b1580156101ce57600080fd5b505af11580156101e2573d6000803e3d6000fd5b5050505080806101f190610669565b915050610165565b505050565b6000805b848110156102945783838281811061021c5761021c610617565b90506020020160208101906102319190610645565b6001600160a01b03166001600088888581811061025057610250610617565b60209081029290920135835250810191909152604001600020546001600160a01b03161461028257600091505061029a565b8061028c81610669565b915050610202565b50600190505b949350505050565b6102aa610414565b8281146102fe5760405162461bcd60e51b815260206004820152601860248201527f496e707574206c656e67746873206d757374206d61746368000000000000000060448201526064015b60405180910390fd5b60005b838110156103c957600085858381811061031d5761031d610617565b905060200201359050600084848481811061033a5761033a610617565b905060200201602081019061034f9190610645565b60008381526001602090815260409182902080546001600160a01b0319166001600160a01b0385169081179091558251868152918201529192507fefe884cc7f82a6cf3cf68f64221519dcf96b5cae9048e1bb008ee32cd05aaa91910160405180910390a1505080806103c190610669565b915050610301565b5050505050565b6000838152600160205260408120546001600160a01b03168383826104095760405162461bcd60e51b81526004016102f5929190610690565b509095945050505050565b6000546001600160a01b031633146104865760405162461bcd60e51b815260206004820152602f60248201527f4f6e6c792074686520636f6e7472616374206f776e6572206d6179207065726660448201526e37b936903a3434b99030b1ba34b7b760891b60648201526084016102f5565b565b60006020828403121561049a57600080fd5b5035919050565b60008083601f8401126104b357600080fd5b50813567ffffffffffffffff8111156104cb57600080fd5b6020830191508360208260051b85010111156104e657600080fd5b9250929050565b6000806020838503121561050057600080fd5b823567ffffffffffffffff81111561051757600080fd5b610523858286016104a1565b90969095509350505050565b6000806000806040858703121561054557600080fd5b843567ffffffffffffffff8082111561055d57600080fd5b610569888389016104a1565b9096509450602087013591508082111561058257600080fd5b5061058f878288016104a1565b95989497509550505050565b6000806000604084860312156105b057600080fd5b83359250602084013567ffffffffffffffff808211156105cf57600080fd5b818601915086601f8301126105e357600080fd5b8135818111156105f257600080fd5b87602082850101111561060457600080fd5b6020830194508093505050509250925092565b634e487b7160e01b600052603260045260246000fd5b6001600160a01b038116811461064257600080fd5b50565b60006020828403121561065757600080fd5b81356106628161062d565b9392505050565b60006001820161068957634e487b7160e01b600052601160045260246000fd5b5060010190565b60208152816020820152818360408301376000818301604090810191909152601f909201601f1916010191905056fea2646970667358221220996d090da4e51794f8bfd5a41dc2df9a884a540d2c3da6e4ce6019bf7d57f05f64736f6c63430008110033",
+        "metadata": {
+          "compiler": {
+            "version": "0.8.17+commit.8df45f5f"
+          },
+          "language": "Solidity",
+          "output": {
+            "abi": [
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_owner",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "name",
+                    "type": "bytes32",
+                    "indexed": false
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "destination",
+                    "type": "address",
+                    "indexed": false
+                  }
+                ],
+                "type": "event",
+                "name": "AddressImported",
+                "anonymous": false
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "oldOwner",
+                    "type": "address",
+                    "indexed": false
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "newOwner",
+                    "type": "address",
+                    "indexed": false
+                  }
+                ],
+                "type": "event",
+                "name": "OwnerChanged",
+                "anonymous": false
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "newOwner",
+                    "type": "address",
+                    "indexed": false
+                  }
+                ],
+                "type": "event",
+                "name": "OwnerNominated",
+                "anonymous": false
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32[]",
+                    "name": "names",
+                    "type": "bytes32[]"
+                  },
+                  {
+                    "internalType": "address[]",
+                    "name": "destinations",
+                    "type": "address[]"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "areAddressesImported",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ]
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "name",
+                    "type": "bytes32"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "getAddress",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ]
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32[]",
+                    "name": "names",
+                    "type": "bytes32[]"
+                  },
+                  {
+                    "internalType": "address[]",
+                    "name": "destinations",
+                    "type": "address[]"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "importAddresses"
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "owner",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ]
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "contract IMixinResolver[]",
+                    "name": "destinations",
+                    "type": "address[]"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "rebuildCaches"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "repository",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ]
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "name",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "reason",
+                    "type": "string"
+                  }
+                ],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "requireAndGetAddress",
+                "outputs": [
+                  {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                  }
+                ]
+              }
+            ],
+            "devdoc": {
+              "kind": "dev",
+              "methods": {},
+              "version": 1
+            },
+            "userdoc": {
+              "kind": "user",
+              "methods": {},
+              "version": 1
+            }
+          },
+          "settings": {
+            "remappings": [
+              ":ds-test/=lib/forge-std/lib/ds-test/src/",
+              ":forge-std/=lib/forge-std/src/"
+            ],
+            "optimizer": {
+              "enabled": true,
+              "runs": 200
+            },
+            "metadata": {
+              "bytecodeHash": "ipfs"
+            },
+            "compilationTarget": {
+              "src/AddressResolver.sol": "AddressResolver"
+            },
+            "libraries": {}
+          },
+          "sources": {
+            "src/AddressResolver.sol": {
+              "keccak256": "0xf984fb4672251986b790407039193448bcd4524d8975fd5dd72c23846e15bd14",
+              "urls": [
+                "bzz-raw://949987e882e7d34373a73cbde63d24ab911182d4a3d057c343bd0e5cfa5c1fff",
+                "dweb:/ipfs/QmSThxP5DRyGoGj2jxBtTzjGe4Gs6GXuoLdGU7sLvzKTs2"
+              ],
+              "license": "UNLICENSED"
+            },
+            "src/interfaces/IMixinResolver.sol": {
+              "keccak256": "0xb37456759ab775181d52e39e82bdbaa1a8d5e39344e1e61581f60247b5e66d28",
+              "urls": [
+                "bzz-raw://90272f503e0203eb7eda3765de82ddbf0d5b012ad13a6e0628dd034c8ecd533b",
+                "dweb:/ipfs/Qmf8v7ZSWNWr8JPV1Zq34mD4reR9YB3Qfh9ovyb52mkSwr"
+              ],
+              "license": "UNLICENSED"
+            },
+            "src/lib/Owned.sol": {
+              "keccak256": "0x427ff25db39ee4972af83d3a283d2b024c83c9d5c1ed261bb4a536e8ab7ee193",
+              "urls": [
+                "bzz-raw://d7436473a802101c8c398df9776983c38690b90599d045c4d09804669aaac038",
+                "dweb:/ipfs/QmQPRKZ8FMAibCf3bMLXTPEqh1YsiUMGYf8bybJ7DhABGb"
+              ],
+              "license": "UNLICENSED"
+            }
+          },
+          "version": 1
+        }
+      },
+      "deployTx": {
+        "type": 2,
+        "chainId": 31337,
+        "nonce": 823,
+        "maxPriorityFeePerGas": {
+          "type": "BigNumber",
+          "hex": "0x59682f00"
+        },
+        "maxFeePerGas": {
+          "type": "BigNumber",
+          "hex": "0x59682f00"
+        },
+        "gasPrice": null,
+        "gasLimit": {
+          "type": "BigNumber",
+          "hex": "0x0789d1"
+        },
+        "to": null,
+        "value": {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        "data": "0x608060405234801561001057600080fd5b5060405161081c38038061081c83398101604081905261002f916100e8565b806001600160a01b03811661008a5760405162461bcd60e51b815260206004820152601960248201527f4f776e657220616464726573732063616e6e6f74206265203000000000000000604482015260640160405180910390fd5b600080546001600160a01b0319166001600160a01b03831690811782556040805192835260208301919091527fb532073b38c83145e3e5135377a08bf9aab55bc0fd7c1179cd4fb995d2a5159c910160405180910390a15050610118565b6000602082840312156100fa57600080fd5b81516001600160a01b038116811461011157600080fd5b9392505050565b6106f5806101276000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80638da5cb5b1161005b5780638da5cb5b146101065780639f42102f14610119578063ab0b8f771461013c578063dacb2d011461014f57600080fd5b8063187f79351461008257806321f8a721146100c8578063766f7815146100f1575b600080fd5b6100ab610090366004610488565b6001602052600090815260409020546001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6100ab6100d6366004610488565b6000908152600160205260409020546001600160a01b031690565b6101046100ff3660046104ed565b610162565b005b6000546100ab906001600160a01b031681565b61012c61012736600461052f565b6101fe565b60405190151581526020016100bf565b61010461014a36600461052f565b6102a2565b6100ab61015d36600461059b565b6103d0565b60005b818110156101f95782828281811061017f5761017f610617565b90506020020160208101906101949190610645565b6001600160a01b031663741853606040518163ffffffff1660e01b8152600401600060405180830381600087803b1580156101ce57600080fd5b505af11580156101e2573d6000803e3d6000fd5b5050505080806101f190610669565b915050610165565b505050565b6000805b848110156102945783838281811061021c5761021c610617565b90506020020160208101906102319190610645565b6001600160a01b03166001600088888581811061025057610250610617565b60209081029290920135835250810191909152604001600020546001600160a01b03161461028257600091505061029a565b8061028c81610669565b915050610202565b50600190505b949350505050565b6102aa610414565b8281146102fe5760405162461bcd60e51b815260206004820152601860248201527f496e707574206c656e67746873206d757374206d61746368000000000000000060448201526064015b60405180910390fd5b60005b838110156103c957600085858381811061031d5761031d610617565b905060200201359050600084848481811061033a5761033a610617565b905060200201602081019061034f9190610645565b60008381526001602090815260409182902080546001600160a01b0319166001600160a01b0385169081179091558251868152918201529192507fefe884cc7f82a6cf3cf68f64221519dcf96b5cae9048e1bb008ee32cd05aaa91910160405180910390a1505080806103c190610669565b915050610301565b5050505050565b6000838152600160205260408120546001600160a01b03168383826104095760405162461bcd60e51b81526004016102f5929190610690565b509095945050505050565b6000546001600160a01b031633146104865760405162461bcd60e51b815260206004820152602f60248201527f4f6e6c792074686520636f6e7472616374206f776e6572206d6179207065726660448201526e37b936903a3434b99030b1ba34b7b760891b60648201526084016102f5565b565b60006020828403121561049a57600080fd5b5035919050565b60008083601f8401126104b357600080fd5b50813567ffffffffffffffff8111156104cb57600080fd5b6020830191508360208260051b85010111156104e657600080fd5b9250929050565b6000806020838503121561050057600080fd5b823567ffffffffffffffff81111561051757600080fd5b610523858286016104a1565b90969095509350505050565b6000806000806040858703121561054557600080fd5b843567ffffffffffffffff8082111561055d57600080fd5b610569888389016104a1565b9096509450602087013591508082111561058257600080fd5b5061058f878288016104a1565b95989497509550505050565b6000806000604084860312156105b057600080fd5b83359250602084013567ffffffffffffffff808211156105cf57600080fd5b818601915086601f8301126105e357600080fd5b8135818111156105f257600080fd5b87602082850101111561060457600080fd5b6020830194508093505050509250925092565b634e487b7160e01b600052603260045260246000fd5b6001600160a01b038116811461064257600080fd5b50565b60006020828403121561065757600080fd5b81356106628161062d565b9392505050565b60006001820161068957634e487b7160e01b600052601160045260246000fd5b5060010190565b60208152816020820152818360408301376000818301604090810191909152601f909201601f1916010191905056fea2646970667358221220996d090da4e51794f8bfd5a41dc2df9a884a540d2c3da6e4ce6019bf7d57f05f64736f6c63430008110033000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "accessList": [],
+        "hash": "0x1c35e4a726fd8b9e254c387c3fd62edafa9b18577090ab706311672beecd2114",
+        "v": 0,
+        "r": "0x38f3ff0333bcf84539a5cb44a3d4606fe7390ba8af3a0bd5530ae4399331737b",
+        "s": "0x10a60a590ed715bcd508cb06be09bb5250eb7207c215528301bc6b78d1d31f49",
+        "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        "confirmations": 0,
+        "blockNumber": 824
+      },
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_owner",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "name",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "destination",
+              "type": "address"
+            }
+          ],
+          "name": "AddressImported",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "oldOwner",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnerChanged",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnerNominated",
+          "type": "event"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32[]",
+              "name": "names",
+              "type": "bytes32[]"
+            },
+            {
+              "internalType": "address[]",
+              "name": "destinations",
+              "type": "address[]"
+            }
+          ],
+          "name": "areAddressesImported",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "name",
+              "type": "bytes32"
+            }
+          ],
+          "name": "getAddress",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32[]",
+              "name": "names",
+              "type": "bytes32[]"
+            },
+            {
+              "internalType": "address[]",
+              "name": "destinations",
+              "type": "address[]"
+            }
+          ],
+          "name": "importAddresses",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "contract IMixinResolver[]",
+              "name": "destinations",
+              "type": "address[]"
+            }
+          ],
+          "name": "rebuildCaches",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "name": "repository",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "name",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "string",
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "requireAndGetAddress",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ]
+    },
+    {
+      "name": "TakeMarket",
+      "proxy": {
+        "version": 1,
+        "address": "0x4BEA9aAe24187d6128403DC556510A18d727871a",
+        "abi": [
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_resolver",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "previousAdmin",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "newAdmin",
+                "type": "address"
+              }
+            ],
+            "name": "AdminChanged",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "name",
+                "type": "bytes32"
+              },
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "destination",
+                "type": "address"
+              }
+            ],
+            "name": "CacheUpdated",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": true,
+                "internalType": "address",
+                "name": "implementation",
+                "type": "address"
+              }
+            ],
+            "name": "Upgraded",
+            "type": "event"
+          },
+          {
+            "stateMutability": "payable",
+            "type": "fallback"
+          },
+          {
+            "inputs": [],
+            "name": "implementation",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "isResolverCached",
+            "outputs": [
+              {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "proxyAdmin",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "rebuildCache",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "resolver",
+            "outputs": [
+              {
+                "internalType": "contract AddressResolver",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "resolverAddressesRequired",
+            "outputs": [
+              {
+                "internalType": "bytes32[]",
+                "name": "addresses",
+                "type": "bytes32[]"
+              }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_admin",
+                "type": "address"
+              }
+            ],
+            "name": "setProxyAdmin",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_implementation",
+                "type": "address"
+              }
+            ],
+            "name": "upgrade",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "stateMutability": "payable",
+            "type": "receive"
+          }
+        ],
+        "bytecode": {
+          "object": "0x60806040526002805534801561001457600080fd5b5060405161091738038061091783398101604081905261003391610058565b600080546001600160a01b0319166001600160a01b0392909216919091179055610088565b60006020828403121561006a57600080fd5b81516001600160a01b038116811461008157600080fd5b9392505050565b610880806100976000396000f3fe608060405234801561001057600080fd5b50600436106100625760003560e01c806304f3bcec146100675780630dbe671f146100975780632af64bd3146100ae57806374185360146100c6578063899ffef4146100d0578063ea06b665146100e5575b600080fd5b60005461007a906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6100a060025481565b60405190815260200161008e565b6100b66100f8565b604051901515815260200161008e565b6100ce610207565b005b6100d861038b565b60405161008e919061070d565b61007a6100f3366004610751565b610414565b60008061010361038b565b905060005b81518110156101fe5760008282815181106101255761012561076a565b60209081029190910181015160008181526001909252604080832054925490516321f8a72160e01b8152600481018390529193506001600160a01b039283169216906321f8a72190602401602060405180830381865afa15801561018d573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906101b19190610780565b6001600160a01b03161415806101dc57506000818152600160205260409020546001600160a01b0316155b156101eb576000935050505090565b50806101f6816107a9565b915050610108565b50600191505090565b600061021161038b565b905060005b81518110156103875760008282815181106102335761023361076a565b6020026020010151905060008060009054906101000a90046001600160a01b03166001600160a01b031663dacb2d0183846040516020016102a091907f5265736f6c766572206d697373696e67207461726765743a20000000000000008152601981019190915260390190565b6040516020818303038152906040526040518363ffffffff1660e01b81526004016102cc929190610816565b602060405180830381865afa1580156102e9573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061030d9190610780565b60008381526001602090815260409182902080546001600160a01b0319166001600160a01b0385169081179091558251868152918201529192507f88a93678a3692f6789d9546fc621bf7234b101ddb7d4fe479455112831b8aa68910160405180910390a15050808061037f906107a9565b915050610216565b5050565b604080516002808252606080830184529260009291906020830190803683370190505090506f54616b654d61726b657453686172657360801b816000815181106103d7576103d761076a565b6020026020010181815250506915185ad953585c9ad95d60b21b816001815181106104045761040461076a565b6020908102919091010152919050565b6000808260405160200161042a91815260200190565b60405160208183030381529060405280519060200120905060006104ab61044f6105b2565b6040513060388201526f5af43d82803e903d91602b57fd5bf3ff60248201526014810191909152733d602d80600a3d3981f3363d3d373d3d3d363d738152605881018490526037600c8201206078820152605560439091012090565b9050806001600160a01b03163b6000036105ab576104d06104ca6105b2565b836105d5565b9050806001600160a01b03811663766019b76104ea61067d565b6040516001600160e01b031960e084901b1681526001600160a01b039091166004820152602401600060405180830381600087803b15801561052b57600080fd5b505af115801561053f573d6000803e3d6000fd5b505060005460405163cd6dc68760e01b81526001600160a01b03918216600482015260248101899052908416925063cd6dc6879150604401600060405180830381600087803b15801561059157600080fd5b505af11580156105a5573d6000803e3d6000fd5b50505050505b9392505050565b60006105d06f54616b654d61726b657453686172657360801b610691565b905090565b6000763d602d80600a3d3981f3363d3d373d3d3d363d730000008360601b60e81c176000526e5af43d82803e903d91602b57fd5bf38360781b1760205281603760096000f590506001600160a01b0381166106775760405162461bcd60e51b815260206004820152601760248201527f455243313136373a2063726561746532206661696c656400000000000000000060448201526064015b60405180910390fd5b92915050565b60006105d06915185ad953585c9ad95d60b21b5b600081815260016020908152604080832054905170026b4b9b9b4b7339030b2323932b9b99d1607d1b92810192909252603182018490526001600160a01b03169081151590605101604051602081830303815290604052906107065760405162461bcd60e51b815260040161066e9190610837565b5092915050565b6020808252825182820181905260009190848201906040850190845b8181101561074557835183529284019291840191600101610729565b50909695505050505050565b60006020828403121561076357600080fd5b5035919050565b634e487b7160e01b600052603260045260246000fd5b60006020828403121561079257600080fd5b81516001600160a01b03811681146105ab57600080fd5b6000600182016107c957634e487b7160e01b600052601160045260246000fd5b5060010190565b6000815180845260005b818110156107f6576020818501810151868301820152016107da565b506000602082860101526020601f19601f83011685010191505092915050565b82815260406020820152600061082f60408301846107d0565b949350505050565b6020815260006105ab60208301846107d056fea264697066735822122029569b3006b2ae9e4c111ec551c0f105c1f8f5688bf4fcc15c49fe4068dbc5b964736f6c63430008110033",
+          "sourceMap": "177:1454:23:-:0;;;242:1;226:17;;250:63;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;454:8:20;:37;;-1:-1:-1;;;;;;454:37:20;-1:-1:-1;;;;;454:37:20;;;;;;;;;;177:1454:23;;14:290:27;84:6;137:2;125:9;116:7;112:23;108:32;105:52;;;153:1;150;143:12;105:52;179:16;;-1:-1:-1;;;;;224:31:27;;214:42;;204:70;;270:1;267;260:12;204:70;293:5;14:290;-1:-1:-1;;;14:290:27:o;:::-;177:1454:23;;;;;;",
+          "linkReferences": {}
+        },
+        "metadata": {
+          "compiler": {
+            "version": "0.8.17+commit.8df45f5f"
+          },
+          "language": "Solidity",
+          "output": {
+            "abi": [
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_resolver",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "name",
+                    "type": "bytes32",
+                    "indexed": false
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "destination",
+                    "type": "address",
+                    "indexed": false
+                  }
+                ],
+                "type": "event",
+                "name": "CacheUpdated",
+                "anonymous": false
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "a",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ]
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "takeId",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "getOrCreateTakeSharesContract",
+                "outputs": [
+                  {
+                    "internalType": "contract TakeMarketShares",
+                    "name": "",
+                    "type": "address"
+                  }
+                ]
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "isResolverCached",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ]
+              },
+              {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "rebuildCache"
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "resolver",
+                "outputs": [
+                  {
+                    "internalType": "contract AddressResolver",
+                    "name": "",
+                    "type": "address"
+                  }
+                ]
+              },
+              {
+                "inputs": [],
+                "stateMutability": "pure",
+                "type": "function",
+                "name": "resolverAddressesRequired",
+                "outputs": [
+                  {
+                    "internalType": "bytes32[]",
+                    "name": "addresses",
+                    "type": "bytes32[]"
+                  }
+                ]
+              }
+            ],
+            "devdoc": {
+              "kind": "dev",
+              "methods": {},
+              "version": 1
+            },
+            "userdoc": {
+              "kind": "user",
+              "methods": {},
+              "version": 1
+            }
+          },
+          "settings": {
+            "remappings": [
+              ":@vercel3/=lib/vercel3-contracts/src/",
+              ":ds-test/=lib/forge-std/lib/ds-test/src/",
+              ":forge-std/=lib/forge-std/src/",
+              ":vercel3-contracts/=lib/vercel3-contracts/src/"
+            ],
+            "optimizer": {
+              "enabled": true,
+              "runs": 200
+            },
+            "metadata": {
+              "bytecodeHash": "ipfs"
+            },
+            "compilationTarget": {
+              "src/TakeMarket.sol": "TakeMarket"
+            },
+            "libraries": {}
+          },
+          "sources": {
+            "lib/vercel3-contracts/src/AddressResolver.sol": {
+              "keccak256": "0xf984fb4672251986b790407039193448bcd4524d8975fd5dd72c23846e15bd14",
+              "urls": [
+                "bzz-raw://949987e882e7d34373a73cbde63d24ab911182d4a3d057c343bd0e5cfa5c1fff",
+                "dweb:/ipfs/QmSThxP5DRyGoGj2jxBtTzjGe4Gs6GXuoLdGU7sLvzKTs2"
+              ],
+              "license": "UNLICENSED"
+            },
+            "lib/vercel3-contracts/src/interfaces/IMixinResolver.sol": {
+              "keccak256": "0xb37456759ab775181d52e39e82bdbaa1a8d5e39344e1e61581f60247b5e66d28",
+              "urls": [
+                "bzz-raw://90272f503e0203eb7eda3765de82ddbf0d5b012ad13a6e0628dd034c8ecd533b",
+                "dweb:/ipfs/Qmf8v7ZSWNWr8JPV1Zq34mD4reR9YB3Qfh9ovyb52mkSwr"
+              ],
+              "license": "UNLICENSED"
+            },
+            "lib/vercel3-contracts/src/lib/Clones.sol": {
+              "keccak256": "0x888d64d221d52c31d015b76e50ca1af5ef8ff076550810b49cea6b01d8267a10",
+              "urls": [
+                "bzz-raw://4da0f451fe5aefdb95204dbec4a9448a8a2b00a444864bb5dbf7162da842a0f7",
+                "dweb:/ipfs/QmYciAwNiJzgGMAqSTUANwMjy5HykNUvmkQ5PQhNTRqrB5"
+              ],
+              "license": "MIT"
+            },
+            "lib/vercel3-contracts/src/lib/MixinResolver.sol": {
+              "keccak256": "0xb014c8d0267c2036982e70e0908b27200ac774df6cc3ed63707187561e4bbabd",
+              "urls": [
+                "bzz-raw://3adf9e0a4733429350baaa66d3cc110dc5e9f12241bcd9efd2c86b6b4492cb5c",
+                "dweb:/ipfs/QmYZmc5JFzW3kggFwHwpFMAi76dyGnw2tL6HMXPQaAP9MN"
+              ],
+              "license": "UNLICENSED"
+            },
+            "lib/vercel3-contracts/src/lib/MixinResolverStatic.sol": {
+              "keccak256": "0x0b1cf7ed1521785237857492941a2148b9c34183cd4a145e6a735a08d5d30474",
+              "urls": [
+                "bzz-raw://08b3562c85d29650e1a950180b4339d0f476b6702917bf6bba7ad209ed90fbbe",
+                "dweb:/ipfs/QmSX4LrpvTwFe6cMJgGtUfrTRMQXK5U6mN1KrtRxGuYLjQ"
+              ],
+              "license": "LGPL-3.0-only"
+            },
+            "lib/vercel3-contracts/src/lib/Owned.sol": {
+              "keccak256": "0x427ff25db39ee4972af83d3a283d2b024c83c9d5c1ed261bb4a536e8ab7ee193",
+              "urls": [
+                "bzz-raw://d7436473a802101c8c398df9776983c38690b90599d045c4d09804669aaac038",
+                "dweb:/ipfs/QmQPRKZ8FMAibCf3bMLXTPEqh1YsiUMGYf8bybJ7DhABGb"
+              ],
+              "license": "UNLICENSED"
+            },
+            "src/TakeMarket.sol": {
+              "keccak256": "0x1797099854494b81b2207fc0c98260d5e5681c564f2a975db6adcc5021ec21d3",
+              "urls": [
+                "bzz-raw://09f6cb6dc68f1f027d263fc071ca1de85d123dc351f4ec25ada7c4ebe5d1a2f9",
+                "dweb:/ipfs/QmTNTM4TvtH2yASYAHbQ1CgdALgoauzpFkEZqf6n2BFMbr"
+              ],
+              "license": "LGPL-3.0-only"
+            },
+            "src/TakeMarketShares.sol": {
+              "keccak256": "0x0f6d46c7398cf7b9ff37a99ff9172e6681092ab433ac1ac90ec03d31a2cc04d3",
+              "urls": [
+                "bzz-raw://bd8216e31f5bb592a107e40e53a680174d9c3a1672cd48077c722670e097dd5f",
+                "dweb:/ipfs/QmNQNT3UK8hiH685PScreeeFWPf1xmHLD2h1rTphyiKztQ"
+              ],
+              "license": "LGPL-3.0-only"
+            },
+            "src/lib/TakeMarketSharesFactoryAuthority.sol": {
+              "keccak256": "0x593cd0535c08d970c5bc54df2b88128e05facf6419f9072e70c53407f7d364d1",
+              "urls": [
+                "bzz-raw://dcfb564c7a99428a5e536c4eb922c13129139c1c36e2b89439c3b6d67a97d478",
+                "dweb:/ipfs/QmWhXRKaUsHu3UQrymRPHxKM53NJAnNh6vq66cuM1gNYM2"
+              ],
+              "license": "LGPL-3.0-only"
+            }
+          },
+          "version": 1
+        }
+      },
+      "impl": {
+        "version": 3,
+        "address": "0x2ca60d89144D4cdf85dA87af4FE12aBF9265F28C",
+        "abi": [
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_resolver",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "name",
+                "type": "bytes32"
+              },
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "destination",
+                "type": "address"
+              }
+            ],
+            "name": "CacheUpdated",
+            "type": "event"
+          },
+          {
+            "inputs": [],
+            "name": "a",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "takeId",
+                "type": "uint256"
+              }
+            ],
+            "name": "getOrCreateTakeSharesContract",
+            "outputs": [
+              {
+                "internalType": "contract TakeMarketShares",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "isResolverCached",
+            "outputs": [
+              {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "rebuildCache",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "resolver",
+            "outputs": [
+              {
+                "internalType": "contract AddressResolver",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "resolverAddressesRequired",
+            "outputs": [
+              {
+                "internalType": "bytes32[]",
+                "name": "addresses",
+                "type": "bytes32[]"
+              }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+          }
+        ],
+        "bytecode": {
+          "object": "0x60806040526002805534801561001457600080fd5b5060405161091738038061091783398101604081905261003391610058565b600080546001600160a01b0319166001600160a01b0392909216919091179055610088565b60006020828403121561006a57600080fd5b81516001600160a01b038116811461008157600080fd5b9392505050565b610880806100976000396000f3fe608060405234801561001057600080fd5b50600436106100625760003560e01c806304f3bcec146100675780630dbe671f146100975780632af64bd3146100ae57806374185360146100c6578063899ffef4146100d0578063ea06b665146100e5575b600080fd5b60005461007a906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6100a060025481565b60405190815260200161008e565b6100b66100f8565b604051901515815260200161008e565b6100ce610207565b005b6100d861038b565b60405161008e919061070d565b61007a6100f3366004610751565b610414565b60008061010361038b565b905060005b81518110156101fe5760008282815181106101255761012561076a565b60209081029190910181015160008181526001909252604080832054925490516321f8a72160e01b8152600481018390529193506001600160a01b039283169216906321f8a72190602401602060405180830381865afa15801561018d573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906101b19190610780565b6001600160a01b03161415806101dc57506000818152600160205260409020546001600160a01b0316155b156101eb576000935050505090565b50806101f6816107a9565b915050610108565b50600191505090565b600061021161038b565b905060005b81518110156103875760008282815181106102335761023361076a565b6020026020010151905060008060009054906101000a90046001600160a01b03166001600160a01b031663dacb2d0183846040516020016102a091907f5265736f6c766572206d697373696e67207461726765743a20000000000000008152601981019190915260390190565b6040516020818303038152906040526040518363ffffffff1660e01b81526004016102cc929190610816565b602060405180830381865afa1580156102e9573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061030d9190610780565b60008381526001602090815260409182902080546001600160a01b0319166001600160a01b0385169081179091558251868152918201529192507f88a93678a3692f6789d9546fc621bf7234b101ddb7d4fe479455112831b8aa68910160405180910390a15050808061037f906107a9565b915050610216565b5050565b604080516002808252606080830184529260009291906020830190803683370190505090506f54616b654d61726b657453686172657360801b816000815181106103d7576103d761076a565b6020026020010181815250506915185ad953585c9ad95d60b21b816001815181106104045761040461076a565b6020908102919091010152919050565b6000808260405160200161042a91815260200190565b60405160208183030381529060405280519060200120905060006104ab61044f6105b2565b6040513060388201526f5af43d82803e903d91602b57fd5bf3ff60248201526014810191909152733d602d80600a3d3981f3363d3d373d3d3d363d738152605881018490526037600c8201206078820152605560439091012090565b9050806001600160a01b03163b6000036105ab576104d06104ca6105b2565b836105d5565b9050806001600160a01b03811663766019b76104ea61067d565b6040516001600160e01b031960e084901b1681526001600160a01b039091166004820152602401600060405180830381600087803b15801561052b57600080fd5b505af115801561053f573d6000803e3d6000fd5b505060005460405163cd6dc68760e01b81526001600160a01b03918216600482015260248101899052908416925063cd6dc6879150604401600060405180830381600087803b15801561059157600080fd5b505af11580156105a5573d6000803e3d6000fd5b50505050505b9392505050565b60006105d06f54616b654d61726b657453686172657360801b610691565b905090565b6000763d602d80600a3d3981f3363d3d373d3d3d363d730000008360601b60e81c176000526e5af43d82803e903d91602b57fd5bf38360781b1760205281603760096000f590506001600160a01b0381166106775760405162461bcd60e51b815260206004820152601760248201527f455243313136373a2063726561746532206661696c656400000000000000000060448201526064015b60405180910390fd5b92915050565b60006105d06915185ad953585c9ad95d60b21b5b600081815260016020908152604080832054905170026b4b9b9b4b7339030b2323932b9b99d1607d1b92810192909252603182018490526001600160a01b03169081151590605101604051602081830303815290604052906107065760405162461bcd60e51b815260040161066e9190610837565b5092915050565b6020808252825182820181905260009190848201906040850190845b8181101561074557835183529284019291840191600101610729565b50909695505050505050565b60006020828403121561076357600080fd5b5035919050565b634e487b7160e01b600052603260045260246000fd5b60006020828403121561079257600080fd5b81516001600160a01b03811681146105ab57600080fd5b6000600182016107c957634e487b7160e01b600052601160045260246000fd5b5060010190565b6000815180845260005b818110156107f6576020818501810151868301820152016107da565b506000602082860101526020601f19601f83011685010191505092915050565b82815260406020820152600061082f60408301846107d0565b949350505050565b6020815260006105ab60208301846107d056fea264697066735822122029569b3006b2ae9e4c111ec551c0f105c1f8f5688bf4fcc15c49fe4068dbc5b964736f6c63430008110033",
+          "sourceMap": "177:1454:23:-:0;;;242:1;226:17;;250:63;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;454:8:20;:37;;-1:-1:-1;;;;;;454:37:20;-1:-1:-1;;;;;454:37:20;;;;;;;;;;177:1454:23;;14:290:27;84:6;137:2;125:9;116:7;112:23;108:32;105:52;;;153:1;150;143:12;105:52;179:16;;-1:-1:-1;;;;;224:31:27;;214:42;;204:70;;270:1;267;260:12;204:70;293:5;14:290;-1:-1:-1;;;14:290:27:o;:::-;177:1454:23;;;;;;",
+          "linkReferences": {}
+        },
+        "metadata": {
+          "compiler": {
+            "version": "0.8.17+commit.8df45f5f"
+          },
+          "language": "Solidity",
+          "output": {
+            "abi": [
+              {
+                "inputs": [
+                  {
+                    "internalType": "address",
+                    "name": "_resolver",
+                    "type": "address"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "name",
+                    "type": "bytes32",
+                    "indexed": false
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "destination",
+                    "type": "address",
+                    "indexed": false
+                  }
+                ],
+                "type": "event",
+                "name": "CacheUpdated",
+                "anonymous": false
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "a",
+                "outputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ]
+              },
+              {
+                "inputs": [
+                  {
+                    "internalType": "uint256",
+                    "name": "takeId",
+                    "type": "uint256"
+                  }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "getOrCreateTakeSharesContract",
+                "outputs": [
+                  {
+                    "internalType": "contract TakeMarketShares",
+                    "name": "",
+                    "type": "address"
+                  }
+                ]
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "isResolverCached",
+                "outputs": [
+                  {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                  }
+                ]
+              },
+              {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function",
+                "name": "rebuildCache"
+              },
+              {
+                "inputs": [],
+                "stateMutability": "view",
+                "type": "function",
+                "name": "resolver",
+                "outputs": [
+                  {
+                    "internalType": "contract AddressResolver",
+                    "name": "",
+                    "type": "address"
+                  }
+                ]
+              },
+              {
+                "inputs": [],
+                "stateMutability": "pure",
+                "type": "function",
+                "name": "resolverAddressesRequired",
+                "outputs": [
+                  {
+                    "internalType": "bytes32[]",
+                    "name": "addresses",
+                    "type": "bytes32[]"
+                  }
+                ]
+              }
+            ],
+            "devdoc": {
+              "kind": "dev",
+              "methods": {},
+              "version": 1
+            },
+            "userdoc": {
+              "kind": "user",
+              "methods": {},
+              "version": 1
+            }
+          },
+          "settings": {
+            "remappings": [
+              ":@vercel3/=lib/vercel3-contracts/src/",
+              ":ds-test/=lib/forge-std/lib/ds-test/src/",
+              ":forge-std/=lib/forge-std/src/",
+              ":vercel3-contracts/=lib/vercel3-contracts/src/"
+            ],
+            "optimizer": {
+              "enabled": true,
+              "runs": 200
+            },
+            "metadata": {
+              "bytecodeHash": "ipfs"
+            },
+            "compilationTarget": {
+              "src/TakeMarket.sol": "TakeMarket"
+            },
+            "libraries": {}
+          },
+          "sources": {
+            "lib/vercel3-contracts/src/AddressResolver.sol": {
+              "keccak256": "0xf984fb4672251986b790407039193448bcd4524d8975fd5dd72c23846e15bd14",
+              "urls": [
+                "bzz-raw://949987e882e7d34373a73cbde63d24ab911182d4a3d057c343bd0e5cfa5c1fff",
+                "dweb:/ipfs/QmSThxP5DRyGoGj2jxBtTzjGe4Gs6GXuoLdGU7sLvzKTs2"
+              ],
+              "license": "UNLICENSED"
+            },
+            "lib/vercel3-contracts/src/interfaces/IMixinResolver.sol": {
+              "keccak256": "0xb37456759ab775181d52e39e82bdbaa1a8d5e39344e1e61581f60247b5e66d28",
+              "urls": [
+                "bzz-raw://90272f503e0203eb7eda3765de82ddbf0d5b012ad13a6e0628dd034c8ecd533b",
+                "dweb:/ipfs/Qmf8v7ZSWNWr8JPV1Zq34mD4reR9YB3Qfh9ovyb52mkSwr"
+              ],
+              "license": "UNLICENSED"
+            },
+            "lib/vercel3-contracts/src/lib/Clones.sol": {
+              "keccak256": "0x888d64d221d52c31d015b76e50ca1af5ef8ff076550810b49cea6b01d8267a10",
+              "urls": [
+                "bzz-raw://4da0f451fe5aefdb95204dbec4a9448a8a2b00a444864bb5dbf7162da842a0f7",
+                "dweb:/ipfs/QmYciAwNiJzgGMAqSTUANwMjy5HykNUvmkQ5PQhNTRqrB5"
+              ],
+              "license": "MIT"
+            },
+            "lib/vercel3-contracts/src/lib/MixinResolver.sol": {
+              "keccak256": "0xb014c8d0267c2036982e70e0908b27200ac774df6cc3ed63707187561e4bbabd",
+              "urls": [
+                "bzz-raw://3adf9e0a4733429350baaa66d3cc110dc5e9f12241bcd9efd2c86b6b4492cb5c",
+                "dweb:/ipfs/QmYZmc5JFzW3kggFwHwpFMAi76dyGnw2tL6HMXPQaAP9MN"
+              ],
+              "license": "UNLICENSED"
+            },
+            "lib/vercel3-contracts/src/lib/MixinResolverStatic.sol": {
+              "keccak256": "0x0b1cf7ed1521785237857492941a2148b9c34183cd4a145e6a735a08d5d30474",
+              "urls": [
+                "bzz-raw://08b3562c85d29650e1a950180b4339d0f476b6702917bf6bba7ad209ed90fbbe",
+                "dweb:/ipfs/QmSX4LrpvTwFe6cMJgGtUfrTRMQXK5U6mN1KrtRxGuYLjQ"
+              ],
+              "license": "LGPL-3.0-only"
+            },
+            "lib/vercel3-contracts/src/lib/Owned.sol": {
+              "keccak256": "0x427ff25db39ee4972af83d3a283d2b024c83c9d5c1ed261bb4a536e8ab7ee193",
+              "urls": [
+                "bzz-raw://d7436473a802101c8c398df9776983c38690b90599d045c4d09804669aaac038",
+                "dweb:/ipfs/QmQPRKZ8FMAibCf3bMLXTPEqh1YsiUMGYf8bybJ7DhABGb"
+              ],
+              "license": "UNLICENSED"
+            },
+            "src/TakeMarket.sol": {
+              "keccak256": "0x1797099854494b81b2207fc0c98260d5e5681c564f2a975db6adcc5021ec21d3",
+              "urls": [
+                "bzz-raw://09f6cb6dc68f1f027d263fc071ca1de85d123dc351f4ec25ada7c4ebe5d1a2f9",
+                "dweb:/ipfs/QmTNTM4TvtH2yASYAHbQ1CgdALgoauzpFkEZqf6n2BFMbr"
+              ],
+              "license": "LGPL-3.0-only"
+            },
+            "src/TakeMarketShares.sol": {
+              "keccak256": "0x0f6d46c7398cf7b9ff37a99ff9172e6681092ab433ac1ac90ec03d31a2cc04d3",
+              "urls": [
+                "bzz-raw://bd8216e31f5bb592a107e40e53a680174d9c3a1672cd48077c722670e097dd5f",
+                "dweb:/ipfs/QmNQNT3UK8hiH685PScreeeFWPf1xmHLD2h1rTphyiKztQ"
+              ],
+              "license": "LGPL-3.0-only"
+            },
+            "src/lib/TakeMarketSharesFactoryAuthority.sol": {
+              "keccak256": "0x593cd0535c08d970c5bc54df2b88128e05facf6419f9072e70c53407f7d364d1",
+              "urls": [
+                "bzz-raw://dcfb564c7a99428a5e536c4eb922c13129139c1c36e2b89439c3b6d67a97d478",
+                "dweb:/ipfs/QmWhXRKaUsHu3UQrymRPHxKM53NJAnNh6vq66cuM1gNYM2"
+              ],
+              "license": "LGPL-3.0-only"
+            }
+          },
+          "version": 1
+        }
+      },
+      "deployTx": {
+        "type": 2,
+        "chainId": 31337,
+        "nonce": 845,
+        "maxPriorityFeePerGas": {
+          "type": "BigNumber",
+          "hex": "0x59682f00"
+        },
+        "maxFeePerGas": {
+          "type": "BigNumber",
+          "hex": "0x59682f00"
+        },
+        "gasPrice": null,
+        "gasLimit": {
+          "type": "BigNumber",
+          "hex": "0x092b60"
+        },
+        "to": null,
+        "value": {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        "data": "0x60806040526002805534801561001457600080fd5b5060405161091738038061091783398101604081905261003391610058565b600080546001600160a01b0319166001600160a01b0392909216919091179055610088565b60006020828403121561006a57600080fd5b81516001600160a01b038116811461008157600080fd5b9392505050565b610880806100976000396000f3fe608060405234801561001057600080fd5b50600436106100625760003560e01c806304f3bcec146100675780630dbe671f146100975780632af64bd3146100ae57806374185360146100c6578063899ffef4146100d0578063ea06b665146100e5575b600080fd5b60005461007a906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6100a060025481565b60405190815260200161008e565b6100b66100f8565b604051901515815260200161008e565b6100ce610207565b005b6100d861038b565b60405161008e919061070d565b61007a6100f3366004610751565b610414565b60008061010361038b565b905060005b81518110156101fe5760008282815181106101255761012561076a565b60209081029190910181015160008181526001909252604080832054925490516321f8a72160e01b8152600481018390529193506001600160a01b039283169216906321f8a72190602401602060405180830381865afa15801561018d573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906101b19190610780565b6001600160a01b03161415806101dc57506000818152600160205260409020546001600160a01b0316155b156101eb576000935050505090565b50806101f6816107a9565b915050610108565b50600191505090565b600061021161038b565b905060005b81518110156103875760008282815181106102335761023361076a565b6020026020010151905060008060009054906101000a90046001600160a01b03166001600160a01b031663dacb2d0183846040516020016102a091907f5265736f6c766572206d697373696e67207461726765743a20000000000000008152601981019190915260390190565b6040516020818303038152906040526040518363ffffffff1660e01b81526004016102cc929190610816565b602060405180830381865afa1580156102e9573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061030d9190610780565b60008381526001602090815260409182902080546001600160a01b0319166001600160a01b0385169081179091558251868152918201529192507f88a93678a3692f6789d9546fc621bf7234b101ddb7d4fe479455112831b8aa68910160405180910390a15050808061037f906107a9565b915050610216565b5050565b604080516002808252606080830184529260009291906020830190803683370190505090506f54616b654d61726b657453686172657360801b816000815181106103d7576103d761076a565b6020026020010181815250506915185ad953585c9ad95d60b21b816001815181106104045761040461076a565b6020908102919091010152919050565b6000808260405160200161042a91815260200190565b60405160208183030381529060405280519060200120905060006104ab61044f6105b2565b6040513060388201526f5af43d82803e903d91602b57fd5bf3ff60248201526014810191909152733d602d80600a3d3981f3363d3d373d3d3d363d738152605881018490526037600c8201206078820152605560439091012090565b9050806001600160a01b03163b6000036105ab576104d06104ca6105b2565b836105d5565b9050806001600160a01b03811663766019b76104ea61067d565b6040516001600160e01b031960e084901b1681526001600160a01b039091166004820152602401600060405180830381600087803b15801561052b57600080fd5b505af115801561053f573d6000803e3d6000fd5b505060005460405163cd6dc68760e01b81526001600160a01b03918216600482015260248101899052908416925063cd6dc6879150604401600060405180830381600087803b15801561059157600080fd5b505af11580156105a5573d6000803e3d6000fd5b50505050505b9392505050565b60006105d06f54616b654d61726b657453686172657360801b610691565b905090565b6000763d602d80600a3d3981f3363d3d373d3d3d363d730000008360601b60e81c176000526e5af43d82803e903d91602b57fd5bf38360781b1760205281603760096000f590506001600160a01b0381166106775760405162461bcd60e51b815260206004820152601760248201527f455243313136373a2063726561746532206661696c656400000000000000000060448201526064015b60405180910390fd5b92915050565b60006105d06915185ad953585c9ad95d60b21b5b600081815260016020908152604080832054905170026b4b9b9b4b7339030b2323932b9b99d1607d1b92810192909252603182018490526001600160a01b03169081151590605101604051602081830303815290604052906107065760405162461bcd60e51b815260040161066e9190610837565b5092915050565b6020808252825182820181905260009190848201906040850190845b8181101561074557835183529284019291840191600101610729565b50909695505050505050565b60006020828403121561076357600080fd5b5035919050565b634e487b7160e01b600052603260045260246000fd5b60006020828403121561079257600080fd5b81516001600160a01b03811681146105ab57600080fd5b6000600182016107c957634e487b7160e01b600052601160045260246000fd5b5060010190565b6000815180845260005b818110156107f6576020818501810151868301820152016107da565b506000602082860101526020601f19601f83011685010191505092915050565b82815260406020820152600061082f60408301846107d0565b949350505050565b6020815260006105ab60208301846107d056fea264697066735822122029569b3006b2ae9e4c111ec551c0f105c1f8f5688bf4fcc15c49fe4068dbc5b964736f6c6343000811003300000000000000000000000003f7f064e6ced8e154e3fdaaf92dccc4e818e97b",
+        "accessList": [],
+        "hash": "0x250a3794400d5120b8fb5a2a9a29ae11907bd6ce0408bbf2933d17a6d689ba40",
+        "v": 1,
+        "r": "0x316a36c1211174a1345bea528c257c0be147265b70c47300b0e8b7523c2313bf",
+        "s": "0x6a01d90e7d0d0717f93174533fad815840dd2d0cf43e7f568610835bb1d7c0ca",
+        "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        "confirmations": 0,
+        "blockNumber": 846
+      },
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_resolver",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "name",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "destination",
+              "type": "address"
+            }
+          ],
+          "name": "CacheUpdated",
+          "type": "event"
+        },
+        {
+          "inputs": [],
+          "name": "a",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "takeId",
+              "type": "uint256"
+            }
+          ],
+          "name": "getOrCreateTakeSharesContract",
+          "outputs": [
+            {
+              "internalType": "contract TakeMarketShares",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "isResolverCached",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "rebuildCache",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "resolver",
+          "outputs": [
+            {
+              "internalType": "contract AddressResolver",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "resolverAddressesRequired",
+          "outputs": [
+            {
+              "internalType": "bytes32[]",
+              "name": "addresses",
+              "type": "bytes32[]"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
+        }
+      ]
+    }
+  ]
+}

@@ -4,7 +4,9 @@ import { join } from 'path'
 import { resolve } from 'path'
 import { ethers } from 'ethers'
 import * as shell from 'shelljs'
-import { ContractDeployment, Manifest, MANIFEST_VERSIONS } from '../types'
+import { ContractDeployment, Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST } from '../types'
+import { addressResolver_Artifact, systemContracts } from '../contracts'
+import { proxy_Artifact } from '../contracts'
 
 const DEPLOY_TRANSACTION_KEY = 'deployTransaction2'
 
@@ -25,9 +27,12 @@ export async function deploy(argv: DeployArgs) {
 
     let inputManifest: Manifest
     try {
-        inputManifest = require(resolve(join(process.cwd(), "/", argv.inputManifest))) as Manifest
+        const p = resolve(join(process.cwd(), "/", argv.inputManifest))
+        inputManifest = require(p) as Manifest
     } catch (err) {
-        throw new Error("Can't find input manifest: " + err)
+        // console.log("Can't find input manifest: " + err)
+        console.log(`Creating new empty manifest...`)
+        inputManifest = EMPTY_MANIFEST
     }
 
     shell.cd(projectDir)
@@ -77,12 +82,9 @@ export async function deploy(argv: DeployArgs) {
 
         artifacts.push(artifactJson)
     }
-    const systemContracts = [
-        'src/Proxy.sol',
-        'src/AddressResolver.sol',
-    ]
     const artifacts2 = artifacts
         // Filter: not system contracts.
+        // TODO: code smell.
         .filter(artifact => !systemContracts.includes(artifact.ast.absolutePath))
         // Filter: only contracts with changed bytecode.
         .filter(artifact => {
@@ -117,7 +119,8 @@ export async function deploy(argv: DeployArgs) {
         const previous = prevDeployments.find(deployment => deployment.name == args.name)
         const yy = args.proxy ? 'proxy' : 'impl'
         const name = args.proxy ? `Proxy${args.name}` : args.name
-
+        
+        // If we have a previous deployment, and we're not overwriting, then just return the previous deployment.
         if (previous != null && previous[yy] != null && !args.overwrite) {
             console.log(`Loaded ${name} (v${previous[yy].version})`)
             const contract = new ethers.Contract(previous[yy].address, abi, signer)
@@ -125,8 +128,10 @@ export async function deploy(argv: DeployArgs) {
             contract[DEPLOY_TRANSACTION_KEY] = previous.deployTx
             return contract
         }
-
-        if (args.overwrite) {
+        
+        // If we're overwriting, then deploy.
+        // If there is no previous deployment, then deploy.
+        if (previous == null || args.overwrite) {
             // Deploy.
             const version = 1 + (previous ? previous[yy].version : 0)
             console.log(`Deploying ${name} (v${version})`)
@@ -138,17 +143,20 @@ export async function deploy(argv: DeployArgs) {
             return contract
         }
 
+
         throw new Error("Unexpected")
     }
 
     // Build the signer, provider, system contracts.
-    const proxy_Artifact = artifacts.filter(artifact => artifact.ast.absolutePath == 'src/Proxy.sol')[0]
-    const addressResolver_Artifact = artifacts.filter(artifact => artifact.ast.absolutePath == 'src/AddressResolver.sol')[0]
-
-    if (projectType == 'foundry' && !rpcUrl) {
-        rpcUrl = 'http://localhost:8545'
-        privateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    if(!rpcUrl) {
+        if (projectType == 'foundry') {
+            rpcUrl = 'http://localhost:8545'
+            privateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+        } else {
+            throw new Error("No RPC URL provided.")
+        }
     }
+
     const provider = new ethers.providers.JsonRpcProvider()
     const signer = new ethers.Wallet(privateKey, provider)
     const account = await signer.getAddress()
@@ -158,12 +166,13 @@ export async function deploy(argv: DeployArgs) {
     console.log()
 
     // 1. Deploy AddressResolver
+    const isDeployed = (name: string) => !!prevDeployments.find(deployment => deployment.name == name)
     const addressResolver = await getOrDeploy({
         name: 'AddressResolver',
-        abi: addressResolver_Artifact.abi,
+        abi: addressResolver_Artifact.abi as any,
         bytecode: addressResolver_Artifact.bytecode.object,
         constructorArgs: [account],
-        overwrite: false,
+        overwrite: !isDeployed("AddressResolver"),
         proxy: false
     })
     console.log(`AddressResolver is at ${addressResolver.address}`)
@@ -181,7 +190,7 @@ export async function deploy(argv: DeployArgs) {
         // 2.1 Deploy Proxy.
         const proxy = await getOrDeploy({
             name: `${contractName}`,
-            abi: proxy_Artifact.abi,
+            abi: proxy_Artifact.abi as any,
             bytecode: proxy_Artifact.bytecode.object,
             constructorArgs: [addressResolver.address],
             overwrite: false,
@@ -273,7 +282,7 @@ export async function deploy(argv: DeployArgs) {
             entry.proxy = {
                 version: 1,
                 address: proxy.address,
-                abi: proxy_Artifact.abi,
+                abi: proxy_Artifact.abi as any,
                 bytecode: bytecode,
                 metadata: metadata,
             }
@@ -312,13 +321,19 @@ export async function deploy(argv: DeployArgs) {
         deployments,
     }
 
+    try {
+        shell.mkdir('.vercel3')
+        shell.mkdir('.vercel3/deployments')
+        shell.mkdir('.vercel3/deployments/localhost')
+    } catch(err) {}
+
     fs.writeFileSync(
         '.vercel3/deployments/localhost/manifest.json',
         JSON.stringify(manifest, null, 2)
     )
 
     // Now test creating a new take shares market.
-    const takeMarket = contractsForResolver.filter(contract => contract.name == 'TakeMarket')[0].impl.contract
-    const tx = await takeMarket.getOrCreateTakeSharesContract(2)
-    await tx.wait(1)
+    // const takeMarket = contractsForResolver.filter(contract => contract.name == 'TakeMarket')[0].impl.contract
+    // const tx = await takeMarket.getOrCreateTakeSharesContract(2)
+    // await tx.wait(1)
 }
