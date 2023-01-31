@@ -15,13 +15,18 @@ export async function generateNPMPackage(argv: GenerateNPMPackageArgs) {
 
     // TODO check version.
 
-    const entries = manifest.deployments.reduce((acc: any, entry: any) => {
-        console.log(entry)
+    const entries = manifest.deployments.filter((entry: any) => entry.name != "AddressResolver").reduce((acc: any, entry: any) => {
+        // console.log(entry)
+        const { version, abi } = entry.impl
+        
+        const { address } = entry.proxy
+
         acc = {
             ...acc,
             [entry.name]: {
-                abi: entry.abi,
-                address: entry.proxy,
+                version,
+                abi,
+                address,
                 deployBlock: entry.deployTx.blockNumber,
             }
         }

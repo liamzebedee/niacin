@@ -8,6 +8,8 @@ import "@vercel3/lib/MixinResolver.sol";
 contract TakeMarket is 
     MixinResolver 
 {
+	uint public a = 5;
+
     constructor(address _resolver) MixinResolver(_resolver) {
     }
 

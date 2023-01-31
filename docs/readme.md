@@ -25,3 +25,37 @@ Deployment follows this basic pipeline:
    - Upgrade the proxy to the new implementation.
  - Import all new targets into the `AddressResolver` registry.
  - Rebuild the MixinResolver caches for all contracts we are tracking.
+
+## Usage.
+
+### Dynamically linking to contracts.
+
+Rather than manually copying-and-pasting addresses everywhere, wouldn't it be easier if you could automatically resolve them? 
+
+Use the `MixinResolver`:
+
+```sol
+import "@vercel3/lib/MixinResolver.sol";
+import "./IERC20.sol";
+
+contract SlayAMM is
+    MixinResolver 
+{
+    constructor(address _resolver) MixinResolver(_resolver) {
+    }
+
+    function resolverAddressesRequired() public override pure returns (bytes32[] memory addresses) {
+        bytes32[] memory requiredAddresses = new bytes32[](2);
+        requiredAddresses[0] = bytes32("SlayToken");
+        return requiredAddresses;
+    }
+
+    function slayToken() internal view returns (address) {
+        return IERC20(requireAndGetAddress(bytes32("SlayToken")));
+    }
+
+    function mint() external {
+        slayToken().transfer(msg.sender, 1e18 * 50);
+    }
+}
+```
