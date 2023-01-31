@@ -19,4 +19,3 @@ Deployment follows this basic pipeline:
    - Upgrade the proxy to the new implementation.
  - Import all new targets into the `AddressResolver` registry.
  - Rebuild the MixinResolver caches for all contracts we are tracking.
-

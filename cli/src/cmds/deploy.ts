@@ -7,6 +7,7 @@ import * as shell from 'shelljs'
 import { ContractDeployment, Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST } from '../types'
 import { addressResolver_Artifact, systemContracts } from '../contracts'
 import { proxy_Artifact } from '../contracts'
+import chalk from 'chalk'
 
 const DEPLOY_TRANSACTION_KEY = 'deployTransaction2'
 
@@ -35,10 +36,12 @@ export async function deploy(argv: DeployArgs) {
         inputManifest = EMPTY_MANIFEST
     }
 
+    console.log(chalk.green("(1) Build"))
     shell.cd(projectDir)
-    console.log(`Project directory: ${shell.pwd()}`)
-    console.log(`Project type: ${projectType}`)
-    console.log(`Input manifest: `)
+    console.log(chalk.gray(`Project directory:`), `${shell.pwd()}`)
+    console.log(chalk.gray(`Project type:`), `${projectType}`)
+    // console.log(`Input manifest: `)
+    console.log()
     console.log(`> forge build`)
 
 
@@ -79,9 +82,9 @@ export async function deploy(argv: DeployArgs) {
         // console.log(artifact)
         const artifactJson = JSON.parse(artifact)
         // console.log(artifactJson)
-
         artifacts.push(artifactJson)
     }
+
     const artifacts2 = artifacts
         // Filter: not system contracts.
         // TODO: code smell.
@@ -103,6 +106,9 @@ export async function deploy(argv: DeployArgs) {
 
     // Now deploy.
     // 
+
+    console.log()
+    console.log(chalk.green("(2) Deploy"))
 
     // Get the latest deployment info if from a previous run.
     const prevDeployments = inputManifest.deployments
@@ -161,8 +167,8 @@ export async function deploy(argv: DeployArgs) {
     const signer = new ethers.Wallet(privateKey, provider)
     const account = await signer.getAddress()
     console.log()
-    console.log(`RPC URL: ${rpcUrl}`)
-    console.log(`Deploying from account: ${account}`)
+    console.log(chalk.gray(`RPC URL:`), `${rpcUrl}`)
+    console.log(chalk.gray(`Deploying from account:`), `${account}`)
     console.log()
 
     // 1. Deploy AddressResolver
@@ -186,7 +192,7 @@ export async function deploy(argv: DeployArgs) {
         console.log()
         const contractName = artifact.ast.absolutePath.split('/').pop().split('.')[0]
 
-        console.log(`[${artifact.ast.absolutePath}]`)
+        console.log(chalk.yellow(`[${artifact.ast.absolutePath}]`))
         // 2.1 Deploy Proxy.
         const proxy = await getOrDeploy({
             name: `${contractName}`,
