@@ -18,17 +18,12 @@ yargs(hideBin(process.argv))
                 type: 'string',
                 description: 'The contracts project directory (ie. Foundry, Hardhat project)',
             })
-            .option('input-manifest', {
+            .option('manifest', {
                 type: 'string',
-                description: 'The manifest.json of previous deployments',
+                description: 'The manifest.json of previous deployments. The new manifest is written to this file.',
                 default: '.vercel3',
             })
-            .option('output-manifest', {
-                type: 'string',
-                description: 'Where to write the manifest.json of new deployments',
-                default: '.vercel3',
-            })
-            .demandOption(['project-dir', 'input-manifest', 'output-manifest'], '')
+            .demandOption(['project-dir', 'manifest'], '')
     }, deploy)
     .command('generate-npm-pkg', 'generate an NPM package from a deployment manifest', (yargs: any) => {
         return yargs
@@ -43,4 +38,5 @@ yargs(hideBin(process.argv))
             .demandOption(['manifest-path'], '')
     }, generateNPMPackage)
     .help()
+    .demandCommand()
     .parse()

@@ -28,6 +28,9 @@ contract Proxy is
     ProxyStorage,
     MixinResolver 
 {
+    event Upgraded(address indexed implementation);
+    event AdminChanged(address previousAdmin, address newAdmin);
+
     constructor(address _resolver) MixinResolver(_resolver) {
         _setProxyAdmin(msg.sender);
     }
@@ -36,9 +39,6 @@ contract Proxy is
         bytes32[] memory requiredAddresses = new bytes32[](0);
         return requiredAddresses;
     }
-
-    event Upgraded(address indexed implementation);
-    event AdminChanged(address previousAdmin, address newAdmin);
 
     function proxyAdmin() public view returns (address) {
         return _store().admin;
@@ -68,16 +68,26 @@ contract Proxy is
     function _fallback() internal {
         address _implementation = _store().implementation;
         assembly {
+            // Copy msg.data. We take full control of memory in this inline assembly
+            // block because it will not return to Solidity code. We overwrite the
+            // Solidity scratch pad at memory position 0.
             calldatacopy(0, 0, calldatasize())
-            let success := delegatecall(not(0), _implementation, 0, calldatasize(), 0, 0)
+
+            // Call the implementation.
+            // out and outsize are 0 because we don't know the size yet.
+            let result := delegatecall(gas(), _implementation, 0, calldatasize(), 0, 0)
+
+            // Copy the returned data.
             returndatacopy(0, 0, returndatasize())
-            switch success
-                case 0 {
-                    revert(0, returndatasize())
-                }
-                default {
-                    return(0, returndatasize())
-                }
+
+            switch result
+            // delegatecall returns 0 on error.
+            case 0 {
+                revert(0, returndatasize())
+            }
+            default {
+                return(0, returndatasize())
+            }
         }
     }
 

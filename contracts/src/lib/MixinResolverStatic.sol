@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.13;
 
-// import {IMixinResolver} from "./interfaces/IMixinResolver.sol";
+import {IGenericResolver} from "../interfaces/IGenericResolver.sol";
 
 // Inheritance
 import {Owned} from "./Owned.sol";
@@ -9,20 +9,26 @@ import {Owned} from "./Owned.sol";
 // Internal references
 import {AddressResolver} from "../AddressResolver.sol";
 
-// https://docs.synthetix.io/contracts/source/contracts/mixinresolver
-// is IMixinResolver
-contract MixinResolverStatic {
+// A version of the resolver mixin which doesn't have a cache. Instead, it just calls out dynamically
+// to the resolver for every resolution of a dependency.
+// 
+// This is useful for factory contracts - in a scenario where you might have 10's of thousands of
+// contracts deployed, it becomes costly and infeasible to update their caches. Instead, they can
+// just call out to the resolver directly.
+contract MixinResolverStatic is
+    IGenericResolver
+{
     AddressResolver public resolver;
 
     constructor(address _resolver) {
         resolver = AddressResolver(_resolver);
     }
 
+    /* ========== INTERNAL FUNCTIONS ========== */
+
     function _initialize(address _resolver) internal {
         resolver = AddressResolver(_resolver);
     }
-
-    /* ========== INTERNAL FUNCTIONS ========== */
 
     function combineArrays(bytes32[] memory first, bytes32[] memory second)
         internal
@@ -42,25 +48,23 @@ contract MixinResolverStatic {
 
     /* ========== PUBLIC FUNCTIONS ========== */
 
-    // Note: this function is public not external in order for it to be overridden and invoked via super in subclasses
-    function resolverAddressesRequired() public virtual view returns (bytes32[] memory addresses) {}
+    function resolverAddressesRequired() external view override returns (bytes32[] memory addresses) {}
 
-    function rebuildCache() public {}
+    // rebuildCache is implemented so we can detect if we're using a static resolver.
+    function rebuildCache() pure public {
+        revert("ERR_STATIC_RESOLVER");
+    }
 
     /* ========== INTERNAL FUNCTIONS ========== */
 
-    function requireAndGetAddress(bytes32 name) internal view returns (address) {
+    function requireAndGetAddress(bytes32 name) internal view override returns (address) {
         address _foundAddress =
                 resolver.requireAndGetAddress(name, string(abi.encodePacked("Resolver missing target: ", name)));
         require(_foundAddress != address(0), string(abi.encodePacked("Missing address: ", name)));
         return _foundAddress;
     }
 
-    function getAddress(bytes32 name) internal view returns (address) {
+    function getAddress(bytes32 name) internal view override returns (address) {
         return resolver.getAddress(name);
     }
-
-    /* ========== EVENTS ========== */
-
-    event CacheUpdated(bytes32 name, address destination);
 }

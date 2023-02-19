@@ -31,13 +31,17 @@ Coming soon:
 ### Usage.
 
 ```sh
-node build/index.js deploy --project-dir ./contracts
+npm i
+# install `aller` binary
+npm link
+
+aller deploy --project-dir ./contracts
 ```
 
 ### Example.
 
 ```sh
-(base) ➜  vercel3-tools git:(master) ✗ node build/index.js deploy --project-dir ./contracts
+(base) ➜  vercel3-tools git:(master) ✗ aller deploy --project-dir ./contracts
 Project directory: /Users/liamz/Documents/Projects/vercel3/take.xyz/vercel3-tools/contracts
 forge build
 No files changed, compilation skipped
@@ -88,7 +92,7 @@ mkdir: path already exists: .vercel3/deployments/localhost
 Autogenerate an `index.js` which is importable in Next.js (since JSON loading isn't supported by default), and usable in other tooling (Telegram bots).
 
 ```sh
-node build/index.js generate-npm-pkg --manifest-path contracts/.vercel3/deployments/localhost/manifest.json --out index.js
+aller generate-npm-pkg --manifest-path contracts/.vercel3/deployments/localhost/manifest.json --out index.js
 ```
 
 ```js

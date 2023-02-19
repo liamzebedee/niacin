@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import "../interfaces/IMixinResolver.sol";
+import {IGenericResolver} from "../interfaces/IGenericResolver.sol";
+import {IMixinResolver} from "../interfaces/IMixinResolver.sol";
 
 // Inheritance
-import "./Owned.sol";
+import {Owned} from "./Owned.sol";
 
 // Internal references
-import "../AddressResolver.sol";
+import {AddressResolver} from "../AddressResolver.sol";
 
 // https://docs.synthetix.io/contracts/source/contracts/mixinresolver
-contract MixinResolver is IMixinResolver {
+abstract contract MixinResolver is 
+    IMixinResolver 
+{
     AddressResolver public resolver;
 
     mapping(bytes32 => address) private addressCache;
@@ -19,11 +22,11 @@ contract MixinResolver is IMixinResolver {
         resolver = AddressResolver(_resolver);
     }
 
+    /* ========== INTERNAL FUNCTIONS ========== */
+
     function _initialize(address _resolver) internal {
         resolver = AddressResolver(_resolver);
     }
-
-    /* ========== INTERNAL FUNCTIONS ========== */
 
     function combineArrays(bytes32[] memory first, bytes32[] memory second)
         internal
@@ -44,9 +47,9 @@ contract MixinResolver is IMixinResolver {
     /* ========== PUBLIC FUNCTIONS ========== */
 
     // Note: this function is public not external in order for it to be overridden and invoked via super in subclasses
-    function resolverAddressesRequired() public virtual view returns (bytes32[] memory addresses) {}
+    function resolverAddressesRequired() public virtual override view returns (bytes32[] memory addresses) {}
 
-    function rebuildCache() public {
+    function rebuildCache() public override {
         bytes32[] memory requiredAddresses = resolverAddressesRequired();
         // The resolver must call this function whenver it updates its state
         for (uint i = 0; i < requiredAddresses.length; i++) {
@@ -61,7 +64,7 @@ contract MixinResolver is IMixinResolver {
 
     /* ========== VIEWS ========== */
 
-    function isResolverCached() external view returns (bool) {
+    function isResolverCached() external view override returns (bool) {
         bytes32[] memory requiredAddresses = resolverAddressesRequired();
         for (uint i = 0; i < requiredAddresses.length; i++) {
             bytes32 name = requiredAddresses[i];
@@ -76,17 +79,13 @@ contract MixinResolver is IMixinResolver {
 
     /* ========== INTERNAL FUNCTIONS ========== */
 
-    function requireAndGetAddress(bytes32 name) internal view returns (address) {
+    function requireAndGetAddress(bytes32 name) internal view override returns (address) {
         address _foundAddress = addressCache[name];
         require(_foundAddress != address(0), string(abi.encodePacked("Missing address: ", name)));
         return _foundAddress;
     }
 
-    function getAddress(bytes32 name) internal view returns (address) {
+    function getAddress(bytes32 name) internal view override returns (address) {
         return addressCache[name];
     }
-
-    /* ========== EVENTS ========== */
-
-    event CacheUpdated(bytes32 name, address destination);
 }
