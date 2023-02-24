@@ -8,6 +8,7 @@ import { Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST, DeployImplEvent, UpsertPro
 import { addressResolver_Artifact, systemContracts } from '../contracts'
 import { proxy_Artifact } from '../contracts'
 import chalk from 'chalk'
+import { table } from 'table'
 
 const DEPLOY_TRANSACTION_KEY = 'deployTransaction2'
 
@@ -117,20 +118,24 @@ const getNewTargets = (inputManifest: Manifest, artifacts: any[]) => {
             const contractFilename = artifact.ast.absolutePath.split('/').pop().split('.')[0]
             const contractName = contractFilename.split('.').pop()
             const previousDeployment = inputManifest.targets.user[contractFilename]
-            
+
+            const isNew = previousDeployment == null
+
             const hasPreviousVersion = previousDeployment != null
-            const shouldUpgrade = hasPreviousVersion && previousDeployment.bytecode.object != artifact.bytecode.object
+            const isModified = previousDeployment != null && previousDeployment.bytecode.object != artifact.bytecode.object
+            const shouldUpgrade = isModified
 
             artifact.contractName = contractName
-            // artifact.hasPreviousVersion = hasPreviousVersion
-            // artifact.shouldUpgrade = shouldUpgrade
+            artifact.hasPreviousVersion = hasPreviousVersion
+            artifact.shouldUpgrade = shouldUpgrade
             artifact.previousDeployment = previousDeployment
+            artifact.isModified = isModified
+            artifact.isNew = isNew
 
             // We deploy if there is no previous deployment, or if we should upgrade.
             artifact.shouldDeploy = !hasPreviousVersion || shouldUpgrade
             return artifact
         })
-        .filter(artifact => artifact.shouldDeploy)
     return newTargetsArtifacts
 }
 
@@ -175,9 +180,46 @@ interface DeployFuncArgs {
     constructorArgs: any[]
 }
 
+
+const getGasParametersForTx = async () => {
+    // TODO: use the provider.getFeeData()
+    const feeData = await (await fetch(`https://gasstation-mainnet.matic.network/v2`)).json()
+
+    const { safeLow, standard, fast, estimatedBaseFee } = feeData
+
+    // safeLow.maxFee = convertFloatToUint256(safeLow.maxFee)
+    // safeLow.maxPriorityFee = convertFloatToUint256(safeLow.maxPriorityFee)
+
+    // standard.maxFee = convertFloatToUint256(standard.maxFee)
+    // standard.maxPriorityFee = convertFloatToUint256(standard.maxPriorityFee)
+
+    // fast.maxFee = convertFloatToUint256(fast.maxFee)
+    // fast.maxPriorityFee = convertFloatToUint256(fast.maxPriorityFee)
+
+    return {
+        maxFeePerGas: ethers.utils.parseUnits(fast.maxFee.toString().split('.')[0], "gwei"),
+        maxPriorityFeePerGas: ethers.utils.parseUnits(fast.maxPriorityFee.toString().split('.')[0], "gwei"),
+    }
+}
+
+const defaultGasEstimator = async () => {
+    return {}
+}
+
+const gasEstimators = {
+    'default': defaultGasEstimator,
+    'polygon': getGasParametersForTx
+}
+
+let gasEstimator = defaultGasEstimator
+
+
 const deployContract = async (args: DeployFuncArgs) => {
     const Contract = new ethers.ContractFactory(args.abi, args.bytecode, args.signer)
-    const contract = await Contract.deploy(...args.constructorArgs)
+    
+    const gasInfo = await gasEstimator()
+    const contract = await Contract.deploy(...args.constructorArgs, gasInfo)
+    
     console.debug(`deployContract tx=${contract.deployTransaction.hash}`)
     await contract.deployTransaction.wait()
     const rx = await args.signer.provider.getTransactionReceipt(contract.deployTransaction.hash)
@@ -203,6 +245,8 @@ interface DeployArgs {
     projectType: string
     projectDir: string
     manifest: string
+    config: string
+    gasEstimator: string
 }
 
 const prompts = require('prompt-sync')({ sigint: true });
@@ -214,6 +258,7 @@ export async function deploy(argv: DeployArgs) {
         projectDir
     } = argv
 
+    // Load manifest.
     let manifest: Manifest
     try {
         const p = resolve(join(process.cwd(), "/", argv.manifest))
@@ -224,15 +269,29 @@ export async function deploy(argv: DeployArgs) {
         manifest = EMPTY_MANIFEST
     }
 
-    // Attempt to read .allerrc.js
+    // Load configuration.
     let allerrc: any = {}
+    const p = resolve(join(projectDir, "/", argv.config))
+    // Check the config exists.
     try {
-        const p = resolve(join(projectDir, "/.allerrc.js"))
-        console.log(`Loaded .allerrc.js`)
-        allerrc = require(p)
+        const res = fs.accessSync(p, fs.constants.R_OK)
     } catch (err) {
-        console.log("Can't find .allerrc.js: " + err)
+        throw Error(`Can't find .allerrc.js at ${p}: ${err}`)
     }
+    console.log(`Loading configuration: ${p}`)
+    console.log(`Loaded .allerrc.js`)
+    allerrc = require(p)
+
+    // Load gas estimator.
+    let gasEstimatorName = argv.gasEstimator || 'default'
+    // @ts-ignore
+    gasEstimator = gasEstimators[gasEstimatorName]
+    if(!gasEstimator) {
+        throw new Error(`Unknown gas estimator: ${gasEstimatorName}`)
+    }
+    console.log(`Using gas estimator: ${gasEstimatorName}`)
+
+
     const ignoredFiles = allerrc.ignore || []
 
     console.log(chalk.green("(1) Build"))
@@ -248,19 +307,105 @@ export async function deploy(argv: DeployArgs) {
         shell.echo('Error: Forge build failed');
         shell.exit(1);
     }
-    
-    const targets = findTargets()
-        .filter(path => !ignoredFiles.includes(path))
     console.debug()
-    console.debug(`Targets detected:`)
-    console.debug(targets)
+    
+    const allTargets = findTargets()
+    const targets = allTargets
+        .filter(path => !ignoredFiles.includes(path))
 
     const artifacts = findArtifacts(targets)
-    const targetsForDeployment = getNewTargets(manifest, artifacts)
+    let targetsForDeployment = getNewTargets(manifest, artifacts)
 
-    console.log()
-    console.log(`Contracts for deployment:`)
-    console.log(targetsForDeployment.map(artifact => artifact.ast.absolutePath))
+    const humanInfo = allTargets.map(target => {
+        // Lookup from targetsForDeployment.
+        const deployInfo = targetsForDeployment.find(t => t.ast.absolutePath === target)
+        let ignored = ignoredFiles.includes(target)
+
+        // contract                 | version  | status    | action        
+        // src/TakeMarketShares.sol | n/a      | new       | deploy
+        // src/TakeMarketShares.sol | v1 -> v2 | modified  | upgrade
+        // src/TakeMarketShares.sol | v1       | unchanged | none
+
+        let deployInfo2 = {
+            isNew: true,
+            isModified: false,
+            shouldDeploy: false,
+            shouldUpgrade: false,
+            version: 'n/a'
+        }
+
+        if (deployInfo) {
+            deployInfo2 = {
+                isNew: deployInfo.isNew,
+                isModified: deployInfo.isModified,
+                shouldDeploy: deployInfo.shouldDeploy,
+                shouldUpgrade: deployInfo.shouldUpgrade,
+                version: deployInfo.previousDeployment ? deployInfo.previousDeployment.version : 'n/a',
+            }
+        }
+
+        let status = ''
+        if(ignored) {
+            status = 'ignored'
+        } else if (deployInfo2.isNew) {
+            status = 'new'
+        } else if (deployInfo2.isModified) {
+            status = 'modified'
+        } else {
+            status = 'unchanged'
+        }
+
+        let action = ''
+        if(ignored) {
+            action = 'none'
+        } else if (deployInfo2.shouldUpgrade) {
+            action = `upgrade`
+        } else if (deployInfo2.shouldDeploy) {
+            action = 'deploy'
+        } else {
+            action = 'none'
+        }
+        
+        return {
+            name: target,
+            version: deployInfo2.version,
+            status,
+            action,
+            ignored,
+            isModified: deployInfo2.isModified,
+            shouldUpgrade: deployInfo2.shouldUpgrade,
+            shouldDeploy: deployInfo2.shouldDeploy,
+        }
+    })
+    
+    // console.table(humanInfo)
+    const columns = 'Contract | Version | Status | Action'
+        .split(' | ')
+    const humantableData = [columns]
+        // @ts-ignore
+        .concat(humanInfo.map(info => {
+            
+            let fields = [
+                info.name,
+                info.version,
+                info.status,
+                info.action
+            ]
+
+            if (info.ignored) {
+                fields = fields.map(field => chalk.gray(field))
+            } else {
+                if(fields[3] != 'none') {
+                    fields = fields.map(field => chalk.yellow(field))
+                }
+            }
+            return fields
+        }))
+    console.log(table(humantableData))
+
+    targetsForDeployment = targetsForDeployment
+        .filter(artifact => artifact.shouldDeploy)
+
 
 
     // Now deploy.
@@ -401,7 +546,8 @@ export async function deploy(argv: DeployArgs) {
 
         // 2.3 Upgrade the proxy to new version.
         console.log(`Upgrading ${chalk.yellow(proxyName)} to implementation v${version}`)
-        const tx = await proxy.upgrade(impl.address)
+        const gasParams = await gasEstimator()
+        const tx = await proxy.upgrade(impl.address, gasParams)
     }
 
     // 3. Import the addresses.
@@ -457,7 +603,8 @@ export async function deploy(argv: DeployArgs) {
         }
 
         console.log(`Rebuilding cache for ${chalk.yellow(targetName)}`)
-        await i.rebuildCache()
+        const gasParams = await gasEstimator()
+        await i.rebuildCache(gasParams)
     }
 
     // 4.2 Caches for implementations.
@@ -485,7 +632,8 @@ export async function deploy(argv: DeployArgs) {
         }
 
         console.log(`Rebuilding cache for ${chalk.yellow(fullyUniqueId)}`)
-        await i.rebuildCache()    
+        const gasParams = await gasEstimator()
+        await i.rebuildCache(gasParams)
     }
 
     console.log('Done rebuilding caches.')

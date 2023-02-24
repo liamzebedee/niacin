@@ -21,6 +21,7 @@
     "lodash": "^4.17.21",
     "prompt-sync": "^4.2.0",
     "shelljs": "^0.8.5",
+    "table": "^6.8.1",
     "yargs": "^17.6.2"
   },
   "devDependencies": {

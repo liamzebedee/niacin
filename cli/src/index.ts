@@ -23,6 +23,16 @@ yargs(hideBin(process.argv))
                 description: 'The manifest.json of previous deployments. The new manifest is written to this file.',
                 default: '.vercel3',
             })
+            .option('config', {
+                type: 'string',
+                description: 'The path to the .allerrc.js configuration file.',
+                default: '.allerrc.js',
+            })
+            .option('gas-estimator', {
+                type: 'string',
+                description: 'This configures a custom gas estimator. For Polygon, this uses the Polygon gas station. Options: polygon',
+                default: '',
+            })
             .demandOption(['project-dir', 'manifest'], '')
     }, deploy)
     .command('generate-npm-pkg', 'generate an NPM package from a deployment manifest', (yargs: any) => {

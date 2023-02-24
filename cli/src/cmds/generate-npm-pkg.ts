@@ -2,6 +2,7 @@ const glob = require('glob')
 const fs = require('node:fs')
 import { join } from 'path'
 import { resolve } from 'path'
+import { Manifest } from '../types'
 
 
 export interface GenerateNPMPackageArgs {
@@ -11,19 +12,16 @@ export interface GenerateNPMPackageArgs {
 
 export async function generateNPMPackage(argv: GenerateNPMPackageArgs) {
     const { manifestPath } = argv
-    const manifest = require(resolve(manifestPath))
+    const manifest = require(resolve(manifestPath)) as Manifest
 
     // TODO check version.
 
-    const entries = manifest.deployments.filter((entry: any) => entry.name != "AddressResolver").reduce((acc: any, entry: any) => {
-        // console.log(entry)
-        const { version, abi } = entry.impl
-        
-        const { address } = entry.proxy
+    const entries = Object.values(manifest.targets.user).reduce((acc, entry) => {
+        const { version, abi, address } = entry
 
         acc = {
             ...acc,
-            [entry.name]: {
+            [entry.target]: {
                 version,
                 abi,
                 address,
