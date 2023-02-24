@@ -4,7 +4,7 @@ import { join } from 'path'
 import { resolve } from 'path'
 import { ethers } from 'ethers'
 import * as shell from 'shelljs'
-import { Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST, DeployImplEvent, UpsertProxyEvent, ContractInfo, UpsertAddressResolver, DeploymentEvent, Targets, DeploymentNamespace } from '../types'
+import { Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST, DeployImplEvent, UpsertProxyEvent, ContractInfo, UpsertAddressResolver, DeploymentEvent, Targets, DeploymentNamespace, Deployment } from '../types'
 import { addressResolver_Artifact, systemContracts } from '../contracts'
 import { proxy_Artifact } from '../contracts'
 import chalk from 'chalk'
@@ -251,6 +251,53 @@ interface DeployArgs {
 
 const prompts = require('prompt-sync')({ sigint: true });
 
+
+class DeploymentManager {
+    deployment: Deployment
+
+    constructor(public manifestPath: string, public manifest: Manifest) {
+        this.deployment = {
+            events: [],
+            time: +new Date,
+            _complete: false
+        }
+        this.manifestPath = manifestPath
+        // clone manifest. TODO code smell
+        this.manifest = JSON.parse(JSON.stringify(manifest))
+    }
+
+    addEvent(event: any) {
+        this.deployment.events.push(event)
+        this.save()
+    }
+
+    complete() {
+        this.deployment._complete = true
+        this.save()
+    }
+
+    save() {
+        try {
+            const manifest = {
+                ...this.manifest,
+                deployments: [
+                    ...this.manifest.deployments,
+                    this.deployment
+                ]
+            }
+
+            fs.writeFileSync(
+                this.manifestPath,
+                JSON.stringify(manifest, null, 2)
+            )
+        } catch (err) {
+            console.error("Error writing manifest")
+            console.error(this.manifest)
+            console.error(err)
+        }
+    }
+}
+
 export async function deploy(argv: DeployArgs) {
     let { RPC_URL: rpcUrl, PRIVATE_KEY: privateKey } = process.env
     const {
@@ -410,6 +457,7 @@ export async function deploy(argv: DeployArgs) {
 
     // Now deploy.
     // 
+    const deploymentManager = new DeploymentManager(argv.manifest, manifest)
     console.log()
     console.log(chalk.green("(2) Deploy"))
 
@@ -448,7 +496,7 @@ export async function deploy(argv: DeployArgs) {
     }
     console.log()
 
-    let deploymentEvents: any[] = []
+    // let deploymentEvents: any[] = []
 
     // 1. AddressResolver
     console.log(`1. Locating AddressResolver...`)
@@ -464,7 +512,7 @@ export async function deploy(argv: DeployArgs) {
     console.log(chalk.gray(`${chalk.yellow('AddressResolver')} is at ${addressResolver.address}`))
 
     if (manifest.targets.system.AddressResolver == null) {
-        deploymentEvents.push({ 
+        deploymentManager.addEvent({ 
             type: "upsert_address_resolver", 
             address: addressResolver.address,
             bytecode: addressResolver_Artifact.bytecode,
@@ -502,7 +550,7 @@ export async function deploy(argv: DeployArgs) {
             signer: signer,
         })
 
-        deploymentEvents.push(
+        deploymentManager.addEvent(
             { 
                 type: "upsert_proxy", 
                 proxy,
@@ -528,7 +576,7 @@ export async function deploy(argv: DeployArgs) {
             constructorArgs: [addressResolver.address],
         })
 
-        deploymentEvents.push(
+        deploymentManager.addEvent(
             { 
                 type: "deploy_impl", 
                 impl, 
@@ -557,10 +605,7 @@ export async function deploy(argv: DeployArgs) {
     console.log(`3. Importing addresses into AddressResolver...`)
     const deployments = [
         ...manifest.deployments,
-        { 
-            events: deploymentEvents,
-            time: +new Date
-        }
+        deploymentManager.deployment
     ]
     const targets2 = getTargetsFromEvents(
         deployments
@@ -580,7 +625,10 @@ export async function deploy(argv: DeployArgs) {
     })
     const clean = await addressResolver.areAddressesImported(names, destinations)
     if (!clean) {
-        await addressResolver.importAddresses(names, destinations)
+        const gasParams = await gasEstimator()
+        const tx = await addressResolver.importAddresses(names, destinations, gasParams)
+        console.log(`tx: ${tx.hash}`)
+        await tx.wait(1)
         console.log(`Imported ${names.length} addresses.`)
     } else {
         console.log(chalk.gray(`No addresses to import.`))
@@ -591,21 +639,21 @@ export async function deploy(argv: DeployArgs) {
     console.log(`4. Rebuilding MixinResolver caches...`)
 
     // 4.1 Caches for proxies.
-    for (let [targetName, target] of Object.entries(targets2.system)) {
-        if(targetName == 'AddressResolver') continue
+    // for (let [targetName, target] of Object.entries(targets2.system)) {
+    //     if(targetName == 'AddressResolver') continue
 
-        const i = new ethers.Contract(target.address, target.abi, signer)
+    //     const i = new ethers.Contract(target.address, target.abi, signer)
         
-        const fresh = await i.isResolverCached()
-        if (fresh) {
-            console.log(chalk.gray(`Skipping ${chalk.yellow(targetName)} - cache is fresh`))
-            continue
-        }
+    //     const fresh = await i.isResolverCached()
+    //     if (fresh) {
+    //         console.log(chalk.gray(`Skipping ${chalk.yellow(targetName)} - cache is fresh`))
+    //         continue
+    //     }
 
-        console.log(`Rebuilding cache for ${chalk.yellow(targetName)}`)
-        const gasParams = await gasEstimator()
-        await i.rebuildCache(gasParams)
-    }
+    //     console.log(`Rebuilding cache for ${chalk.yellow(targetName)}`)
+    //     const gasParams = await gasEstimator()
+    //     await i.rebuildCache(gasParams)
+    // }
 
     // 4.2 Caches for implementations.
     /*
@@ -624,7 +672,7 @@ export async function deploy(argv: DeployArgs) {
         if (!i.isResolverCached) continue
 
         // Log the version as well, since we might be rebuilding the cache of multiple versions.
-        const fullyUniqueId = `${target.target} v${target.version}`
+        const fullyUniqueId = `${target.target} (v${target.version})`
         const fresh = await i.isResolverCached()
         if (fresh) {
             console.log(chalk.gray(`Skipping ${chalk.yellow(fullyUniqueId)} - cache is fresh`))
@@ -642,9 +690,16 @@ export async function deploy(argv: DeployArgs) {
     // 5. Update manifest.
     console.log(`5. Saving deployments manifest...`)
 
+    // TODO code smell.
+    // Complete the deployment.
+    deploymentManager.complete()
+    const completedDeployment = deploymentManager.deployment
     const manifest2: Manifest = {
         version: MANIFEST_VERSIONS.pop(),
-        deployments,
+        deployments: [
+            ...manifest.deployments,
+            completedDeployment
+        ],
         targets: targets2
     }
 

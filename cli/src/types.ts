@@ -18,6 +18,8 @@ export interface Targets {
 
 export interface Deployment {
     events: DeploymentEvent[]
+    time: number
+    _complete: boolean
 }
 
 export type DeploymentEvent = UpsertAddressResolver | UpsertProxyEvent | DeployImplEvent | ImportAddressesEvent | RebuildCacheEvent 
