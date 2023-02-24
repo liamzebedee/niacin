@@ -111,3 +111,30 @@ export interface ContractInfo {
     metadata: any
     deployTx: ethers.Transaction & { blockNumber: number }
 }
+
+export interface EVMBuildArtifact {
+    ast: {
+        absolutePath: string
+    }
+    bytecode: {
+        object: string
+        sourceMap: string
+        linkReferences: any
+    }
+    abi: ethers.utils.Fragment[]
+}
+
+// TODO refactor this, it's temporary
+export interface AllerArtifact extends EVMBuildArtifact {
+    contractName: string
+    hasPreviousVersion: boolean
+    shouldUpgrade: boolean
+    previousDeployment: ContractInfo
+    isModified: boolean
+    isNew: boolean
+    proxyIdentity: ContractInfo
+
+    // We deploy if there is no previous deployment, or if we should upgrade.
+    shouldDeploy: boolean
+    metadata: any
+}

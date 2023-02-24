@@ -12,7 +12,7 @@ yargs(hideBin(process.argv))
         return yargs
             .option('project-type', {
                 type: 'string',
-                enum: ['foundry'],
+                enum: ['foundry', 'hardhat'],
             })
             .option('project-dir', {
                 type: 'string',
@@ -31,7 +31,7 @@ yargs(hideBin(process.argv))
             .option('gas-estimator', {
                 type: 'string',
                 description: 'This configures a custom gas estimator. For Polygon, this uses the Polygon gas station. Options: polygon',
-                default: '',
+                enum: ['polygon'],
             })
             .demandOption(['project-dir', 'manifest'], '')
     }, deploy)

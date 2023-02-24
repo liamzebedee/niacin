@@ -35,56 +35,67 @@ npm i
 # install `aller` binary
 npm link
 
-aller deploy --project-dir ./contracts
+aller deploy --project-dir . --project-type foundry --manifest ./manifest-polygon2.json --gas-estimator polygon
 ```
 
 ### Example.
 
 ```sh
-(base) ➜  vercel3-tools git:(master) ✗ aller deploy --project-dir ./contracts
-Project directory: /Users/liamz/Documents/Projects/vercel3/take.xyz/vercel3-tools/contracts
-forge build
+(base) ➜  contracts git:(contracts-rewrite-aller) ✗ aller deploy --project-dir . --project-type foundry --manifest ./manifest-polygon2.json --gas-estimator polygon
+Creating new empty manifest...
+Loading configuration: /Users/liamz/Documents/Projects/take.xyz/contracts/.allerrc.js
+Loaded .allerrc.js
+Using gas estimator: polygon
+(1) Build
+Project directory: /Users/liamz/Documents/Projects/take.xyz/contracts
+Project type: foundry
+
+> forge build
 No files changed, compilation skipped
-[
-  'src/AddressResolver.sol',
-  'src/example/TakeMarket.sol',
-  'src/example/TakeMarketShares.sol',
-  'src/Proxy.sol',
-  'src/SystemStatus.sol'
-]
-Deploying from account: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 
-AddressResolver deployed at 0xC1e0A9DB9eA830c52603798481045688c8AE99C2
 
-Deploying contracts...
+(2) Deploy
 
-[src/example/TakeMarket.sol]
-Deploying ProxyTakeMarket
-Deploying TakeMarket (impl)
-Upgrading ProxyTakeMarket
+RPC URL: https://polygon-rpc.com
+Deploying from account: 0x913Fd60887e7b99F2EE9115a79F3C5886ad2d47A
 
-[src/example/TakeMarketShares.sol]
-Deploying ProxyTakeMarketShares
-Deploying TakeMarketShares (impl)
-Upgrading ProxyTakeMarketShares
+╔════════════════════════════╤═════════╤═════════╤════════╤═══════════════╗
+║ Contract                   │ Version │ Status  │ Action │ Proxy Address ║
+╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
+║ src/HYPE.sol               │ n/a     │ new     │ deploy │               ║
+╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
+║ src/Take.sol               │ n/a     │ new     │ deploy │               ║
+╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
+║ src/TakeMarketSharesV1.sol │ n/a     │ ignored │ none   │               ║
+╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
+║ src/TakeMarketV1.sol       │ n/a     │ ignored │ none   │               ║
+╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
+║ src/TakeRewardsV1.sol      │ n/a     │ new     │ deploy │               ║
+╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
+║ src/Test2.sol              │ n/a     │ new     │ deploy │               ║
+╚════════════════════════════╧═════════╧═════════╧════════╧═══════════════╝
 
-[src/SystemStatus.sol]
-Deploying ProxySystemStatus
-Deploying SystemStatus (impl)
-Upgrading ProxySystemStatus
+Continue? [y/N]: y
 
-Importing addresses into AddressResolver
+1. Locating AddressResolver...
+deployContract tx=0x262863b24c6acf5fbbdba23ef12793f5138941f80251a8e2e2ce655d933b552b
+AddressResolver is at 0x00B8A57df493830bB833140F0C203d8Fd900603F
 
-Rebuilding MixinResolver caches...
-Rebuilding cache for ProxyTakeMarket
-Rebuilding cache for TakeMarket
-Rebuilding cache for ProxyTakeMarketShares
-Rebuilding cache for TakeMarketShares
-Rebuilding cache for ProxySystemStatus
-Done rebuilding caches
-mkdir: path already exists: .vercel3
-mkdir: path already exists: .vercel3/deployments
-mkdir: path already exists: .vercel3/deployments/localhost
+2. Deploying contracts...
+
+[src/HYPE.sol]
+Creating proxy ProxyHYPE for HYPE
+deployContract tx=0xcab5d6b7998fef8eebefb85df2b42106d24f00686fa49d1a67982026339895ad
+Deploying HYPE v1
+deployContract tx=0x606b79595ce1f9a732580a288a0c40ba53156e2d1a5fdf9d9f3fe74943f09108
+Upgrading ProxyHYPE to implementation v1
+
+[src/Take.sol]
+Creating proxy ProxyTake for Take
+deployContract tx=0xa5623b5a70f65314b6fdd4d3e14b36f7698cf8856cc059ce9bcfda2bd76bb328
+Deploying Take v1
+deployContract tx=0xaee7db06ecb720c0cb7d41cd14a8a7f87f4f4dd6d409c307107d0040e8008123
+Upgrading ProxyTake to implementation v1
 ```
 
 ## `generate-npm-package`

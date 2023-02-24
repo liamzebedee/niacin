@@ -4,11 +4,12 @@ import { join } from 'path'
 import { resolve } from 'path'
 import { ethers } from 'ethers'
 import * as shell from 'shelljs'
-import { Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST, DeployImplEvent, UpsertProxyEvent, ContractInfo, UpsertAddressResolver, DeploymentEvent, Targets, DeploymentNamespace, Deployment } from '../types'
+import { Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST, DeployImplEvent, UpsertProxyEvent, ContractInfo, UpsertAddressResolver, DeploymentEvent, Targets, DeploymentNamespace, Deployment, EVMBuildArtifact, AllerArtifact } from '../types'
 import { addressResolver_Artifact, systemContracts } from '../contracts'
 import { proxy_Artifact } from '../contracts'
 import chalk from 'chalk'
 import { table } from 'table'
+const prompts = require('prompt-sync')({ sigint: true });
 
 const DEPLOY_TRANSACTION_KEY = 'deployTransaction2'
 
@@ -84,16 +85,23 @@ const findTargets: () => string[] = () => {
     const pattern = 'src/**/*.sol'
     const files = glob.sync(pattern)
     const contracts = files.filter((path: string) => {
-        if (path.includes('lib')) {
+        if (path.includes('lib/')) {
             return false
         }
-        if (path.includes('interfaces')) {
+        if (path.includes('libraries/')) {
+            return false
+        }
+        if (path.includes('test/')) {
+            return false
+        }
+        if (path.includes('interfaces/')) {
             return false
         }
         return true
     })
     return contracts
 }
+
 
 
 const findArtifacts = (targetPaths: string[]) => {
@@ -104,20 +112,23 @@ const findArtifacts = (targetPaths: string[]) => {
         const contractFilename = contractSrcPath.split('/').pop().split('.')[0]
         const contractWithoutExt = contractFilename.split('.').pop()
         const artifact = shell.cat(`./out/${contractFilename}.sol/${contractWithoutExt}.json`)
-        const artifactJson = JSON.parse(artifact)
+        const artifactJson = JSON.parse(artifact) as EVMBuildArtifact
         artifacts.push(artifactJson)
     }
     return artifacts
 }
 
 
-const getNewTargets = (inputManifest: Manifest, artifacts: any[]) => {
+const getNewTargets = (inputManifest: Manifest, artifacts: EVMBuildArtifact[]) => {
     const newTargetsArtifacts = artifacts
         // Filter: only contracts with changed bytecode.
-        .map(artifact => {
+        .map(evmArtifact => {
+            let artifact: AllerArtifact = evmArtifact as AllerArtifact
+
             const contractFilename = artifact.ast.absolutePath.split('/').pop().split('.')[0]
             const contractName = contractFilename.split('.').pop()
             const previousDeployment = inputManifest.targets.user[contractFilename]
+            const proxyIdentity = inputManifest.targets.system[`Proxy`+contractFilename]
 
             const isNew = previousDeployment == null
 
@@ -131,6 +142,7 @@ const getNewTargets = (inputManifest: Manifest, artifacts: any[]) => {
             artifact.previousDeployment = previousDeployment
             artifact.isModified = isModified
             artifact.isNew = isNew
+            artifact.proxyIdentity = proxyIdentity
 
             // We deploy if there is no previous deployment, or if we should upgrade.
             artifact.shouldDeploy = !hasPreviousVersion || shouldUpgrade
@@ -240,18 +252,6 @@ const getContract = async (args: GetContractArgs) => {
     return contract
 }
 
-
-interface DeployArgs {
-    projectType: string
-    projectDir: string
-    manifest: string
-    config: string
-    gasEstimator: string
-}
-
-const prompts = require('prompt-sync')({ sigint: true });
-
-
 class DeploymentManager {
     deployment: Deployment
 
@@ -298,6 +298,58 @@ class DeploymentManager {
     }
 }
 
+interface DeployArgs {
+    projectType: string
+    projectDir: string
+    manifest: string
+    config: string
+    gasEstimator: string
+}
+
+// Deploys a set of smart contracts to a blockchain. 
+// 
+// Each contract is "wrapped" in a proxy contract, which allows us to upgrade the contract later. Every contract 
+// has access to the AddressResolver, which allows contracts to look up other contracts by name.
+// 
+// The deployer tool searches the project directory for contracts, and filters them into a set of targets.
+// Non-targets include libraries, interfaces, and abstract contracts (WIP).
+// 
+// A target is a contract that is deployed to the blockchain. It is wrapped in a proxy contract, which allows
+// us to upgrade the contract later. The proxy contract is deployed first, and then the target contract is deployed
+// and the proxy is upgraded to point to the new implementation.
+// 
+// Every target is referred to by its name and version. The name is the name of the contract, and the version is
+// a string that is incremented every time the contract is deployed. 
+// 
+// The deployer will deploy each target, including its implementation and proxy, and perform upgrades.
+// Then it will update the AddressResolver with the latest version of each target.
+// 
+// The entire history of the deployment, including the ABI's of previous versions of each target, is stored in
+// a manifest file. This allows us to easily refer to previous versions of a target, and to easily access their
+// previous ABI's. It also allows us to easily rollback to a previous implementation with ease.
+// 
+// From the deployment events, we can determine the targets, with their names, versions, and addresses.
+// And we can generate a lightweight JS package, which can be used to easily access the deployed targets.
+// 
+// ADDITIONAL NOTES:
+// - the block number a contract is deployed at is essential for indexers. This is stored.
+// - contracts which are deleted from a codebase still need to resolve other contracts, which may still be maintained.
+//   as such, we need to keep the old versions of the contracts in the manifest, which are injected with the new targets
+//   when they are deployed.
+// - the manifest contains deployments for a single chain. Multichain deployments can be done by using separate manifest files.
+// 
+// COMPARISON:
+// - Diamond Standard. What a fucking shitshow.
+// - OZ Proxies. What a slightly less but ever grande shitshow.
+// - Vercel/Next.js. The divine inspiration for this tool.
+// - Synthetix v2 deployer. I adapted 80% of the code from the Synthetix deployer, but rewritten to be more user-friendly and tool-like.
+// - Chugsplash. A very interesting approach, though much too complex a solution in my eyes.
+// 
+// ACKNOWLEDGEMENTS:
+// - This tool is based off of the Synthetix v2 deployer, and 7yrs experience in deploying smart contracts, 
+//   subgraphs, frontends, and other tools. It's been a long ride, and to be honest, I was expecting someone
+//   to make this much sooner.
+// 
 export async function deploy(argv: DeployArgs) {
     let { RPC_URL: rpcUrl, PRIVATE_KEY: privateKey } = process.env
     const {
@@ -363,7 +415,7 @@ export async function deploy(argv: DeployArgs) {
     const artifacts = findArtifacts(targets)
     let targetsForDeployment = getNewTargets(manifest, artifacts)
 
-    const humanInfo = allTargets.map(target => {
+    const deploymentSummaryInfo = allTargets.map(target => {
         // Lookup from targetsForDeployment.
         const deployInfo = targetsForDeployment.find(t => t.ast.absolutePath === target)
         let ignored = ignoredFiles.includes(target)
@@ -378,7 +430,8 @@ export async function deploy(argv: DeployArgs) {
             isModified: false,
             shouldDeploy: false,
             shouldUpgrade: false,
-            version: 'n/a'
+            version: 'n/a',
+            link: ""
         }
 
         if (deployInfo) {
@@ -387,7 +440,8 @@ export async function deploy(argv: DeployArgs) {
                 isModified: deployInfo.isModified,
                 shouldDeploy: deployInfo.shouldDeploy,
                 shouldUpgrade: deployInfo.shouldUpgrade,
-                version: deployInfo.previousDeployment ? deployInfo.previousDeployment.version : 'n/a',
+                version: deployInfo.previousDeployment ? String(deployInfo.previousDeployment.version) : 'n/a',
+                link: deployInfo.proxyIdentity ? deployInfo.proxyIdentity.address : ""
             }
         }
 
@@ -412,31 +466,32 @@ export async function deploy(argv: DeployArgs) {
         } else {
             action = 'none'
         }
+
+        let version = deployInfo.previousDeployment ? String(deployInfo.previousDeployment.version) : 'n/a'
         
         return {
             name: target,
-            version: deployInfo2.version,
+            version: version,
             status,
             action,
+            link: deployInfo2.link,
+            
+            // Meta.
             ignored,
-            isModified: deployInfo2.isModified,
-            shouldUpgrade: deployInfo2.shouldUpgrade,
-            shouldDeploy: deployInfo2.shouldDeploy,
         }
     })
     
     // console.table(humanInfo)
-    const columns = 'Contract | Version | Status | Action'
+    const columns = 'Contract | Version | Status | Action | Proxy Address'
         .split(' | ')
-    const humantableData = [columns]
-        // @ts-ignore
-        .concat(humanInfo.map(info => {
-            
+    const deploymentSummaryTable = [columns]
+        .concat(deploymentSummaryInfo.map(info => {
             let fields = [
                 info.name,
                 info.version,
                 info.status,
-                info.action
+                info.action,
+                info.link,
             ]
 
             if (info.ignored) {
@@ -448,7 +503,6 @@ export async function deploy(argv: DeployArgs) {
             }
             return fields
         }))
-    console.log(table(humantableData))
 
     targetsForDeployment = targetsForDeployment
         .filter(artifact => artifact.shouldDeploy)
@@ -464,7 +518,7 @@ export async function deploy(argv: DeployArgs) {
     // Build the signer, provider, system contracts.
     if(!rpcUrl) {
         console.log(chalk.gray(`No RPC URL provided. Using default for project type: ${projectType}`))
-        if (projectType == 'foundry') {
+        if (projectType == 'foundry' || projectType == 'hardhat') {
             rpcUrl = 'http://localhost:8545'
         } else {
             throw new Error("No RPC URL provided.")
@@ -473,7 +527,7 @@ export async function deploy(argv: DeployArgs) {
 
     if(!privateKey) {
         console.log(chalk.gray(`No PRIVATE KEY provided. Using default for project type: ${projectType}`))
-        if (projectType == 'foundry') {
+        if (projectType == 'foundry' || projectType == 'hardhat') {
             privateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
         } else {
             throw new Error("No PRIVATE KEY provided.")
@@ -488,6 +542,13 @@ export async function deploy(argv: DeployArgs) {
     console.log(chalk.gray(`Deploying from account:`), `${account}`)
     console.log()
 
+    // Print a summary for the deployment.
+    // contract                 | version  | status    | action
+    // src/TakeMarketShares.sol | n/a      | new       | deploy
+    // src/TakeMarketShares.sol | v1 -> v2 | modified  | upgrade
+    // src/TakeMarketShares.sol | v1       | unchanged | none
+    console.log(table(deploymentSummaryTable))
+
     // Await user confirmation to continue.
     const doesUserContinue = prompts("Continue? [y/N]: ")
     if (doesUserContinue != "y") {
@@ -495,8 +556,6 @@ export async function deploy(argv: DeployArgs) {
         return
     }
     console.log()
-
-    // let deploymentEvents: any[] = []
 
     // 1. AddressResolver
     console.log(`1. Locating AddressResolver...`)
@@ -713,9 +772,4 @@ export async function deploy(argv: DeployArgs) {
         console.error(manifest2)
         console.error(err)
     }
-
-    // Now test creating a new take shares market.
-    // const takeMarket = contractsForResolver.filter(contract => contract.name == 'TakeMarket')[0].impl.contract
-    // const tx = await takeMarket.getOrCreateTakeSharesContract(2)
-    // await tx.wait(1)
 }
