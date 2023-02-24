@@ -5,7 +5,7 @@ const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
 
 yargs(hideBin(process.argv))
-    .scriptName("vercel3-tools")
+    .scriptName("aller")
     .usage('$0 <cmd> [args]')
     // @ts-ignore
     .command('deploy', 'deploy the contracts', (yargs) => {

@@ -278,6 +278,7 @@ class DeploymentManager {
 
     save() {
         try {
+            // At each step, we write the new deployment events to disk.
             const manifest = {
                 ...this.manifest,
                 deployments: [
@@ -315,7 +316,7 @@ interface DeployArgs {
 // Non-targets include libraries, interfaces, and abstract contracts (WIP).
 // 
 // A target is a contract that is deployed to the blockchain. It is wrapped in a proxy contract, which allows
-// us to upgrade the contract later. The proxy contract is deployed first, and then the target contract is deployed
+// us to upgrade the contract later. The proxy contract is deployed first, and then the implementation is deployed
 // and the proxy is upgraded to point to the new implementation.
 // 
 // Every target is referred to by its name and version. The name is the name of the contract, and the version is
@@ -467,7 +468,7 @@ export async function deploy(argv: DeployArgs) {
             action = 'none'
         }
 
-        let version = deployInfo.previousDeployment ? String(deployInfo.previousDeployment.version) : 'n/a'
+        let version = deployInfo2.version
         
         return {
             name: target,

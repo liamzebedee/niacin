@@ -23,22 +23,39 @@ docs/                              # Documentation on the deployer.
 
 Steps:
 
- 1. Install the `vercel3-contracts` into your Forge project - 
+ 1. Install the `aller` contracts into your Forge project - 
  
  ```sh
- forge install liamzebedee/vercel3-pipeline
- echo "@vercel3=./lib/vercel3-pipeline/contracts/src/" >> remappings.txt
+ cp -R contracts/ your-foundry-project/lib/aller
+ echo "@aller=./lib/aller/src/" >> remappings.txt
  ```
 
- 2. Install the vercel3 deployer command -
+ 2. Install the `aller` command -
  
  ```sh
- npm i -G vercel3-deploy
+ cd cli
+ npm install
+ npm link
  ```
-
- 3. Deploy. 
+ 
+ 3. Deploy to localhost. 
  
  ```sh
- vercel3-deploy --project-dir . --project-type foundry --input-manifest ./.vercel3/deployments/localhost/manifest.json
+ # You can set ETH_RPC_URL and PRIVATE_KEY as environment variables.
+ # If they are unset, aller assumes local deployment and loads the default Hardhat/Founry private key for you.
+ aller deploy --project-dir . --project-type foundry --manifest ./manifest.json
  ```
 
+**NOTE**: contracts must inherit the address resolver mixin as follows:
+
+```
+import "@aller/lib/MixinResolver.sol";
+
+contract TakeMarket is 
+    MixinResolver 
+{
+	uint public a = 2;
+
+    constructor(address _resolver) MixinResolver(_resolver) {
+    }
+```
