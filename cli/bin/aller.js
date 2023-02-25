@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('aller-cli')
+require('../build/index')

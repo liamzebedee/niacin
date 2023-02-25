@@ -3,6 +3,3 @@
 	url = https://github.com/foundry-rs/forge-std
 [submodule "lib/forge-std"]
 	branch = v1.3.0
-[submodule "example-project/lib/vercel3-pipeline"]
-	path = example-project/lib/vercel3-pipeline
-	url = https://github.com/liamzebedee/vercel3-pipeline

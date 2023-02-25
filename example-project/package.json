@@ -1,0 +1,25 @@
+{
+  "name": "example-project",
+  "version": "1.0.0",
+  "description": "vercel3 example project =======================",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "sync-aller-contracts": "rm -r node_modules/aller-contracts && cp -R ../contracts node_modules/aller-contracts",
+    "deploy": "npx aller deploy --project-dir . --project-type foundry --manifest ./manifest.json -y",
+    "build": "forge build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "volta": {
+    "node": "16.19.1"
+  },
+  "dependencies": {
+    "aller-cli": "file:../cli",
+    "aller-contracts": "^1.1.0"
+  }
+}

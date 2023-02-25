@@ -1,5 +1,6 @@
 import { deploy } from "./cmds/deploy"
 import { generateNPMPackage } from "./cmds/generate-npm-pkg"
+import { initializeProject } from "./cmds/initialize_project"
 
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
@@ -33,6 +34,11 @@ yargs(hideBin(process.argv))
                 description: 'This configures a custom gas estimator. For Polygon, this uses the Polygon gas station. Options: polygon',
                 enum: ['polygon'],
             })
+            .option('y', {
+                type: 'boolean',
+                description: 'Automatically answer yes to all prompts',
+                default: false,
+            })
             .demandOption(['project-dir', 'manifest'], '')
     }, deploy)
     .command('generate-npm-pkg', 'generate an NPM package from a deployment manifest', (yargs: any) => {
@@ -47,6 +53,14 @@ yargs(hideBin(process.argv))
             })
             .demandOption(['manifest-path'], '')
     }, generateNPMPackage)
+    .command('init', 'generate an .allerc.js configuration file', (yargs: any) => {
+        return yargs
+            .option('out', {
+                type: 'string',
+                description: 'The output path for the .allerrc.js file',
+                default: './.allerrc.js',
+            })
+    }, initializeProject)
     .help()
     .demandCommand()
     .parse()

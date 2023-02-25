@@ -1,1 +1,1 @@
-@vercel3=./lib/vercel3-pipeline/contracts/src/
+@aller=./node_modules/aller-contracts/src/

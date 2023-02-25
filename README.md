@@ -2,7 +2,7 @@
 
 Continuous deployment for Solidity.
 
- * Zero config. All contracts are deployed with upgradeability built-in. Built-in dependency injection for contracts.
+ * Zero config. All contracts are deployed with upgradeability built-in. Built-in dependency injection for contracts. Tracks Git metadata.
  * Instant tracking of deployment artifacts in the `manifest.json`.
  * Automatically generate a JS module containing deployment info/abi's, for use in frontends/subgraphs.
 

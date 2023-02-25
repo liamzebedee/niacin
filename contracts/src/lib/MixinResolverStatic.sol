@@ -55,6 +55,10 @@ contract MixinResolverStatic is
         revert("ERR_STATIC_RESOLVER");
     }
 
+    function isResolverCached() pure public returns (bool) {
+        return true;
+    }
+
     /* ========== INTERNAL FUNCTIONS ========== */
 
     function requireAndGetAddress(bytes32 name) internal view override returns (address) {

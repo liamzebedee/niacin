@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {TakeMarketSharesFactoryAuthority} from "./lib/TakeMarketSharesFactoryAuthority.sol";
-import {MixinResolverStatic} from "@vercel3/lib/MixinResolverStatic.sol";
+import {MixinResolverStatic} from "@aller/lib/MixinResolverStatic.sol";
 
 contract TakeMarketShares is 
     MixinResolverStatic,

@@ -5,6 +5,15 @@ export const MANIFEST_VERSIONS = [
     '0.1.0'
 ]
 
+export const CONFIG_VERSIONS = [
+    '0.1.0'
+]
+
+export interface AllerConfig {
+    version: string
+    ignore: string[]
+}
+
 export interface Manifest {
     version: string
     targets: Targets
@@ -16,9 +25,22 @@ export interface Targets {
     user: Record<string, ContractInfo>
 }
 
+export interface VersionControlInfo {
+    type: 'git' | 'none'
+    tag: string
+    branch: string
+    dirty: boolean
+    descriptor: string
+}
+
 export interface Deployment {
     events: DeploymentEvent[]
     time: number
+    
+    // A tag from a version control system. For Git, this is a git hash.
+    revision: VersionControlInfo
+
+    // Internal/WIP.
     _complete: boolean
 }
 

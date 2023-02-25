@@ -4,7 +4,7 @@ import { join } from 'path'
 import { resolve } from 'path'
 import { ethers } from 'ethers'
 import * as shell from 'shelljs'
-import { Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST, DeployImplEvent, UpsertProxyEvent, ContractInfo, UpsertAddressResolver, DeploymentEvent, Targets, DeploymentNamespace, Deployment, EVMBuildArtifact, AllerArtifact } from '../types'
+import { Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST, DeployImplEvent, UpsertProxyEvent, ContractInfo, UpsertAddressResolver, DeploymentEvent, Targets, DeploymentNamespace, Deployment, EVMBuildArtifact, AllerArtifact, AllerConfig, VersionControlInfo } from '../types'
 import { addressResolver_Artifact, systemContracts } from '../contracts'
 import { proxy_Artifact } from '../contracts'
 import chalk from 'chalk'
@@ -12,6 +12,20 @@ import { table } from 'table'
 const prompts = require('prompt-sync')({ sigint: true });
 
 const DEPLOY_TRANSACTION_KEY = 'deployTransaction2'
+
+const logTx = (tx: ethers.Transaction) => {
+    console.debug(chalk.gray(`tx: ${tx.hash}`))
+}
+
+const promptConfirmation = (msg: string, yes: boolean): boolean => {
+    if (yes) {
+        console.log(`${msg} [y/N]: y`)
+        return true
+    } else {
+        const answer = prompts(`${msg} [y/N]: `)
+        return answer == "y"
+    }
+}
 
 export const eventToContractInfo = (event: UpsertAddressResolver | DeployImplEvent | UpsertProxyEvent): ContractInfo => {
     const version = event.type == 'deploy_impl' ? event.version : 1
@@ -231,13 +245,15 @@ const deployContract = async (args: DeployFuncArgs) => {
     
     const gasInfo = await gasEstimator()
     const contract = await Contract.deploy(...args.constructorArgs, gasInfo)
-    
-    console.debug(`deployContract tx=${contract.deployTransaction.hash}`)
+    logTx(contract.deployTransaction)
+
     await contract.deployTransaction.wait()
     const rx = await args.signer.provider.getTransactionReceipt(contract.deployTransaction.hash)
     contract.deployTransaction.blockNumber = rx.blockNumber
     // @ts-ignore
     contract[DEPLOY_TRANSACTION_KEY] = contract.deployTransaction
+
+    console.log(chalk.gray(`contract: ${contract.address}`))
     return contract
 }
 
@@ -255,11 +271,12 @@ const getContract = async (args: GetContractArgs) => {
 class DeploymentManager {
     deployment: Deployment
 
-    constructor(public manifestPath: string, public manifest: Manifest) {
+    constructor(public manifestPath: string, public manifest: Manifest, private revision: VersionControlInfo) {
         this.deployment = {
             events: [],
             time: +new Date,
-            _complete: false
+            revision,
+            _complete: false,
         }
         this.manifestPath = manifestPath
         // clone manifest. TODO code smell
@@ -305,6 +322,7 @@ interface DeployArgs {
     manifest: string
     config: string
     gasEstimator: string
+    y: boolean
 }
 
 // Deploys a set of smart contracts to a blockchain. 
@@ -370,7 +388,6 @@ export async function deploy(argv: DeployArgs) {
     }
 
     // Load configuration.
-    let allerrc: any = {}
     const p = resolve(join(projectDir, "/", argv.config))
     // Check the config exists.
     try {
@@ -380,7 +397,7 @@ export async function deploy(argv: DeployArgs) {
     }
     console.log(`Loading configuration: ${p}`)
     console.log(`Loaded .allerrc.js`)
-    allerrc = require(p)
+    const allerrc = require(p) as AllerConfig
 
     // Load gas estimator.
     let gasEstimatorName = argv.gasEstimator || 'default'
@@ -393,7 +410,8 @@ export async function deploy(argv: DeployArgs) {
 
 
     const ignoredFiles = allerrc.ignore || []
-
+    
+    console.log()
     console.log(chalk.green("(1) Build"))
     shell.cd(projectDir)
     console.log(chalk.gray(`Project directory:`), `${shell.pwd()}`)
@@ -512,7 +530,55 @@ export async function deploy(argv: DeployArgs) {
 
     // Now deploy.
     // 
-    const deploymentManager = new DeploymentManager(argv.manifest, manifest)
+    
+    // Try to get the version control tag.
+    let versionControlInfo: VersionControlInfo = {
+        type: 'none',
+        tag: '',
+        branch: '',
+        dirty: false,
+        descriptor: '',
+    }
+    
+    const isGitRepo = shell.exec('git rev-parse --is-inside-work-tree', { silent: true }).stdout.trim()
+    if (isGitRepo === 'true') {
+        console.log(chalk.gray(`Git repository detected.`))
+
+        try {
+            const dirty = shell.exec('git status --porcelain', { silent: true }).stdout.trim().length > 0
+            const branch = shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).stdout.trim()
+            const tag = shell.exec('git rev-parse HEAD', { silent: true }).stdout.trim()
+            const descriptor = `${tag}${dirty ? '-dirty' : ''}`
+            versionControlInfo = {
+                type: 'git',
+                tag,
+                branch,
+                dirty,
+                descriptor,
+            }
+        } catch (err) {
+            console.log(chalk.yellow(`Can't get version control tag: ${err}`))
+        }
+    }
+
+    if (versionControlInfo.type != 'none' && versionControlInfo.dirty) {
+        if(!promptConfirmation(`You are deploying from a dirty git repository. Are you sure you want to continue?`, argv.y)) {
+            return console.log(`Aborting.`)
+        }
+    }
+
+    console.log(`Recording version control information:`)
+    // branch = master
+    // commit = 232312
+    // dirty = true
+    console.log(`  ${chalk.gray(`branch`)} = ${versionControlInfo.branch}`)
+    console.log(`  ${chalk.gray(`commit`)} = ${versionControlInfo.tag}`)
+    console.log(`  ${chalk.gray(`dirty`)} = ${versionControlInfo.dirty}`)
+    console.log()
+    
+
+    
+    const deploymentManager = new DeploymentManager(argv.manifest, manifest, versionControlInfo)
     console.log()
     console.log(chalk.green("(2) Deploy"))
 
@@ -551,15 +617,14 @@ export async function deploy(argv: DeployArgs) {
     console.log(table(deploymentSummaryTable))
 
     // Await user confirmation to continue.
-    const doesUserContinue = prompts("Continue? [y/N]: ")
-    if (doesUserContinue != "y") {
-        console.log(`Aborting deployment.`)
-        return
+    if (!promptConfirmation(`Continue?`, argv.y)) {
+        return console.log(`Aborting.`)
     }
     console.log()
 
     // 1. AddressResolver
     console.log(`1. Locating AddressResolver...`)
+    console.log()
     const addressResolver = await getOrCreate({
         manifest: manifest,
         deploymentNamespace: "system",
@@ -585,7 +650,8 @@ export async function deploy(argv: DeployArgs) {
     
     console.log()
     console.log(`2. Deploying contracts...`)
-    if(targetsForDeployment.length == 0) {
+    if (targetsForDeployment.length == 0) {
+        console.log()
         console.log(chalk.gray(`No new contracts to deploy.`))
     }
     for (let artifact of targetsForDeployment) {
@@ -606,7 +672,7 @@ export async function deploy(argv: DeployArgs) {
             name: proxyName,
             abi: proxy_Artifact.abi as any,
             bytecode: proxy_Artifact.bytecode.object,
-            constructorArgs: [addressResolver.address],
+            constructorArgs: [],
             signer: signer,
         })
 
@@ -626,8 +692,8 @@ export async function deploy(argv: DeployArgs) {
 
         // 2.2 Deploy implementation.
         const previous = manifest.targets.user[artifact.contractName]
-        const version = 1 + (previous ? previous.version : 0)
-        console.log(`Deploying ${chalk.yellow(artifact.contractName)} v${version}`)
+        const nextVersion = 1 + (previous ? previous.version : 0)
+        console.log(`Deploying ${chalk.yellow(artifact.contractName)} v${nextVersion}`)
 
         const impl = await deployContract({
             signer: signer,
@@ -640,7 +706,7 @@ export async function deploy(argv: DeployArgs) {
             { 
                 type: "deploy_impl", 
                 impl, 
-                version, 
+                version: nextVersion, 
                 target: artifact.contractName,
                 abi: artifact.abi,
                 deployTx: impl[DEPLOY_TRANSACTION_KEY],
@@ -653,9 +719,11 @@ export async function deploy(argv: DeployArgs) {
         )
 
         // 2.3 Upgrade the proxy to new version.
-        console.log(`Upgrading ${chalk.yellow(proxyName)} to implementation v${version}`)
+        console.log(`Upgrading ${chalk.yellow(proxyName)} to implementation v${nextVersion}`)
         const gasParams = await gasEstimator()
-        const tx = await proxy.upgrade(impl.address, gasParams)
+        const tx = await proxy.upgrade(impl.address, nextVersion, gasParams)
+        logTx(tx)
+        await tx.wait(1)
     }
 
     // 3. Import the addresses.
@@ -663,6 +731,7 @@ export async function deploy(argv: DeployArgs) {
 
     console.log()
     console.log(`3. Importing addresses into AddressResolver...`)
+    console.log()
     const deployments = [
         ...manifest.deployments,
         deploymentManager.deployment
@@ -684,10 +753,11 @@ export async function deploy(argv: DeployArgs) {
         return proxy.address
     })
     const clean = await addressResolver.areAddressesImported(names, destinations)
+    // console.debug(names, destinations)
     if (!clean) {
         const gasParams = await gasEstimator()
         const tx = await addressResolver.importAddresses(names, destinations, gasParams)
-        console.log(`tx: ${tx.hash}`)
+        logTx(tx)
         await tx.wait(1)
         console.log(`Imported ${names.length} addresses.`)
     } else {
@@ -697,25 +767,9 @@ export async function deploy(argv: DeployArgs) {
     // 4. Rebuild caches.
     console.log()
     console.log(`4. Rebuilding MixinResolver caches...`)
+    console.log()
 
-    // 4.1 Caches for proxies.
-    // for (let [targetName, target] of Object.entries(targets2.system)) {
-    //     if(targetName == 'AddressResolver') continue
-
-    //     const i = new ethers.Contract(target.address, target.abi, signer)
-        
-    //     const fresh = await i.isResolverCached()
-    //     if (fresh) {
-    //         console.log(chalk.gray(`Skipping ${chalk.yellow(targetName)} - cache is fresh`))
-    //         continue
-    //     }
-
-    //     console.log(`Rebuilding cache for ${chalk.yellow(targetName)}`)
-    //     const gasParams = await gasEstimator()
-    //     await i.rebuildCache(gasParams)
-    // }
-
-    // 4.2 Caches for implementations.
+    // 4.1 Caches for implementations.
     /*
      * It's important that we map all past impls, as a user might delete a target,
      * but it's addressresolver cache still needs to be updated.
@@ -727,12 +781,10 @@ export async function deploy(argv: DeployArgs) {
         .flat()))
     {
         const i = new ethers.Contract(target.address, target.abi, signer)
-        
-        // check if we need to rebuild cache.
-        if (!i.isResolverCached) continue
 
         // Log the version as well, since we might be rebuilding the cache of multiple versions.
         const fullyUniqueId = `${target.target} (v${target.version})`
+        
         const fresh = await i.isResolverCached()
         if (fresh) {
             console.log(chalk.gray(`Skipping ${chalk.yellow(fullyUniqueId)} - cache is fresh`))
@@ -740,15 +792,20 @@ export async function deploy(argv: DeployArgs) {
         }
 
         console.log(`Rebuilding cache for ${chalk.yellow(fullyUniqueId)}`)
+        // console.debug(chalk.gray(`Address: ${target.address}`))
         const gasParams = await gasEstimator()
-        await i.rebuildCache(gasParams)
+        const tx = await i.rebuildCache(gasParams)
+        logTx(tx)
+        await tx.wait(1)
     }
-
+    
+    console.log()
     console.log('Done rebuilding caches.')
     console.log()
 
     // 5. Update manifest.
     console.log(`5. Saving deployments manifest...`)
+    console.log()
 
     // TODO code smell.
     // Complete the deployment.

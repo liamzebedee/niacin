@@ -5,13 +5,11 @@ pragma solidity ^0.8.13;
 // The proxy forwards all calls to the implementation.
 // The proxy has an admin.
 
-import "./lib/MixinResolver.sol";
-
 contract ProxyStorage {
     struct ProxyStore {
         address admin;
         address implementation;
-        bool init;
+        uint32 version;
     }
 
     bytes32 constant STORE_SLOT = bytes32(uint(keccak256("eth.nakamofo.proxy")) - 1);
@@ -25,19 +23,13 @@ contract ProxyStorage {
 }
 
 contract Proxy is 
-    ProxyStorage,
-    MixinResolver 
+    ProxyStorage
 {
-    event Upgraded(address indexed implementation);
+    event Upgraded(address indexed implementation, uint32 indexed version);
     event AdminChanged(address previousAdmin, address newAdmin);
 
-    constructor(address _resolver) MixinResolver(_resolver) {
+    constructor() {
         _setProxyAdmin(msg.sender);
-    }
-
-    function resolverAddressesRequired() public override pure returns (bytes32[] memory addresses) {
-        bytes32[] memory requiredAddresses = new bytes32[](0);
-        return requiredAddresses;
     }
 
     function proxyAdmin() public view returns (address) {
@@ -46,6 +38,10 @@ contract Proxy is
 
     function implementation() public view returns (address) {
         return _store().implementation;
+    }
+
+    function implementationVersion() public view returns (uint32) {
+        return _store().version;
     }
 
     function setProxyAdmin(address _admin) public {
@@ -58,10 +54,11 @@ contract Proxy is
         _store().admin = _admin;
     }
 
-    function upgrade(address _implementation) public {
+    function upgrade(address _implementation, uint32 version) public {
         require(msg.sender == _store().admin, "ERR_UNAUTHORISED");
-        emit Upgraded(_implementation);
+        emit Upgraded(_implementation, version);
         _store().implementation = _implementation;
+        _store().version = version;
     }
 
     /// @dev Fallback function forwards all transactions and returns all received return data.
@@ -110,31 +107,3 @@ contract Proxy is
 
 
 
-
-
-// contract ImplementationStorage {
-//     struct ImplementationStore {
-//         address target;
-//     }
-
-//     bytes32 constant STORE_SLOT = bytes32(uint(keccak256("eth.nakamofo.implementation")) - 1);
-
-//     function _store() internal pure returns (ImplementationStore storage store) {
-//         bytes32 s = STORE_SLOT;
-//         assembly {
-//             store.slot := s
-//         }
-//     }
-// }
-
-// abstract contract TargetImplementation is 
-//     ImplementationStorage 
-// {
-//     function onProxyUpgrade(address _target) public {
-//         _store().target = _target;
-//     }
-
-//     function getProxy() public view returns (address) {
-//         return _store().target;
-//     }
-// }

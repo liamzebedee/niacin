@@ -2,9 +2,9 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "@vercel3/Proxy.sol";
-import "@vercel3/lib/Clones.sol";
-import "@vercel3/AddressResolver.sol";
+import "@aller/Proxy.sol";
+import "@aller/lib/Clones.sol";
+import "@aller/AddressResolver.sol";
 import {TakeMarket} from "../src/TakeMarket.sol";
 import {TakeMarketShares} from "../src/TakeMarketShares.sol";
 
@@ -18,13 +18,13 @@ contract ATest is Test {
         // Deploy each contract:
         // (1) The proxy - the stable identity.
         // (2) The implementation.
-        Proxy proxy1 = new Proxy(address(resolver));
+        Proxy proxy1 = new Proxy();
         TakeMarket takeMarket = new TakeMarket(address(resolver));
-        proxy1.upgrade(address(takeMarket));
+        proxy1.upgrade(address(takeMarket), 1);
         
-        Proxy proxy2 = new Proxy(address(resolver));
+        Proxy proxy2 = new Proxy();
         TakeMarketShares takeMarketShares = new TakeMarketShares(address(resolver));
-        proxy2.upgrade(address(takeMarketShares));
+        proxy2.upgrade(address(takeMarketShares), 1);
 
         // Import the contracts - (name, proxy) - into the resolver.
         bytes32[] memory names = new bytes32[](2);

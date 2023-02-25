@@ -2,13 +2,13 @@
 pragma solidity ^0.8.13;
 
 import "./TakeMarketShares.sol";
-import "@vercel3/lib/Clones.sol";
-import "@vercel3/lib/MixinResolver.sol";
+import "@aller/lib/Clones.sol";
+import "@aller/lib/MixinResolver.sol";
 
 contract TakeMarket is 
     MixinResolver 
 {
-	uint public a = 2;
+	uint public a = 5;
 
     constructor(address _resolver) MixinResolver(_resolver) {
     }
