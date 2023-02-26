@@ -11,7 +11,6 @@ import {IConfigurable} from "../interfaces/IConfigurable.sol";
 // Internal references
 import {AddressResolver} from "../AddressResolver.sol";
 
-// https://docs.synthetix.io/contracts/source/contracts/mixinresolver
 abstract contract MixinResolver is 
     IMixinResolver,
     IConfigurable

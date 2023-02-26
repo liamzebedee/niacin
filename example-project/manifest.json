@@ -21676,6 +21676,2517 @@
       },
       "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       "_complete": true
+    },
+    {
+      "events": [
+        {
+          "type": "upsert_proxy",
+          "proxy": {
+            "interface": {
+              "fragments": [
+                {
+                  "name": null,
+                  "type": "constructor",
+                  "inputs": [
+                    {
+                      "name": "_resolver",
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "name": "AdminChanged",
+                  "anonymous": false,
+                  "inputs": [
+                    {
+                      "name": "previousAdmin",
+                      "type": "address",
+                      "indexed": false,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "newAdmin",
+                      "type": "address",
+                      "indexed": false,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "type": "event",
+                  "_isFragment": true
+                },
+                {
+                  "name": "Upgraded",
+                  "anonymous": false,
+                  "inputs": [
+                    {
+                      "name": "implementation",
+                      "type": "address",
+                      "indexed": true,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "version",
+                      "type": "uint32",
+                      "indexed": true,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "type": "event",
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "computeNewDeploymentSalt",
+                  "constant": true,
+                  "inputs": [
+                    {
+                      "name": "version",
+                      "type": "uint32",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "bytes32",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "bytes32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "configured",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "bool",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "bool",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "implementation",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "implementationVersion",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "uint32",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "proxyAdmin",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "resolver",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "setProxyAdmin",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "_admin",
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "upgrade",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "_implementation",
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "version",
+                      "type": "uint32",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "upgrade2",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "_newImplementation",
+                      "type": "bytes",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "bytes",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "version",
+                      "type": "uint32",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                }
+              ],
+              "_abiCoder": {
+                "coerceFunc": null
+              },
+              "functions": {
+                "computeNewDeploymentSalt(uint32)": {
+                  "type": "function",
+                  "name": "computeNewDeploymentSalt",
+                  "constant": true,
+                  "inputs": [
+                    {
+                      "name": "version",
+                      "type": "uint32",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "bytes32",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "bytes32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "configured()": {
+                  "type": "function",
+                  "name": "configured",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "bool",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "bool",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "implementation()": {
+                  "type": "function",
+                  "name": "implementation",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "implementationVersion()": {
+                  "type": "function",
+                  "name": "implementationVersion",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "uint32",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "proxyAdmin()": {
+                  "type": "function",
+                  "name": "proxyAdmin",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "resolver()": {
+                  "type": "function",
+                  "name": "resolver",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "setProxyAdmin(address)": {
+                  "type": "function",
+                  "name": "setProxyAdmin",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "_admin",
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "upgrade(address,uint32)": {
+                  "type": "function",
+                  "name": "upgrade",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "_implementation",
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "version",
+                      "type": "uint32",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "upgrade2(bytes,uint32)": {
+                  "type": "function",
+                  "name": "upgrade2",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "_newImplementation",
+                      "type": "bytes",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "bytes",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "version",
+                      "type": "uint32",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                }
+              },
+              "errors": {},
+              "events": {
+                "AdminChanged(address,address)": {
+                  "name": "AdminChanged",
+                  "anonymous": false,
+                  "inputs": [
+                    {
+                      "name": "previousAdmin",
+                      "type": "address",
+                      "indexed": false,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "newAdmin",
+                      "type": "address",
+                      "indexed": false,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "type": "event",
+                  "_isFragment": true
+                },
+                "Upgraded(address,uint32)": {
+                  "name": "Upgraded",
+                  "anonymous": false,
+                  "inputs": [
+                    {
+                      "name": "implementation",
+                      "type": "address",
+                      "indexed": true,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "version",
+                      "type": "uint32",
+                      "indexed": true,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint32",
+                      "_isParamType": true
+                    }
+                  ],
+                  "type": "event",
+                  "_isFragment": true
+                }
+              },
+              "structs": {},
+              "deploy": {
+                "name": null,
+                "type": "constructor",
+                "inputs": [
+                  {
+                    "name": "_resolver",
+                    "type": "address",
+                    "indexed": null,
+                    "components": null,
+                    "arrayLength": null,
+                    "arrayChildren": null,
+                    "baseType": "address",
+                    "_isParamType": true
+                  }
+                ],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "gas": null,
+                "_isFragment": true
+              },
+              "_isInterface": true
+            },
+            "provider": {
+              "_isProvider": true,
+              "_events": [],
+              "_emitted": {
+                "block": -2,
+                "t:0x55854ad2b2d86f1fbbe5e48809853ac3b58013e5ffab805fed50097897e47276": 1779,
+                "t:0xa9d674a4eba29be5eed1c8aa3362e83a7cc2ad9c851231aa47ea452741789f9d": 1780
+              },
+              "disableCcipRead": false,
+              "formatter": {
+                "formats": {
+                  "transaction": {},
+                  "transactionRequest": {},
+                  "receiptLog": {},
+                  "receipt": {},
+                  "block": {},
+                  "blockWithTransactions": {},
+                  "filter": {},
+                  "filterLog": {}
+                }
+              },
+              "anyNetwork": false,
+              "_networkPromise": {},
+              "_maxInternalBlockNumber": 1778,
+              "_lastBlockNumber": -2,
+              "_maxFilterBlockRange": 10,
+              "_pollingInterval": 4000,
+              "_fastQueryDate": 1677415621963,
+              "connection": {
+                "url": "http://localhost:8545"
+              },
+              "_nextId": 82,
+              "_eventLoopCache": {
+                "detectNetwork": null,
+                "eth_chainId": null,
+                "eth_blockNumber": null
+              },
+              "_network": {
+                "chainId": 31337,
+                "name": "unknown"
+              },
+              "_internalBlockNumber": {},
+              "_fastBlockNumber": 1778,
+              "_fastBlockNumberPromise": {}
+            },
+            "signer": {
+              "_isSigner": true,
+              "address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "provider": {
+                "_isProvider": true,
+                "_events": [],
+                "_emitted": {
+                  "block": -2,
+                  "t:0x55854ad2b2d86f1fbbe5e48809853ac3b58013e5ffab805fed50097897e47276": 1779,
+                  "t:0xa9d674a4eba29be5eed1c8aa3362e83a7cc2ad9c851231aa47ea452741789f9d": 1780
+                },
+                "disableCcipRead": false,
+                "formatter": {
+                  "formats": {
+                    "transaction": {},
+                    "transactionRequest": {},
+                    "receiptLog": {},
+                    "receipt": {},
+                    "block": {},
+                    "blockWithTransactions": {},
+                    "filter": {},
+                    "filterLog": {}
+                  }
+                },
+                "anyNetwork": false,
+                "_networkPromise": {},
+                "_maxInternalBlockNumber": 1778,
+                "_lastBlockNumber": -2,
+                "_maxFilterBlockRange": 10,
+                "_pollingInterval": 4000,
+                "_fastQueryDate": 1677415621963,
+                "connection": {
+                  "url": "http://localhost:8545"
+                },
+                "_nextId": 82,
+                "_eventLoopCache": {
+                  "detectNetwork": null,
+                  "eth_chainId": null,
+                  "eth_blockNumber": null
+                },
+                "_network": {
+                  "chainId": 31337,
+                  "name": "unknown"
+                },
+                "_internalBlockNumber": {},
+                "_fastBlockNumber": 1778,
+                "_fastBlockNumberPromise": {}
+              }
+            },
+            "callStatic": {},
+            "estimateGas": {},
+            "functions": {},
+            "populateTransaction": {},
+            "filters": {},
+            "_runningEvents": {},
+            "_wrappedEmits": {},
+            "address": "0xc050897faEe2b399F5E6cB73517d9380669665f8",
+            "resolvedAddress": {}
+          },
+          "address": "0xc050897faEe2b399F5E6cB73517d9380669665f8",
+          "target": "TakeMarket",
+          "proxyName": "ProxyTakeMarket",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_resolver",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "previousAdmin",
+                  "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "newAdmin",
+                  "type": "address"
+                }
+              ],
+              "name": "AdminChanged",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "implementation",
+                  "type": "address"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "uint32",
+                  "name": "version",
+                  "type": "uint32"
+                }
+              ],
+              "name": "Upgraded",
+              "type": "event"
+            },
+            {
+              "stateMutability": "payable",
+              "type": "fallback"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint32",
+                  "name": "version",
+                  "type": "uint32"
+                }
+              ],
+              "name": "computeNewDeploymentSalt",
+              "outputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "",
+                  "type": "bytes32"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "configured",
+              "outputs": [
+                {
+                  "internalType": "bool",
+                  "name": "",
+                  "type": "bool"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "implementation",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "implementationVersion",
+              "outputs": [
+                {
+                  "internalType": "uint32",
+                  "name": "",
+                  "type": "uint32"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "proxyAdmin",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "resolver",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_admin",
+                  "type": "address"
+                }
+              ],
+              "name": "setProxyAdmin",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_implementation",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "version",
+                  "type": "uint32"
+                }
+              ],
+              "name": "upgrade",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "bytes",
+                  "name": "_newImplementation",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "version",
+                  "type": "uint32"
+                }
+              ],
+              "name": "upgrade2",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "stateMutability": "payable",
+              "type": "receive"
+            }
+          ],
+          "bytecode": {
+            "object": "0x60806040526000805460ff60a01b1916905534801561001d57600080fd5b50604051610a28380380610a2883398101604081905261003c91610114565b6100453361006a565b600080546001600160a01b0319166001600160a01b0392909216919091179055610165565b7f7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f6100936100e0565b54604080516001600160a01b03928316815291841660208301520160405180910390a1806100bf6100e0565b80546001600160a01b0319166001600160a01b039290921691909117905550565b60008061010e60017f4c3ee7f6a2d8af71947ceff4838fdd00b02c41abff6d08e2cd4475e7186935a9610144565b92915050565b60006020828403121561012657600080fd5b81516001600160a01b038116811461013d57600080fd5b9392505050565b8181038181111561010e57634e487b7160e01b600052601160045260246000fd5b6108b4806101746000396000f3fe60806040526004361061008a5760003560e01c806344b144931161005957806344b144931461013d57806347c026611461015d5780635c60da1b1461017d5780638772a23a146101925780639b9bf2d1146101c357610099565b806304f3bcec146100a157806306bfcec6146100de5780632baa9a7d146101085780633e47158c1461012857610099565b36610099576100976101f1565b005b6100976101f1565b3480156100ad57600080fd5b506000546100c1906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b3480156100ea57600080fd5b506100f361022e565b60405163ffffffff90911681526020016100d5565b34801561011457600080fd5b50610097610123366004610725565b61024e565b34801561013457600080fd5b506100c161033a565b34801561014957600080fd5b5061009761015836600461076e565b610353565b34801561016957600080fd5b50610097610178366004610827565b610473565b34801561018957600080fd5b506100c16104d2565b34801561019e57600080fd5b506000546101b390600160a01b900460ff1681565b60405190151581526020016100d5565b3480156101cf57600080fd5b506101e36101de366004610842565b6104ee565b6040519081526020016100d5565b60006101fb610540565b600101546001600160a01b031690503660008037600080366000845af43d6000803e808015610229573d6000f35b3d6000fd5b6000610238610540565b60010154600160a01b900463ffffffff16919050565b610256610540565b546001600160a01b031633146102a65760405162461bcd60e51b815260206004820152601060248201526f11549497d5539055551213d49254d15160821b60448201526064015b60405180910390fd5b60405163ffffffff8216906001600160a01b038416907fe523aaf37c3bbc80e5b1b689a889eb8bed383aeb61b68175b18c4d6ba05576e190600090a3816102eb610540565b60010180546001600160a01b0319166001600160a01b039290921691909117905580610315610540565b60010160146101000a81548163ffffffff021916908363ffffffff1602179055505050565b6000610344610540565b546001600160a01b0316919050565b60006103696000610363846104ee565b85610574565b600054909150600160a01b900460ff166103e357600054604051633189666560e11b81523060048201526001600160a01b03918216602482015290821690636312ccca90604401600060405180830381600087803b1580156103ca57600080fd5b505af11580156103de573d6000803e3d6000fd5b505050505b806103ec610540565b60010180546001600160a01b0319166001600160a01b039290921691909117905581610416610540565b600101805463ffffffff60a01b1916600160a01b63ffffffff93841602179055604051908316906001600160a01b038316907fe523aaf37c3bbc80e5b1b689a889eb8bed383aeb61b68175b18c4d6ba05576e190600090a3505050565b61047b610540565b546001600160a01b031633146104c65760405162461bcd60e51b815260206004820152601060248201526f11549497d5539055551213d49254d15160821b604482015260640161029d565b6104cf8161067f565b50565b60006104dc610540565b600101546001600160a01b0316919050565b6040516bffffffffffffffffffffffff193060601b1660208201526001600160e01b031960e083901b166034820152600090603801604051602081830303815290604052805190602001209050919050565b60008061056e60017f4c3ee7f6a2d8af71947ceff4838fdd00b02c41abff6d08e2cd4475e7186935a961085d565b92915050565b6000834710156105c65760405162461bcd60e51b815260206004820152601d60248201527f437265617465323a20696e73756666696369656e742062616c616e6365000000604482015260640161029d565b81516000036106175760405162461bcd60e51b815260206004820181905260248201527f437265617465323a2062797465636f6465206c656e677468206973207a65726f604482015260640161029d565b8282516020840186f590506001600160a01b0381166106785760405162461bcd60e51b815260206004820152601960248201527f437265617465323a204661696c6564206f6e206465706c6f7900000000000000604482015260640161029d565b9392505050565b7f7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f6106a8610540565b54604080516001600160a01b03928316815291841660208301520160405180910390a1806106d4610540565b80546001600160a01b0319166001600160a01b039290921691909117905550565b80356001600160a01b038116811461070c57600080fd5b919050565b803563ffffffff8116811461070c57600080fd5b6000806040838503121561073857600080fd5b610741836106f5565b915061074f60208401610711565b90509250929050565b634e487b7160e01b600052604160045260246000fd5b6000806040838503121561078157600080fd5b823567ffffffffffffffff8082111561079957600080fd5b818501915085601f8301126107ad57600080fd5b8135818111156107bf576107bf610758565b604051601f8201601f19908116603f011681019083821181831017156107e7576107e7610758565b8160405282815288602084870101111561080057600080fd5b82602086016020830137600060208483010152809650505050505061074f60208401610711565b60006020828403121561083957600080fd5b610678826106f5565b60006020828403121561085457600080fd5b61067882610711565b8181038181111561056e57634e487b7160e01b600052601160045260246000fdfea2646970667358221220756c6f2fbc7c972eaa44cddc47203ef15960cba4b7b2451a8a4b48282e0b9b3d64736f6c63430008110033",
+            "sourceMap": "648:3466:0:-:0;;;886:5;861:30;;-1:-1:-1;;;;861:30:0;;;898:104;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;939:26;954:10;939:14;:26::i;:::-;975:8;:20;;-1:-1:-1;;;;;;975:20:0;-1:-1:-1;;;;;975:20:0;;;;;;;;;;648:3466;;1479:140;1543:36;1556:8;:6;:8::i;:::-;:14;1543:36;;;-1:-1:-1;;;;;1556:14:0;;;521:34:3;;591:15;;;586:2;571:18;;564:43;456:18;1543:36:0;;;;;;;1606:6;1589:8;:6;:8::i;:::-;:23;;-1:-1:-1;;;;;;1589:23:0;-1:-1:-1;;;;;1589:23:0;;;;;;;;;;-1:-1:-1;1479:140:0:o;479:163::-;520:24;;430:41;470:1;435:31;430:41;:::i;:::-;422:50;479:163;-1:-1:-1;;479:163:0:o;14:290:3:-;84:6;137:2;125:9;116:7;112:23;108:32;105:52;;;153:1;150;143:12;105:52;179:16;;-1:-1:-1;;;;;224:31:3;;214:42;;204:70;;270:1;267;260:12;204:70;293:5;14:290;-1:-1:-1;;;14:290:3:o;618:225::-;685:9;;;706:11;;;703:134;;;759:10;754:3;750:20;747:1;740:31;794:4;791:1;784:15;822:4;819:1;812:15;618:225;648:3466:0;;;;;;",
+            "linkReferences": {}
+          },
+          "metadata": {
+            "compiler": {
+              "version": "0.8.17+commit.8df45f5f"
+            },
+            "language": "Solidity",
+            "output": {
+              "abi": [
+                {
+                  "inputs": [
+                    {
+                      "internalType": "address",
+                      "name": "_resolver",
+                      "type": "address"
+                    }
+                  ],
+                  "stateMutability": "nonpayable",
+                  "type": "constructor"
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "address",
+                      "name": "previousAdmin",
+                      "type": "address",
+                      "indexed": false
+                    },
+                    {
+                      "internalType": "address",
+                      "name": "newAdmin",
+                      "type": "address",
+                      "indexed": false
+                    }
+                  ],
+                  "type": "event",
+                  "name": "AdminChanged",
+                  "anonymous": false
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "address",
+                      "name": "implementation",
+                      "type": "address",
+                      "indexed": true
+                    },
+                    {
+                      "internalType": "uint32",
+                      "name": "version",
+                      "type": "uint32",
+                      "indexed": true
+                    }
+                  ],
+                  "type": "event",
+                  "name": "Upgraded",
+                  "anonymous": false
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "payable",
+                  "type": "fallback"
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "uint32",
+                      "name": "version",
+                      "type": "uint32"
+                    }
+                  ],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "computeNewDeploymentSalt",
+                  "outputs": [
+                    {
+                      "internalType": "bytes32",
+                      "name": "",
+                      "type": "bytes32"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "configured",
+                  "outputs": [
+                    {
+                      "internalType": "bool",
+                      "name": "",
+                      "type": "bool"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "implementation",
+                  "outputs": [
+                    {
+                      "internalType": "address",
+                      "name": "",
+                      "type": "address"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "implementationVersion",
+                  "outputs": [
+                    {
+                      "internalType": "uint32",
+                      "name": "",
+                      "type": "uint32"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "proxyAdmin",
+                  "outputs": [
+                    {
+                      "internalType": "address",
+                      "name": "",
+                      "type": "address"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "resolver",
+                  "outputs": [
+                    {
+                      "internalType": "address",
+                      "name": "",
+                      "type": "address"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "address",
+                      "name": "_admin",
+                      "type": "address"
+                    }
+                  ],
+                  "stateMutability": "nonpayable",
+                  "type": "function",
+                  "name": "setProxyAdmin"
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "address",
+                      "name": "_implementation",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "uint32",
+                      "name": "version",
+                      "type": "uint32"
+                    }
+                  ],
+                  "stateMutability": "nonpayable",
+                  "type": "function",
+                  "name": "upgrade"
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "bytes",
+                      "name": "_newImplementation",
+                      "type": "bytes"
+                    },
+                    {
+                      "internalType": "uint32",
+                      "name": "version",
+                      "type": "uint32"
+                    }
+                  ],
+                  "stateMutability": "nonpayable",
+                  "type": "function",
+                  "name": "upgrade2"
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "payable",
+                  "type": "receive"
+                }
+              ],
+              "devdoc": {
+                "kind": "dev",
+                "methods": {},
+                "version": 1
+              },
+              "userdoc": {
+                "kind": "user",
+                "methods": {},
+                "version": 1
+              }
+            },
+            "settings": {
+              "remappings": [
+                ":ds-test/=lib/forge-std/lib/ds-test/src/",
+                ":forge-std/=lib/forge-std/src/"
+              ],
+              "optimizer": {
+                "enabled": true,
+                "runs": 200
+              },
+              "metadata": {
+                "bytecodeHash": "ipfs"
+              },
+              "compilationTarget": {
+                "src/Proxy.sol": "Proxy"
+              },
+              "libraries": {}
+            },
+            "sources": {
+              "src/Proxy.sol": {
+                "keccak256": "0x2566962c6422074baf1c9b43b3f01e5e3aef4b09c3b56e238e25cd740f0c55e6",
+                "urls": [
+                  "bzz-raw://fbe251fd4d33ff61c3218582980b438c9881aaff10a28e27eb5bb05bf0308c5f",
+                  "dweb:/ipfs/QmP38ZTGWLUFLmLVg3sRPsEyhYgrjgtxUSdfJqFu9PQaHC"
+                ],
+                "license": "LGPL-3.0-only"
+              },
+              "src/interfaces/IConfigurable.sol": {
+                "keccak256": "0x286b39f462dc975aff571b77d176fdf0593733683148dfcab4dec6fc98f288d2",
+                "urls": [
+                  "bzz-raw://c26bea0c9439f1edd45595971f921eb084e1daa0343c070493da7f28085f130d",
+                  "dweb:/ipfs/QmaV3Puu4tGUZMqxwYG1TBRDMPzdEtDyjVMroHkskz4PkX"
+                ],
+                "license": "UNLICENSED"
+              },
+              "src/lib/Create2.sol": {
+                "keccak256": "0xabb3c960d7c16e61304bd66b0b8b866c0ecbeff9ff66f0405555d68db10ad05d",
+                "urls": [
+                  "bzz-raw://7b7f7b901edeefa8d37f4fbe37c8d02a734021f99683a286184362b4f46d9eab",
+                  "dweb:/ipfs/Qmcf9RzakLasQGH8Y68gZLxwXef3vN7kWfwKib8eRGVZYc"
+                ],
+                "license": "MIT"
+              }
+            },
+            "version": 1
+          }
+        },
+        {
+          "type": "deploy_impl",
+          "impl": {
+            "interface": {
+              "fragments": [
+                {
+                  "name": null,
+                  "type": "constructor",
+                  "inputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "name": "CacheUpdated",
+                  "anonymous": false,
+                  "inputs": [
+                    {
+                      "name": "name",
+                      "type": "bytes32",
+                      "indexed": false,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "bytes32",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "destination",
+                      "type": "address",
+                      "indexed": false,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "type": "event",
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "__configure",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "_proxy",
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "_resolver",
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "a",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "uint256",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint256",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "getMessage",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "string",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "string",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "getOrCreateTakeSharesContract",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "takeId",
+                      "type": "uint256",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint256",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "getTakeSharesContract",
+                  "constant": true,
+                  "inputs": [
+                    {
+                      "name": "takeId",
+                      "type": "uint256",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint256",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "initialize",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "_a",
+                      "type": "uint256",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint256",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "isResolverCached",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "bool",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "bool",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "proxy",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "rebuildCache",
+                  "constant": false,
+                  "inputs": [],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "resolver",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "resolverAddressesRequired",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": "addresses",
+                      "type": "bytes32[]",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": -1,
+                      "arrayChildren": {
+                        "name": null,
+                        "type": "bytes32",
+                        "indexed": null,
+                        "components": null,
+                        "arrayLength": null,
+                        "arrayChildren": null,
+                        "baseType": "bytes32",
+                        "_isParamType": true
+                      },
+                      "baseType": "array",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "pure",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                {
+                  "type": "function",
+                  "name": "setHello",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "message",
+                      "type": "string",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "string",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                }
+              ],
+              "_abiCoder": {
+                "coerceFunc": null
+              },
+              "functions": {
+                "__configure(address,address)": {
+                  "type": "function",
+                  "name": "__configure",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "_proxy",
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "_resolver",
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "a()": {
+                  "type": "function",
+                  "name": "a",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "uint256",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint256",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "getMessage()": {
+                  "type": "function",
+                  "name": "getMessage",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "string",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "string",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "getOrCreateTakeSharesContract(uint256)": {
+                  "type": "function",
+                  "name": "getOrCreateTakeSharesContract",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "takeId",
+                      "type": "uint256",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint256",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "getTakeSharesContract(uint256)": {
+                  "type": "function",
+                  "name": "getTakeSharesContract",
+                  "constant": true,
+                  "inputs": [
+                    {
+                      "name": "takeId",
+                      "type": "uint256",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint256",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "initialize(uint256)": {
+                  "type": "function",
+                  "name": "initialize",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "_a",
+                      "type": "uint256",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "uint256",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "isResolverCached()": {
+                  "type": "function",
+                  "name": "isResolverCached",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "bool",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "bool",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "proxy()": {
+                  "type": "function",
+                  "name": "proxy",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "rebuildCache()": {
+                  "type": "function",
+                  "name": "rebuildCache",
+                  "constant": false,
+                  "inputs": [],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "resolver()": {
+                  "type": "function",
+                  "name": "resolver",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": null,
+                      "type": "address",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "view",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "resolverAddressesRequired()": {
+                  "type": "function",
+                  "name": "resolverAddressesRequired",
+                  "constant": true,
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "name": "addresses",
+                      "type": "bytes32[]",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": -1,
+                      "arrayChildren": {
+                        "name": null,
+                        "type": "bytes32",
+                        "indexed": null,
+                        "components": null,
+                        "arrayLength": null,
+                        "arrayChildren": null,
+                        "baseType": "bytes32",
+                        "_isParamType": true
+                      },
+                      "baseType": "array",
+                      "_isParamType": true
+                    }
+                  ],
+                  "payable": false,
+                  "stateMutability": "pure",
+                  "gas": null,
+                  "_isFragment": true
+                },
+                "setHello(string)": {
+                  "type": "function",
+                  "name": "setHello",
+                  "constant": false,
+                  "inputs": [
+                    {
+                      "name": "message",
+                      "type": "string",
+                      "indexed": null,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "string",
+                      "_isParamType": true
+                    }
+                  ],
+                  "outputs": [],
+                  "payable": false,
+                  "stateMutability": "nonpayable",
+                  "gas": null,
+                  "_isFragment": true
+                }
+              },
+              "errors": {},
+              "events": {
+                "CacheUpdated(bytes32,address)": {
+                  "name": "CacheUpdated",
+                  "anonymous": false,
+                  "inputs": [
+                    {
+                      "name": "name",
+                      "type": "bytes32",
+                      "indexed": false,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "bytes32",
+                      "_isParamType": true
+                    },
+                    {
+                      "name": "destination",
+                      "type": "address",
+                      "indexed": false,
+                      "components": null,
+                      "arrayLength": null,
+                      "arrayChildren": null,
+                      "baseType": "address",
+                      "_isParamType": true
+                    }
+                  ],
+                  "type": "event",
+                  "_isFragment": true
+                }
+              },
+              "structs": {},
+              "deploy": {
+                "name": null,
+                "type": "constructor",
+                "inputs": [],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "gas": null,
+                "_isFragment": true
+              },
+              "_isInterface": true
+            },
+            "provider": {
+              "_isProvider": true,
+              "_events": [],
+              "_emitted": {
+                "block": -2,
+                "t:0x55854ad2b2d86f1fbbe5e48809853ac3b58013e5ffab805fed50097897e47276": 1779,
+                "t:0xa9d674a4eba29be5eed1c8aa3362e83a7cc2ad9c851231aa47ea452741789f9d": 1780
+              },
+              "disableCcipRead": false,
+              "formatter": {
+                "formats": {
+                  "transaction": {},
+                  "transactionRequest": {},
+                  "receiptLog": {},
+                  "receipt": {},
+                  "block": {},
+                  "blockWithTransactions": {},
+                  "filter": {},
+                  "filterLog": {}
+                }
+              },
+              "anyNetwork": false,
+              "_networkPromise": {},
+              "_maxInternalBlockNumber": 1778,
+              "_lastBlockNumber": -2,
+              "_maxFilterBlockRange": 10,
+              "_pollingInterval": 4000,
+              "_fastQueryDate": 1677415621963,
+              "connection": {
+                "url": "http://localhost:8545"
+              },
+              "_nextId": 82,
+              "_eventLoopCache": {
+                "detectNetwork": null,
+                "eth_chainId": null,
+                "eth_blockNumber": null
+              },
+              "_network": {
+                "chainId": 31337,
+                "name": "unknown"
+              },
+              "_internalBlockNumber": {},
+              "_fastBlockNumber": 1778,
+              "_fastBlockNumberPromise": {}
+            },
+            "signer": {
+              "_isSigner": true,
+              "address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "provider": {
+                "_isProvider": true,
+                "_events": [],
+                "_emitted": {
+                  "block": -2,
+                  "t:0x55854ad2b2d86f1fbbe5e48809853ac3b58013e5ffab805fed50097897e47276": 1779,
+                  "t:0xa9d674a4eba29be5eed1c8aa3362e83a7cc2ad9c851231aa47ea452741789f9d": 1780
+                },
+                "disableCcipRead": false,
+                "formatter": {
+                  "formats": {
+                    "transaction": {},
+                    "transactionRequest": {},
+                    "receiptLog": {},
+                    "receipt": {},
+                    "block": {},
+                    "blockWithTransactions": {},
+                    "filter": {},
+                    "filterLog": {}
+                  }
+                },
+                "anyNetwork": false,
+                "_networkPromise": {},
+                "_maxInternalBlockNumber": 1778,
+                "_lastBlockNumber": -2,
+                "_maxFilterBlockRange": 10,
+                "_pollingInterval": 4000,
+                "_fastQueryDate": 1677415621963,
+                "connection": {
+                  "url": "http://localhost:8545"
+                },
+                "_nextId": 82,
+                "_eventLoopCache": {
+                  "detectNetwork": null,
+                  "eth_chainId": null,
+                  "eth_blockNumber": null
+                },
+                "_network": {
+                  "chainId": 31337,
+                  "name": "unknown"
+                },
+                "_internalBlockNumber": {},
+                "_fastBlockNumber": 1778,
+                "_fastBlockNumberPromise": {}
+              }
+            },
+            "callStatic": {},
+            "estimateGas": {},
+            "functions": {},
+            "populateTransaction": {},
+            "filters": {},
+            "_runningEvents": {},
+            "_wrappedEmits": {},
+            "address": "0x218c90eFf9394F6C3fc4bf422Aa9940bc9B92E54",
+            "resolvedAddress": {}
+          },
+          "version": 7,
+          "target": "TakeMarket",
+          "abi": [
+            {
+              "inputs": [],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": false,
+                  "internalType": "bytes32",
+                  "name": "name",
+                  "type": "bytes32"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "address",
+                  "name": "destination",
+                  "type": "address"
+                }
+              ],
+              "name": "CacheUpdated",
+              "type": "event"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "_proxy",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_resolver",
+                  "type": "address"
+                }
+              ],
+              "name": "__configure",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "a",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "getMessage",
+              "outputs": [
+                {
+                  "internalType": "string",
+                  "name": "",
+                  "type": "string"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "takeId",
+                  "type": "uint256"
+                }
+              ],
+              "name": "getOrCreateTakeSharesContract",
+              "outputs": [
+                {
+                  "internalType": "contract ITakeMarketShares",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "takeId",
+                  "type": "uint256"
+                }
+              ],
+              "name": "getTakeSharesContract",
+              "outputs": [
+                {
+                  "internalType": "contract ITakeMarketShares",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "_a",
+                  "type": "uint256"
+                }
+              ],
+              "name": "initialize",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "isResolverCached",
+              "outputs": [
+                {
+                  "internalType": "bool",
+                  "name": "",
+                  "type": "bool"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "proxy",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "rebuildCache",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "resolver",
+              "outputs": [
+                {
+                  "internalType": "contract AddressResolver",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "resolverAddressesRequired",
+              "outputs": [
+                {
+                  "internalType": "bytes32[]",
+                  "name": "addresses",
+                  "type": "bytes32[]"
+                }
+              ],
+              "stateMutability": "pure",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "string",
+                  "name": "message",
+                  "type": "string"
+                }
+              ],
+              "name": "setHello",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            }
+          ],
+          "from_impl": "0x9D49ef457758Cf37e62A3ab387620D126A2BE6DF",
+          "to_impl": "0x218c90eFf9394F6C3fc4bf422Aa9940bc9B92E54",
+          "address": "0x218c90eFf9394F6C3fc4bf422Aa9940bc9B92E54",
+          "bytecode": {
+            "object": "0x608060405234801561001057600080fd5b50610e26806100206000396000f3fe608060405234801561001057600080fd5b50600436106100b45760003560e01c806374185360116100715780637418536014610153578063899ffef41461015b578063ce6d41de14610170578063ea06b66514610185578063ec55688914610198578063fe4b84df146101ab57600080fd5b806304f3bcec146100b95780630dbe671f146100e95780632af64bd31461010057806331d212cb14610118578063435ffe941461012b5780636312ccca14610140575b600080fd5b6000546100cc906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6100f260035481565b6040519081526020016100e0565b6101086101be565b60405190151581526020016100e0565b6100cc610126366004610a5e565b6102cd565b61013e610139366004610a8d565b610389565b005b61013e61014e366004610b56565b610399565b61013e61041b565b61016361059b565b6040516100e09190610b8f565b610178610624565b6040516100e09190610c19565b6100cc610193366004610a5e565b6106b2565b6001546100cc906001600160a01b031681565b61013e6101b9366004610a5e565b6107f3565b6000806101c961059b565b905060005b81518110156102c45760008282815181106101eb576101eb610c2c565b60209081029190910181015160008181526002909252604080832054925490516321f8a72160e01b8152600481018390529193506001600160a01b039283169216906321f8a72190602401602060405180830381865afa158015610253573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906102779190610c42565b6001600160a01b03161415806102a257506000818152600260205260409020546001600160a01b0316155b156102b1576000935050505090565b50806102bc81610c5f565b9150506101ce565b50600191505090565b600080826040516020016102e391815260200190565b604051602081830303815290604052805190602001209050600061036461030861088c565b6040513060388201526f5af43d82803e903d91602b57fd5bf3ff60248201526014810191909152733d602d80600a3d3981f3363d3d373d3d3d363d738152605881018490526037600c8201206078820152605560439091012090565b9050806001600160a01b03163b600003610382575060009392505050565b9392505050565b60046103958282610d0f565b5050565b6001600160a01b0382166103ed5760405162461bcd60e51b815260206004820152601660248201527511549497d053149150511657d0d3d3919251d554915160521b60448201526064015b60405180910390fd5b600180546001600160a01b039384166001600160a01b03199182161790915560008054929093169116179055565b600061042561059b565b905060005b815181101561039557600082828151811061044757610447610c2c565b6020026020010151905060008060009054906101000a90046001600160a01b03166001600160a01b031663dacb2d0183846040516020016104b491907f5265736f6c766572206d697373696e67207461726765743a20000000000000008152601981019190915260390190565b6040516020818303038152906040526040518363ffffffff1660e01b81526004016104e0929190610dcf565b602060405180830381865afa1580156104fd573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906105219190610c42565b60008381526002602090815260409182902080546001600160a01b0319166001600160a01b0385169081179091558251868152918201529192507f88a93678a3692f6789d9546fc621bf7234b101ddb7d4fe479455112831b8aa68910160405180910390a15050808061059390610c5f565b91505061042a565b604080516002808252606080830184529260009291906020830190803683370190505090506f54616b654d61726b657453686172657360801b816000815181106105e7576105e7610c2c565b6020026020010181815250506915185ad953585c9ad95d60b21b8160018151811061061457610614610c2c565b6020908102919091010152919050565b6004805461063190610c86565b80601f016020809104026020016040519081016040528092919081815260200182805461065d90610c86565b80156106aa5780601f1061067f576101008083540402835291602001916106aa565b820191906000526020600020905b81548152906001019060200180831161068d57829003601f168201915b505050505081565b600080826040516020016106c891815260200190565b60405160208183030381529060405280519060200120905060006106ed61030861088c565b9050806001600160a01b03163b6000036103825761071261070c61088c565b836108af565b9050806001600160a01b03811663766019b761072c610952565b6040516001600160e01b031960e084901b1681526001600160a01b039091166004820152602401600060405180830381600087803b15801561076d57600080fd5b505af1158015610781573d6000803e3d6000fd5b505060005460405163cd6dc68760e01b81526001600160a01b03918216600482015260248101899052908416925063cd6dc6879150604401600060405180830381600087803b1580156107d357600080fd5b505af11580156107e7573d6000803e3d6000fd5b50505050509392505050565b6001546001600160a01b0316331480610824575061080f61096a565b6001600160a01b0316336001600160a01b0316145b6108845760405162461bcd60e51b815260206004820152602b60248201527f4f6e6c79206f6e65206f66202870726f78792c6465706c6f796572292063616e60448201526a20696e697469616c697a6560a81b60648201526084016103e4565b506001600355565b60006108aa6f54616b654d61726b657453686172657360801b6109e2565b905090565b6000763d602d80600a3d3981f3363d3d373d3d3d363d730000008360601b60e81c176000526e5af43d82803e903d91602b57fd5bf38360781b1760205281603760096000f590506001600160a01b03811661094c5760405162461bcd60e51b815260206004820152601760248201527f455243313136373a2063726561746532206661696c656400000000000000000060448201526064016103e4565b92915050565b60006108aa6915185ad953585c9ad95d60b21b6109e2565b60008060009054906101000a90046001600160a01b03166001600160a01b0316638da5cb5b6040518163ffffffff1660e01b8152600401602060405180830381865afa1580156109be573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906108aa9190610c42565b600081815260026020908152604080832054905170026b4b9b9b4b7339030b2323932b9b99d1607d1b92810192909252603182018490526001600160a01b0316908115159060510160405160208183030381529060405290610a575760405162461bcd60e51b81526004016103e49190610c19565b5092915050565b600060208284031215610a7057600080fd5b5035919050565b634e487b7160e01b600052604160045260246000fd5b600060208284031215610a9f57600080fd5b813567ffffffffffffffff80821115610ab757600080fd5b818401915084601f830112610acb57600080fd5b813581811115610add57610add610a77565b604051601f8201601f19908116603f01168101908382118183101715610b0557610b05610a77565b81604052828152876020848701011115610b1e57600080fd5b826020860160208301376000928101602001929092525095945050505050565b6001600160a01b0381168114610b5357600080fd5b50565b60008060408385031215610b6957600080fd5b8235610b7481610b3e565b91506020830135610b8481610b3e565b809150509250929050565b6020808252825182820181905260009190848201906040850190845b81811015610bc757835183529284019291840191600101610bab565b50909695505050505050565b6000815180845260005b81811015610bf957602081850181015186830182015201610bdd565b506000602082860101526020601f19601f83011685010191505092915050565b6020815260006103826020830184610bd3565b634e487b7160e01b600052603260045260246000fd5b600060208284031215610c5457600080fd5b815161038281610b3e565b600060018201610c7f57634e487b7160e01b600052601160045260246000fd5b5060010190565b600181811c90821680610c9a57607f821691505b602082108103610cba57634e487b7160e01b600052602260045260246000fd5b50919050565b601f821115610d0a57600081815260208120601f850160051c81016020861015610ce75750805b601f850160051c820191505b81811015610d0657828155600101610cf3565b5050505b505050565b815167ffffffffffffffff811115610d2957610d29610a77565b610d3d81610d378454610c86565b84610cc0565b602080601f831160018114610d725760008415610d5a5750858301515b600019600386901b1c1916600185901b178555610d06565b600085815260208120601f198616915b82811015610da157888601518255948401946001909101908401610d82565b5085821015610dbf5787850151600019600388901b60f8161c191681555b5050505050600190811b01905550565b828152604060208201526000610de86040830184610bd3565b94935050505056fea26469706673582212208fbfa65d636ee4b9e80a7cf78d7ad324fa7f8ddd8409b63bc1bdc669d9341d4464736f6c63430008110033",
+            "sourceMap": "222:2016:26:-:0;;;320:21;;;;;;;;;;222:2016;;;;;;",
+            "linkReferences": {}
+          },
+          "metadata": {
+            "compiler": {
+              "version": "0.8.17+commit.8df45f5f"
+            },
+            "language": "Solidity",
+            "output": {
+              "abi": [
+                {
+                  "inputs": [],
+                  "stateMutability": "nonpayable",
+                  "type": "constructor"
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "bytes32",
+                      "name": "name",
+                      "type": "bytes32",
+                      "indexed": false
+                    },
+                    {
+                      "internalType": "address",
+                      "name": "destination",
+                      "type": "address",
+                      "indexed": false
+                    }
+                  ],
+                  "type": "event",
+                  "name": "CacheUpdated",
+                  "anonymous": false
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "address",
+                      "name": "_proxy",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "address",
+                      "name": "_resolver",
+                      "type": "address"
+                    }
+                  ],
+                  "stateMutability": "nonpayable",
+                  "type": "function",
+                  "name": "__configure"
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "a",
+                  "outputs": [
+                    {
+                      "internalType": "uint256",
+                      "name": "",
+                      "type": "uint256"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "getMessage",
+                  "outputs": [
+                    {
+                      "internalType": "string",
+                      "name": "",
+                      "type": "string"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "uint256",
+                      "name": "takeId",
+                      "type": "uint256"
+                    }
+                  ],
+                  "stateMutability": "nonpayable",
+                  "type": "function",
+                  "name": "getOrCreateTakeSharesContract",
+                  "outputs": [
+                    {
+                      "internalType": "contract ITakeMarketShares",
+                      "name": "",
+                      "type": "address"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "uint256",
+                      "name": "takeId",
+                      "type": "uint256"
+                    }
+                  ],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "getTakeSharesContract",
+                  "outputs": [
+                    {
+                      "internalType": "contract ITakeMarketShares",
+                      "name": "",
+                      "type": "address"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "uint256",
+                      "name": "_a",
+                      "type": "uint256"
+                    }
+                  ],
+                  "stateMutability": "nonpayable",
+                  "type": "function",
+                  "name": "initialize"
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "isResolverCached",
+                  "outputs": [
+                    {
+                      "internalType": "bool",
+                      "name": "",
+                      "type": "bool"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "proxy",
+                  "outputs": [
+                    {
+                      "internalType": "address",
+                      "name": "",
+                      "type": "address"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "nonpayable",
+                  "type": "function",
+                  "name": "rebuildCache"
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "view",
+                  "type": "function",
+                  "name": "resolver",
+                  "outputs": [
+                    {
+                      "internalType": "contract AddressResolver",
+                      "name": "",
+                      "type": "address"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [],
+                  "stateMutability": "pure",
+                  "type": "function",
+                  "name": "resolverAddressesRequired",
+                  "outputs": [
+                    {
+                      "internalType": "bytes32[]",
+                      "name": "addresses",
+                      "type": "bytes32[]"
+                    }
+                  ]
+                },
+                {
+                  "inputs": [
+                    {
+                      "internalType": "string",
+                      "name": "message",
+                      "type": "string"
+                    }
+                  ],
+                  "stateMutability": "nonpayable",
+                  "type": "function",
+                  "name": "setHello"
+                }
+              ],
+              "devdoc": {
+                "kind": "dev",
+                "methods": {},
+                "version": 1
+              },
+              "userdoc": {
+                "kind": "user",
+                "methods": {},
+                "version": 1
+              }
+            },
+            "settings": {
+              "remappings": [
+                ":@aller/=node_modules/aller-contracts/src/",
+                ":ds-test/=lib/forge-std/lib/ds-test/src/",
+                ":forge-std/=lib/forge-std/src/"
+              ],
+              "optimizer": {
+                "enabled": true,
+                "runs": 200
+              },
+              "metadata": {
+                "bytecodeHash": "ipfs"
+              },
+              "compilationTarget": {
+                "src/TakeMarket.sol": "TakeMarket"
+              },
+              "libraries": {}
+            },
+            "sources": {
+              "node_modules/aller-contracts/src/AddressResolver.sol": {
+                "keccak256": "0xf984fb4672251986b790407039193448bcd4524d8975fd5dd72c23846e15bd14",
+                "urls": [
+                  "bzz-raw://949987e882e7d34373a73cbde63d24ab911182d4a3d057c343bd0e5cfa5c1fff",
+                  "dweb:/ipfs/QmSThxP5DRyGoGj2jxBtTzjGe4Gs6GXuoLdGU7sLvzKTs2"
+                ],
+                "license": "UNLICENSED"
+              },
+              "node_modules/aller-contracts/src/interfaces/IConfigurable.sol": {
+                "keccak256": "0x286b39f462dc975aff571b77d176fdf0593733683148dfcab4dec6fc98f288d2",
+                "urls": [
+                  "bzz-raw://c26bea0c9439f1edd45595971f921eb084e1daa0343c070493da7f28085f130d",
+                  "dweb:/ipfs/QmaV3Puu4tGUZMqxwYG1TBRDMPzdEtDyjVMroHkskz4PkX"
+                ],
+                "license": "UNLICENSED"
+              },
+              "node_modules/aller-contracts/src/interfaces/IGenericResolver.sol": {
+                "keccak256": "0xd0f7c880cc92380c1bf20b6d07c4430cf7eedf66767265d212466336051eb898",
+                "urls": [
+                  "bzz-raw://d6e9478bf22f27e55ea465d94b8dd222ddaf175b4fa80fd76da444892be6be88",
+                  "dweb:/ipfs/QmSUqCkdfdDuminoHTdWauGDEwhPwCoivR1MhHUeWt3xvC"
+                ],
+                "license": "UNLICENSED"
+              },
+              "node_modules/aller-contracts/src/interfaces/IMixinResolver.sol": {
+                "keccak256": "0x8cd0326977ba298beddef15375d43fbc3667f300c4b47cff862262046106383e",
+                "urls": [
+                  "bzz-raw://6a8e440133ecc142ada1cb5163041d2cd38c9da635af08464d78d3e3557a0e21",
+                  "dweb:/ipfs/QmRqQ68YZv6HTP8su53Q2C3qWryptrPCPD7RiZJKEtToWu"
+                ],
+                "license": "UNLICENSED"
+              },
+              "node_modules/aller-contracts/src/lib/Clones.sol": {
+                "keccak256": "0x888d64d221d52c31d015b76e50ca1af5ef8ff076550810b49cea6b01d8267a10",
+                "urls": [
+                  "bzz-raw://4da0f451fe5aefdb95204dbec4a9448a8a2b00a444864bb5dbf7162da842a0f7",
+                  "dweb:/ipfs/QmYciAwNiJzgGMAqSTUANwMjy5HykNUvmkQ5PQhNTRqrB5"
+                ],
+                "license": "MIT"
+              },
+              "node_modules/aller-contracts/src/lib/Initialized.sol": {
+                "keccak256": "0x9b5348fd8fc8fd904e6438f71f3e720d3c3f1d51a176eb14b205cab38f74fa53",
+                "urls": [
+                  "bzz-raw://27eff3c1dac4c67f4b416c45ebc50cec4a4169383a945d41da785c029228dac4",
+                  "dweb:/ipfs/QmNYYnNdLv5RPu7jPJrcsqkx95pepCinNNu32F8sZAycYc"
+                ],
+                "license": "LGPL-3.0-only"
+              },
+              "node_modules/aller-contracts/src/lib/MixinResolver.sol": {
+                "keccak256": "0xa5f59ac72a8f3329679efa9c5559befb6deed0a380128d2c4a4ff5dd69ea97d6",
+                "urls": [
+                  "bzz-raw://4a446eb971a024ed4da1d79e69306c6082cf510f1e02f0bee05f2df12436b32a",
+                  "dweb:/ipfs/QmUoERgDCU69UUiTfc7UbC9DBXTyDgPKmPc46S5SVvTHSR"
+                ],
+                "license": "UNLICENSED"
+              },
+              "node_modules/aller-contracts/src/lib/Owned.sol": {
+                "keccak256": "0x427ff25db39ee4972af83d3a283d2b024c83c9d5c1ed261bb4a536e8ab7ee193",
+                "urls": [
+                  "bzz-raw://d7436473a802101c8c398df9776983c38690b90599d045c4d09804669aaac038",
+                  "dweb:/ipfs/QmQPRKZ8FMAibCf3bMLXTPEqh1YsiUMGYf8bybJ7DhABGb"
+                ],
+                "license": "UNLICENSED"
+              },
+              "src/TakeMarket.sol": {
+                "keccak256": "0xf936be87c17585eebb23fdb7dd75480920286fd15edda3581fbdea96ca12ff6d",
+                "urls": [
+                  "bzz-raw://11d882c441bab818fd6ee2283dc48d46840d3e42998cf0111481cd8d2427b03f",
+                  "dweb:/ipfs/QmbjugPfxwmiwVCxEKwCPKmryCpKq74MBQkTJFHqx6AvNE"
+                ],
+                "license": "LGPL-3.0-only"
+              },
+              "src/interfaces/ITakeMarketShares.sol": {
+                "keccak256": "0x53c47e61783d9d7ec3f870edf26cc4d37cc87385bd16918cb345e9e971c74456",
+                "urls": [
+                  "bzz-raw://47fc5ede6b37a3cef58b67bee8ed1520ccedccdbc5f767234211f79d2c61f1ac",
+                  "dweb:/ipfs/QmduUwa6JdDcBbEgjRhGzxdqqZSLPqrvnmvyjhGoM2vfAK"
+                ],
+                "license": "LGPL-3.0-only"
+              },
+              "src/lib/TakeMarketSharesFactoryAuthority.sol": {
+                "keccak256": "0x593cd0535c08d970c5bc54df2b88128e05facf6419f9072e70c53407f7d364d1",
+                "urls": [
+                  "bzz-raw://dcfb564c7a99428a5e536c4eb922c13129139c1c36e2b89439c3b6d67a97d478",
+                  "dweb:/ipfs/QmWhXRKaUsHu3UQrymRPHxKM53NJAnNh6vq66cuM1gNYM2"
+                ],
+                "license": "LGPL-3.0-only"
+              }
+            },
+            "version": 1
+          }
+        },
+        {
+          "type": "initialize_contract",
+          "target": "TakeMarket",
+          "version": 7,
+          "calldata": "0xfe4b84df000000000000000000000000000000000000000000000000000000000756b5b3",
+          "tx": "0xa9d674a4eba29be5eed1c8aa3362e83a7cc2ad9c851231aa47ea452741789f9d"
+        }
+      ],
+      "time": 1677415621866,
+      "rpcUrl": "http://localhost:8545",
+      "chainId": "31337",
+      "revision": {
+        "type": "git",
+        "tag": "b9d27bccecba97236f3efd31253928f27d72cdb7",
+        "branch": "main",
+        "dirty": false,
+        "descriptor": "b9d27bccecba97236f3efd31253928f27d72cdb7"
+      },
+      "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "_complete": true
     }
   ],
   "targets": {
@@ -23092,8 +25603,8 @@
     "user": {
       "TakeMarket": {
         "target": "TakeMarket",
-        "version": 6,
-        "address": "0x9D49ef457758Cf37e62A3ab387620D126A2BE6DF",
+        "version": 7,
+        "address": "0x218c90eFf9394F6C3fc4bf422Aa9940bc9B92E54",
         "abi": [
           {
             "inputs": [],
@@ -23288,8 +25799,8 @@
           }
         ],
         "bytecode": {
-          "object": "0x608060405234801561001057600080fd5b50610e26806100206000396000f3fe608060405234801561001057600080fd5b50600436106100b45760003560e01c806374185360116100715780637418536014610153578063899ffef41461015b578063ce6d41de14610170578063ea06b66514610185578063ec55688914610198578063fe4b84df146101ab57600080fd5b806304f3bcec146100b95780630dbe671f146100e95780632af64bd31461010057806331d212cb14610118578063435ffe941461012b5780636312ccca14610140575b600080fd5b6000546100cc906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6100f260035481565b6040519081526020016100e0565b6101086101be565b60405190151581526020016100e0565b6100cc610126366004610a5e565b6102cd565b61013e610139366004610a8d565b610389565b005b61013e61014e366004610b56565b610399565b61013e61041b565b61016361059b565b6040516100e09190610b8f565b610178610624565b6040516100e09190610c19565b6100cc610193366004610a5e565b6106b2565b6001546100cc906001600160a01b031681565b61013e6101b9366004610a5e565b6107f3565b6000806101c961059b565b905060005b81518110156102c45760008282815181106101eb576101eb610c2c565b60209081029190910181015160008181526002909252604080832054925490516321f8a72160e01b8152600481018390529193506001600160a01b039283169216906321f8a72190602401602060405180830381865afa158015610253573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906102779190610c42565b6001600160a01b03161415806102a257506000818152600260205260409020546001600160a01b0316155b156102b1576000935050505090565b50806102bc81610c5f565b9150506101ce565b50600191505090565b600080826040516020016102e391815260200190565b604051602081830303815290604052805190602001209050600061036461030861088c565b6040513060388201526f5af43d82803e903d91602b57fd5bf3ff60248201526014810191909152733d602d80600a3d3981f3363d3d373d3d3d363d738152605881018490526037600c8201206078820152605560439091012090565b9050806001600160a01b03163b600003610382575060009392505050565b9392505050565b60046103958282610d0f565b5050565b6001600160a01b0382166103ed5760405162461bcd60e51b815260206004820152601660248201527511549497d053149150511657d0d3d3919251d554915160521b60448201526064015b60405180910390fd5b600180546001600160a01b039384166001600160a01b03199182161790915560008054929093169116179055565b600061042561059b565b905060005b815181101561039557600082828151811061044757610447610c2c565b6020026020010151905060008060009054906101000a90046001600160a01b03166001600160a01b031663dacb2d0183846040516020016104b491907f5265736f6c766572206d697373696e67207461726765743a20000000000000008152601981019190915260390190565b6040516020818303038152906040526040518363ffffffff1660e01b81526004016104e0929190610dcf565b602060405180830381865afa1580156104fd573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906105219190610c42565b60008381526002602090815260409182902080546001600160a01b0319166001600160a01b0385169081179091558251868152918201529192507f88a93678a3692f6789d9546fc621bf7234b101ddb7d4fe479455112831b8aa68910160405180910390a15050808061059390610c5f565b91505061042a565b604080516002808252606080830184529260009291906020830190803683370190505090506f54616b654d61726b657453686172657360801b816000815181106105e7576105e7610c2c565b6020026020010181815250506915185ad953585c9ad95d60b21b8160018151811061061457610614610c2c565b6020908102919091010152919050565b6004805461063190610c86565b80601f016020809104026020016040519081016040528092919081815260200182805461065d90610c86565b80156106aa5780601f1061067f576101008083540402835291602001916106aa565b820191906000526020600020905b81548152906001019060200180831161068d57829003601f168201915b505050505081565b600080826040516020016106c891815260200190565b60405160208183030381529060405280519060200120905060006106ed61030861088c565b9050806001600160a01b03163b6000036103825761071261070c61088c565b836108af565b9050806001600160a01b03811663766019b761072c610952565b6040516001600160e01b031960e084901b1681526001600160a01b039091166004820152602401600060405180830381600087803b15801561076d57600080fd5b505af1158015610781573d6000803e3d6000fd5b505060005460405163cd6dc68760e01b81526001600160a01b03918216600482015260248101899052908416925063cd6dc6879150604401600060405180830381600087803b1580156107d357600080fd5b505af11580156107e7573d6000803e3d6000fd5b50505050509392505050565b6001546001600160a01b0316331480610824575061080f61096a565b6001600160a01b0316336001600160a01b0316145b6108845760405162461bcd60e51b815260206004820152602b60248201527f4f6e6c79206f6e65206f66202870726f78792c6465706c6f796572292063616e60448201526a20696e697469616c697a6560a81b60648201526084016103e4565b506010600355565b60006108aa6f54616b654d61726b657453686172657360801b6109e2565b905090565b6000763d602d80600a3d3981f3363d3d373d3d3d363d730000008360601b60e81c176000526e5af43d82803e903d91602b57fd5bf38360781b1760205281603760096000f590506001600160a01b03811661094c5760405162461bcd60e51b815260206004820152601760248201527f455243313136373a2063726561746532206661696c656400000000000000000060448201526064016103e4565b92915050565b60006108aa6915185ad953585c9ad95d60b21b6109e2565b60008060009054906101000a90046001600160a01b03166001600160a01b0316638da5cb5b6040518163ffffffff1660e01b8152600401602060405180830381865afa1580156109be573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906108aa9190610c42565b600081815260026020908152604080832054905170026b4b9b9b4b7339030b2323932b9b99d1607d1b92810192909252603182018490526001600160a01b0316908115159060510160405160208183030381529060405290610a575760405162461bcd60e51b81526004016103e49190610c19565b5092915050565b600060208284031215610a7057600080fd5b5035919050565b634e487b7160e01b600052604160045260246000fd5b600060208284031215610a9f57600080fd5b813567ffffffffffffffff80821115610ab757600080fd5b818401915084601f830112610acb57600080fd5b813581811115610add57610add610a77565b604051601f8201601f19908116603f01168101908382118183101715610b0557610b05610a77565b81604052828152876020848701011115610b1e57600080fd5b826020860160208301376000928101602001929092525095945050505050565b6001600160a01b0381168114610b5357600080fd5b50565b60008060408385031215610b6957600080fd5b8235610b7481610b3e565b91506020830135610b8481610b3e565b809150509250929050565b6020808252825182820181905260009190848201906040850190845b81811015610bc757835183529284019291840191600101610bab565b50909695505050505050565b6000815180845260005b81811015610bf957602081850181015186830182015201610bdd565b506000602082860101526020601f19601f83011685010191505092915050565b6020815260006103826020830184610bd3565b634e487b7160e01b600052603260045260246000fd5b600060208284031215610c5457600080fd5b815161038281610b3e565b600060018201610c7f57634e487b7160e01b600052601160045260246000fd5b5060010190565b600181811c90821680610c9a57607f821691505b602082108103610cba57634e487b7160e01b600052602260045260246000fd5b50919050565b601f821115610d0a57600081815260208120601f850160051c81016020861015610ce75750805b601f850160051c820191505b81811015610d0657828155600101610cf3565b5050505b505050565b815167ffffffffffffffff811115610d2957610d29610a77565b610d3d81610d378454610c86565b84610cc0565b602080601f831160018114610d725760008415610d5a5750858301515b600019600386901b1c1916600185901b178555610d06565b600085815260208120601f198616915b82811015610da157888601518255948401946001909101908401610d82565b5085821015610dbf5787850151600019600388901b60f8161c191681555b5050505050600190811b01905550565b828152604060208201526000610de86040830184610bd3565b94935050505056fea2646970667358221220665cd6390392eaeeed3b48bf9f359ab0974089cc6145ffdf0fafea41cb5bddba64736f6c63430008110033",
-          "sourceMap": "222:2017:26:-:0;;;320:21;;;;;;;;;;222:2017;;;;;;",
+          "object": "0x608060405234801561001057600080fd5b50610e26806100206000396000f3fe608060405234801561001057600080fd5b50600436106100b45760003560e01c806374185360116100715780637418536014610153578063899ffef41461015b578063ce6d41de14610170578063ea06b66514610185578063ec55688914610198578063fe4b84df146101ab57600080fd5b806304f3bcec146100b95780630dbe671f146100e95780632af64bd31461010057806331d212cb14610118578063435ffe941461012b5780636312ccca14610140575b600080fd5b6000546100cc906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6100f260035481565b6040519081526020016100e0565b6101086101be565b60405190151581526020016100e0565b6100cc610126366004610a5e565b6102cd565b61013e610139366004610a8d565b610389565b005b61013e61014e366004610b56565b610399565b61013e61041b565b61016361059b565b6040516100e09190610b8f565b610178610624565b6040516100e09190610c19565b6100cc610193366004610a5e565b6106b2565b6001546100cc906001600160a01b031681565b61013e6101b9366004610a5e565b6107f3565b6000806101c961059b565b905060005b81518110156102c45760008282815181106101eb576101eb610c2c565b60209081029190910181015160008181526002909252604080832054925490516321f8a72160e01b8152600481018390529193506001600160a01b039283169216906321f8a72190602401602060405180830381865afa158015610253573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906102779190610c42565b6001600160a01b03161415806102a257506000818152600260205260409020546001600160a01b0316155b156102b1576000935050505090565b50806102bc81610c5f565b9150506101ce565b50600191505090565b600080826040516020016102e391815260200190565b604051602081830303815290604052805190602001209050600061036461030861088c565b6040513060388201526f5af43d82803e903d91602b57fd5bf3ff60248201526014810191909152733d602d80600a3d3981f3363d3d373d3d3d363d738152605881018490526037600c8201206078820152605560439091012090565b9050806001600160a01b03163b600003610382575060009392505050565b9392505050565b60046103958282610d0f565b5050565b6001600160a01b0382166103ed5760405162461bcd60e51b815260206004820152601660248201527511549497d053149150511657d0d3d3919251d554915160521b60448201526064015b60405180910390fd5b600180546001600160a01b039384166001600160a01b03199182161790915560008054929093169116179055565b600061042561059b565b905060005b815181101561039557600082828151811061044757610447610c2c565b6020026020010151905060008060009054906101000a90046001600160a01b03166001600160a01b031663dacb2d0183846040516020016104b491907f5265736f6c766572206d697373696e67207461726765743a20000000000000008152601981019190915260390190565b6040516020818303038152906040526040518363ffffffff1660e01b81526004016104e0929190610dcf565b602060405180830381865afa1580156104fd573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906105219190610c42565b60008381526002602090815260409182902080546001600160a01b0319166001600160a01b0385169081179091558251868152918201529192507f88a93678a3692f6789d9546fc621bf7234b101ddb7d4fe479455112831b8aa68910160405180910390a15050808061059390610c5f565b91505061042a565b604080516002808252606080830184529260009291906020830190803683370190505090506f54616b654d61726b657453686172657360801b816000815181106105e7576105e7610c2c565b6020026020010181815250506915185ad953585c9ad95d60b21b8160018151811061061457610614610c2c565b6020908102919091010152919050565b6004805461063190610c86565b80601f016020809104026020016040519081016040528092919081815260200182805461065d90610c86565b80156106aa5780601f1061067f576101008083540402835291602001916106aa565b820191906000526020600020905b81548152906001019060200180831161068d57829003601f168201915b505050505081565b600080826040516020016106c891815260200190565b60405160208183030381529060405280519060200120905060006106ed61030861088c565b9050806001600160a01b03163b6000036103825761071261070c61088c565b836108af565b9050806001600160a01b03811663766019b761072c610952565b6040516001600160e01b031960e084901b1681526001600160a01b039091166004820152602401600060405180830381600087803b15801561076d57600080fd5b505af1158015610781573d6000803e3d6000fd5b505060005460405163cd6dc68760e01b81526001600160a01b03918216600482015260248101899052908416925063cd6dc6879150604401600060405180830381600087803b1580156107d357600080fd5b505af11580156107e7573d6000803e3d6000fd5b50505050509392505050565b6001546001600160a01b0316331480610824575061080f61096a565b6001600160a01b0316336001600160a01b0316145b6108845760405162461bcd60e51b815260206004820152602b60248201527f4f6e6c79206f6e65206f66202870726f78792c6465706c6f796572292063616e60448201526a20696e697469616c697a6560a81b60648201526084016103e4565b506001600355565b60006108aa6f54616b654d61726b657453686172657360801b6109e2565b905090565b6000763d602d80600a3d3981f3363d3d373d3d3d363d730000008360601b60e81c176000526e5af43d82803e903d91602b57fd5bf38360781b1760205281603760096000f590506001600160a01b03811661094c5760405162461bcd60e51b815260206004820152601760248201527f455243313136373a2063726561746532206661696c656400000000000000000060448201526064016103e4565b92915050565b60006108aa6915185ad953585c9ad95d60b21b6109e2565b60008060009054906101000a90046001600160a01b03166001600160a01b0316638da5cb5b6040518163ffffffff1660e01b8152600401602060405180830381865afa1580156109be573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906108aa9190610c42565b600081815260026020908152604080832054905170026b4b9b9b4b7339030b2323932b9b99d1607d1b92810192909252603182018490526001600160a01b0316908115159060510160405160208183030381529060405290610a575760405162461bcd60e51b81526004016103e49190610c19565b5092915050565b600060208284031215610a7057600080fd5b5035919050565b634e487b7160e01b600052604160045260246000fd5b600060208284031215610a9f57600080fd5b813567ffffffffffffffff80821115610ab757600080fd5b818401915084601f830112610acb57600080fd5b813581811115610add57610add610a77565b604051601f8201601f19908116603f01168101908382118183101715610b0557610b05610a77565b81604052828152876020848701011115610b1e57600080fd5b826020860160208301376000928101602001929092525095945050505050565b6001600160a01b0381168114610b5357600080fd5b50565b60008060408385031215610b6957600080fd5b8235610b7481610b3e565b91506020830135610b8481610b3e565b809150509250929050565b6020808252825182820181905260009190848201906040850190845b81811015610bc757835183529284019291840191600101610bab565b50909695505050505050565b6000815180845260005b81811015610bf957602081850181015186830182015201610bdd565b506000602082860101526020601f19601f83011685010191505092915050565b6020815260006103826020830184610bd3565b634e487b7160e01b600052603260045260246000fd5b600060208284031215610c5457600080fd5b815161038281610b3e565b600060018201610c7f57634e487b7160e01b600052601160045260246000fd5b5060010190565b600181811c90821680610c9a57607f821691505b602082108103610cba57634e487b7160e01b600052602260045260246000fd5b50919050565b601f821115610d0a57600081815260208120601f850160051c81016020861015610ce75750805b601f850160051c820191505b81811015610d0657828155600101610cf3565b5050505b505050565b815167ffffffffffffffff811115610d2957610d29610a77565b610d3d81610d378454610c86565b84610cc0565b602080601f831160018114610d725760008415610d5a5750858301515b600019600386901b1c1916600185901b178555610d06565b600085815260208120601f198616915b82811015610da157888601518255948401946001909101908401610d82565b5085821015610dbf5787850151600019600388901b60f8161c191681555b5050505050600190811b01905550565b828152604060208201526000610de86040830184610bd3565b94935050505056fea26469706673582212208fbfa65d636ee4b9e80a7cf78d7ad324fa7f8ddd8409b63bc1bdc669d9341d4464736f6c63430008110033",
+          "sourceMap": "222:2016:26:-:0;;;320:21;;;;;;;;;;222:2016;;;;;;",
           "linkReferences": {}
         },
         "metadata": {
@@ -23582,10 +26093,10 @@
               "license": "UNLICENSED"
             },
             "src/TakeMarket.sol": {
-              "keccak256": "0xad657ddb2c317ae71eb179729748fcfaa1f0a51bf0222735625aa50a27811061",
+              "keccak256": "0xf936be87c17585eebb23fdb7dd75480920286fd15edda3581fbdea96ca12ff6d",
               "urls": [
-                "bzz-raw://cb0d965e5397493fcf1ad547b30c3398869fb6c44b664e2afc99fdac3275d851",
-                "dweb:/ipfs/QmNdAy6aQVkFUNoEf8aEftrnyigWtXiCqzBBRPUyXvygWo"
+                "bzz-raw://11d882c441bab818fd6ee2283dc48d46840d3e42998cf0111481cd8d2427b03f",
+                "dweb:/ipfs/QmbjugPfxwmiwVCxEKwCPKmryCpKq74MBQkTJFHqx6AvNE"
               ],
               "license": "LGPL-3.0-only"
             },

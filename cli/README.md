@@ -22,7 +22,9 @@ The deployer is designed to remove the hassle of smart contract deployments. _Wo
 
 **Dependency injection for contracts**. No more manually pasting addresses, you can use the `MixinResolver` in order to resolve dependencies to other contracts in your codebase. It is smart and caches entries, meaning no extra `CALL`'s like a Beacon.
 
-**Deployment data for your Dapp/Subgraph**. Contract deployment information is written to a `manifest.json`, containing the addresses, ABI's, and deployment block number and tx (useful for The Graph).
+**Simple migration scripting**. Aller supports an initialize script, written in JS/TS. You can initialize your smart contracts from JS, and apply new settings. It has intelligent helpers, meaning it will only call `setFeeRate` if your fee rate has changed. See [`example-project/deploy/initialize.js`](../example-project/deploy/initialize.js) for an example.
+
+**Deployment data for your Dapp/Subgraph**. Generate an ultra-lightweight `index.js` from your deployment manifest.json, containing the addresses, ABI's, and deployment tx and block number (useful for The Graph).
 
 **Reproducible deployments**. Git metadata (branch, commit) is recorded for each deployment, so you can easily checkout the old source code. Deployer records the RPC and chain ID for each deployment - and checks if you're deploying to the network you intended!
 
