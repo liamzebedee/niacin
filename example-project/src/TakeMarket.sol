@@ -16,7 +16,7 @@ contract TakeMarket is
     }
 
     function initialize(uint _a) public initializer {
-        a = 16;
+        a = 1;
     }
 
     function setHello(string memory message) public {

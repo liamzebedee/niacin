@@ -21661,6 +21661,21 @@
       },
       "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       "_complete": true
+    },
+    {
+      "events": [],
+      "time": 1677415599944,
+      "rpcUrl": "http://localhost:8545",
+      "chainId": "31337",
+      "revision": {
+        "type": "git",
+        "tag": "428f9df7a6321f59f5296c969970bd64900f0713",
+        "branch": "main",
+        "dirty": false,
+        "descriptor": "428f9df7a6321f59f5296c969970bd64900f0713"
+      },
+      "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "_complete": true
     }
   ],
   "targets": {
