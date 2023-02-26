@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.13;
 
+import "./lib/Create2.sol";
+import "./interfaces/IConfigurable.sol";
+
 // An implementation of a proxy.
 // The proxy forwards all calls to the implementation.
 // The proxy has an admin.
@@ -28,8 +31,12 @@ contract Proxy is
     event Upgraded(address indexed implementation, uint32 indexed version);
     event AdminChanged(address previousAdmin, address newAdmin);
 
-    constructor() {
+    address public resolver;
+    bool public configured = false;
+
+    constructor(address _resolver) {
         _setProxyAdmin(msg.sender);
+        resolver = _resolver;
     }
 
     function proxyAdmin() public view returns (address) {
@@ -54,11 +61,18 @@ contract Proxy is
         _store().admin = _admin;
     }
 
-    function upgrade(address _implementation, uint32 version) public {
-        require(msg.sender == _store().admin, "ERR_UNAUTHORISED");
-        emit Upgraded(_implementation, version);
-        _store().implementation = _implementation;
+    function computeNewDeploymentSalt(uint32 version) public view returns (bytes32) {
+        return keccak256(abi.encodePacked(address(this), version));
+    }
+
+    function upgrade(bytes memory _newImplementation, uint32 version) public {
+        address instance = Create2.deploy(0, computeNewDeploymentSalt(version), _newImplementation);
+        if(!configured) {
+            IConfigurable(instance).__configure(address(this), resolver);
+        }
+        _store().implementation = instance;
         _store().version = version;
+        emit Upgraded(instance, version);
     }
 
     /// @dev Fallback function forwards all transactions and returns all received return data.

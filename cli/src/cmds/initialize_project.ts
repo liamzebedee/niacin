@@ -12,10 +12,19 @@ export async function initializeProject(argv: InitializeProjectArgs) {
 
     const defaultConfig: AllerConfig = {
         version: CONFIG_VERSIONS.pop(),
-        ignore: []
+        ignore: [],
+        scripts: {
+            initialize: null
+        }
     }
 
     // Write config.
-    fs.writeFileSync(p, `module.exports = ${JSON.stringify(defaultConfig, null, 4)}`)
+    let jsonFormatted = JSON.stringify(defaultConfig, null, 4)
+    
+    // Remove the quotes on props.
+    // NOTE: This isn't perfect, but it's good enough for now.
+    jsonFormatted = jsonFormatted.replace(/"([^"]+)":/g, '$1:');
+
+    fs.writeFileSync(p, `module.exports = ${jsonFormatted}`)
     console.log(`Wrote config to:`, p)
 }

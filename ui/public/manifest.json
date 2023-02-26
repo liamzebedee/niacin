@@ -21623,44 +21623,6 @@
       },
       "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       "_complete": true
-    },
-    {
-      "events": [],
-      "time": 1677415039176,
-      "rpcUrl": "http://localhost:8545",
-      "chainId": "31337",
-      "revision": {
-        "type": "git",
-        "tag": "452c9d4fa88e28ab89016911d662158965b4f507",
-        "branch": "main",
-        "dirty": true,
-        "descriptor": "452c9d4fa88e28ab89016911d662158965b4f507-dirty"
-      },
-      "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "_complete": true
-    },
-    {
-      "events": [
-        {
-          "type": "initialize_contract",
-          "target": "TakeMarket",
-          "version": 6,
-          "calldata": "0xfe4b84df000000000000000000000000000000000000000000000000000000000756b5b3",
-          "tx": "0x1898a23b577dca3fb90663993efc8e545afff708a1c445160d0698dc325ad798"
-        }
-      ],
-      "time": 1677415049185,
-      "rpcUrl": "http://localhost:8545",
-      "chainId": "31337",
-      "revision": {
-        "type": "git",
-        "tag": "452c9d4fa88e28ab89016911d662158965b4f507",
-        "branch": "main",
-        "dirty": true,
-        "descriptor": "452c9d4fa88e28ab89016911d662158965b4f507-dirty"
-      },
-      "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "_complete": true
     }
   ],
   "targets": {

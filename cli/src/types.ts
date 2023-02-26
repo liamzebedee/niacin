@@ -9,10 +9,59 @@ export const CONFIG_VERSIONS = [
     '0.1.0'
 ]
 
+
+
 export interface AllerConfig {
     version: string
     ignore: string[]
+    scripts: {
+        initialize: InitializeScript | null
+    }
 }
+
+
+
+
+// 
+// Aller Script Runtime.
+// 
+// TODO: extract into separate types.
+export interface InitializeScript {
+    (runtime: AllerScriptRuntime): Promise<void>
+}
+
+export interface EthersContractMod extends ethers.Contract {
+    _name: string
+}
+
+export interface AllerScriptRunStepArgs {
+    contract: EthersContractMod,
+    read?: string,
+    readArgs?: any[],
+    // read: () => Promise<any>,
+    // expect: (actual: any) => Promise<any>,
+    stale?: (input: any) => Promise<boolean>,
+    // write: () => Promise<void>
+    write: string,
+    writeArgs: any[],
+}
+
+export interface AllerScriptInitializeArgs {
+    contract: EthersContractMod,
+    args: any[],
+}
+
+export interface AllerScriptRuntime {
+    targets: Targets
+    contracts: Record<string, EthersContractMod>
+    runStep: (args: AllerScriptRunStepArgs) => Promise<void>
+    initialize: (args: AllerScriptInitializeArgs) => Promise<void>
+}
+
+
+
+
+
 
 export interface Manifest {
     version: string
@@ -34,6 +83,10 @@ export interface VersionControlInfo {
 }
 
 export interface Deployment {
+    deployer: string
+    rpcUrl: string
+    chainId: string
+    
     events: DeploymentEvent[]
     time: number
     
@@ -44,7 +97,7 @@ export interface Deployment {
     _complete: boolean
 }
 
-export type DeploymentEvent = UpsertAddressResolver | UpsertProxyEvent | DeployImplEvent | ImportAddressesEvent | RebuildCacheEvent 
+export type DeploymentEvent = UpsertAddressResolver | UpsertProxyEvent | DeployImplEvent | ImportAddressesEvent | RebuildCacheEvent | InitializeContractEvent
 
 // {
 //     type: 'upsert_proxy' | 'deploy_impl' | 'upgrade_to_impl' | 'import_addresses' | 'rebuild_cache'
@@ -92,13 +145,20 @@ export interface DeployImplEvent {
     from_impl: string
     to_impl: string,
 
-
     bytecode: {
         object: string
         sourceMap: string
         linkReferences: any
     }
     metadata: any
+}
+
+export interface InitializeContractEvent {
+    type: 'initialize_contract'
+    target: string
+    version: number
+    tx: string
+    calldata: string
 }
 
 export interface ImportAddressesEvent {

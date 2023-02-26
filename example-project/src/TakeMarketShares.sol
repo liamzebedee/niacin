@@ -10,7 +10,7 @@ contract TakeMarketShares is
 {
     uint256 public id;
 
-    constructor(address _resolver) MixinResolverStatic(_resolver) {
+    constructor() {
         // Instantiate the default template.
         configureInstance(address(1));
     }

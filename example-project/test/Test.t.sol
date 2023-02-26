@@ -18,12 +18,12 @@ contract ATest is Test {
         // Deploy each contract:
         // (1) The proxy - the stable identity.
         // (2) The implementation.
-        Proxy proxy1 = new Proxy();
-        TakeMarket takeMarket = new TakeMarket(address(resolver));
+        Proxy proxy1 = new Proxy(address(resolver));
+        TakeMarket takeMarket = new TakeMarket();
         proxy1.upgrade(address(takeMarket), 1);
         
-        Proxy proxy2 = new Proxy();
-        TakeMarketShares takeMarketShares = new TakeMarketShares(address(resolver));
+        Proxy proxy2 = new Proxy(address(resolver));
+        TakeMarketShares takeMarketShares = new TakeMarketShares();
         proxy2.upgrade(address(takeMarketShares), 1);
 
         // Import the contracts - (name, proxy) - into the resolver.

@@ -15,7 +15,3 @@ export const systemContracts = [
     'src/Proxy.sol',
     'src/AddressResolver.sol',
 ]
-
-// const proxy_Artifact = artifacts.filter(artifact => artifact.ast.absolutePath == 'src/Proxy.sol')[0]
-// const addressResolver_Artifact = artifacts.filter(artifact => artifact.ast.absolutePath == 'src/AddressResolver.sol')[0]
-

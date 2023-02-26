@@ -1,16 +1,26 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.13;
 
-import "./TakeMarketShares.sol";
+import "./interfaces/ITakeMarketShares.sol";
 import "@aller/lib/Clones.sol";
 import "@aller/lib/MixinResolver.sol";
+import "@aller/lib/Initialized.sol";
 
 contract TakeMarket is 
-    MixinResolver 
+    MixinResolver
 {
-	uint public a = 5;
+    uint public a;
+    string public getMessage;
 
-    constructor(address _resolver) MixinResolver(_resolver) {
+    constructor() {
+    }
+
+    function initialize(uint _a) public initializer {
+        a = 16;
+    }
+
+    function setHello(string memory message) public {
+        getMessage = message;
     }
 
     function resolverAddressesRequired() public override pure returns (bytes32[] memory addresses) {
@@ -28,18 +38,27 @@ contract TakeMarket is
         return requireAndGetAddress(bytes32("TakeMarket"));
     }
 
-    function getOrCreateTakeSharesContract(uint256 takeId) public returns (TakeMarketShares) {
+    function getTakeSharesContract(uint256 takeId) public view returns (ITakeMarketShares) {
+        bytes32 salt = keccak256(abi.encodePacked(takeId));
+        address instance = Clones.predictDeterministicAddress(takeMarketShares(), salt, address(this));
+        if(instance.code.length == 0) {
+            return ITakeMarketShares(address(0));
+        }
+        return ITakeMarketShares(instance);
+    }
+
+    function getOrCreateTakeSharesContract(uint256 takeId) public returns (ITakeMarketShares) {
         bytes32 salt = keccak256(abi.encodePacked(takeId));
         address instance = Clones.predictDeterministicAddress(takeMarketShares(), salt, address(this));
         if(instance.code.length == 0) {
             // Deploy.
             instance = Clones.cloneDeterministic(takeMarketShares(), salt);
-            TakeMarketShares i = TakeMarketShares(instance);
+            ITakeMarketShares i = ITakeMarketShares(instance);
             // Instantiate template. This permissions only TakeMarket to initialize.
             i.configureInstance(takeMarket());
             // Initialize.
             i.initialize(address(resolver), takeId);
         }
-        return TakeMarketShares(instance);
+        return ITakeMarketShares(instance);
     }
 }

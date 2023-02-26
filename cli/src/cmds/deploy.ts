@@ -4,7 +4,7 @@ import { join } from 'path'
 import { resolve } from 'path'
 import { ethers } from 'ethers'
 import * as shell from 'shelljs'
-import { Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST, DeployImplEvent, UpsertProxyEvent, ContractInfo, UpsertAddressResolver, DeploymentEvent, Targets, DeploymentNamespace, Deployment, EVMBuildArtifact, AllerArtifact, AllerConfig, VersionControlInfo } from '../types'
+import { Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST, DeployImplEvent, UpsertProxyEvent, ContractInfo, UpsertAddressResolver, DeploymentEvent, Targets, DeploymentNamespace, Deployment, EVMBuildArtifact, AllerArtifact, AllerConfig, VersionControlInfo, AllerScriptRuntime, AllerScriptRunStepArgs, AllerScriptInitializeArgs, InitializeScript, InitializeContractEvent, EthersContractMod } from '../types'
 import { addressResolver_Artifact, systemContracts } from '../contracts'
 import { proxy_Artifact } from '../contracts'
 import chalk from 'chalk'
@@ -271,11 +271,14 @@ const getContract = async (args: GetContractArgs) => {
 class DeploymentManager {
     deployment: Deployment
 
-    constructor(public manifestPath: string, public manifest: Manifest, private revision: VersionControlInfo) {
+    constructor(public manifestPath: string, public manifest: Manifest, private revision: VersionControlInfo, private deployer: string, private rpcUrl: string, private chainId: string) {
         this.deployment = {
             events: [],
             time: +new Date,
+            rpcUrl,
+            chainId,
             revision,
+            deployer,
             _complete: false,
         }
         this.manifestPath = manifestPath
@@ -398,6 +401,20 @@ export async function deploy(argv: DeployArgs) {
     console.log(`Loading configuration: ${p}`)
     console.log(`Loaded .allerrc.js`)
     const allerrc = require(p) as AllerConfig
+    
+    // Load configuration scripts.
+    let initializeScript: InitializeScript = async (runtime: AllerScriptRuntime) => {}
+    if(allerrc.scripts.initialize) {
+        initializeScript = allerrc.scripts.initialize
+        // const scriptName = 'initialize'
+        // const scriptPath = resolve(join(projectDir, "/", allerrc.scripts.initialize))
+        // try {
+        //     const script = require(scriptPath)
+        //     initializeScript = script.default || script
+        // } catch(err) {
+        //     throw new Error(`Couldn't load "${scriptName}" script: ` + err)
+        // }
+    }
 
     // Load gas estimator.
     let gasEstimatorName = argv.gasEstimator || 'default'
@@ -578,7 +595,6 @@ export async function deploy(argv: DeployArgs) {
     
 
     
-    const deploymentManager = new DeploymentManager(argv.manifest, manifest, versionControlInfo)
     console.log()
     console.log(chalk.green("(2) Deploy"))
 
@@ -606,8 +622,26 @@ export async function deploy(argv: DeployArgs) {
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl)
     const signer = new ethers.Wallet(privateKey, provider)
     const account = signer.address
+    const chainId = String(await (await provider.getNetwork()).chainId)
     console.log(chalk.gray(`Deploying from account:`), `${account}`)
     console.log()
+
+    // Check chainID matches the most recent deployment.
+    if(manifest.deployments.length) {
+        const lastDeployment = manifest.deployments[manifest.deployments.length - 1]
+        if(lastDeployment.chainId != chainId) {
+            throw new Error(`Chain ID mismatch. Last deployment was on chain ID ${lastDeployment.chainId} but you are deploying to chain ID ${chainId}.`)
+        }
+    }
+
+    const deploymentManager = new DeploymentManager(
+        argv.manifest, 
+        manifest, 
+        versionControlInfo, 
+        account,
+        rpcUrl,
+        String(chainId)
+    )
 
     // Print a summary for the deployment.
     // contract                 | version  | status    | action
@@ -637,12 +671,16 @@ export async function deploy(argv: DeployArgs) {
     console.log(chalk.gray(`${chalk.yellow('AddressResolver')} is at ${addressResolver.address}`))
 
     if (manifest.targets.system.AddressResolver == null) {
-        deploymentManager.addEvent({ 
-            type: "upsert_address_resolver", 
+        const event: UpsertAddressResolver = {
+            type: "upsert_address_resolver",
             address: addressResolver.address,
             bytecode: addressResolver_Artifact.bytecode,
             metadata: addressResolver_Artifact.metadata,
-        })
+            target: 'AddressResolver',
+            abi: addressResolver_Artifact.abi as any,
+            deployTx: addressResolver.deployTransaction,
+        }
+        deploymentManager.addEvent(event)
     }
 
     // 2. Deploy contracts.
@@ -672,7 +710,7 @@ export async function deploy(argv: DeployArgs) {
             name: proxyName,
             abi: proxy_Artifact.abi as any,
             bytecode: proxy_Artifact.bytecode.object,
-            constructorArgs: [],
+            constructorArgs: [addressResolver.address],
             signer: signer,
         })
 
@@ -695,18 +733,21 @@ export async function deploy(argv: DeployArgs) {
         const nextVersion = 1 + (previous ? previous.version : 0)
         console.log(`Deploying ${chalk.yellow(artifact.contractName)} v${nextVersion}`)
 
-        const impl = await deployContract({
-            signer: signer,
-            abi: artifact.abi,
-            bytecode: artifact.bytecode.object,
-            constructorArgs: [addressResolver.address],
-        })
+        // Compute initcodehash from the bytecode
+        const initCodeHash = ethers.utils.keccak256(artifact.bytecode.object);
+        const implAddress = ethers.utils.getCreate2Address(
+            proxy.address,
+            await proxy.computeNewDeploymentSalt(nextVersion),
+            initCodeHash,
+        );
+        const impl = new ethers.Contract(implAddress, artifact.abi, signer)
+        console.log(chalk.gray(`contract: ${impl.address} (create2)`))
 
         deploymentManager.addEvent(
-            { 
-                type: "deploy_impl", 
-                impl, 
-                version: nextVersion, 
+            {
+                type: "deploy_impl",
+                impl,
+                version: nextVersion,
                 target: artifact.contractName,
                 abi: artifact.abi,
                 deployTx: impl[DEPLOY_TRANSACTION_KEY],
@@ -721,7 +762,7 @@ export async function deploy(argv: DeployArgs) {
         // 2.3 Upgrade the proxy to new version.
         console.log(`Upgrading ${chalk.yellow(proxyName)} to implementation v${nextVersion}`)
         const gasParams = await gasEstimator()
-        const tx = await proxy.upgrade(impl.address, nextVersion, gasParams)
+        const tx = await proxy.upgrade2(artifact.bytecode.object, nextVersion, gasParams)
         logTx(tx)
         await tx.wait(1)
     }
@@ -736,10 +777,14 @@ export async function deploy(argv: DeployArgs) {
         ...manifest.deployments,
         deploymentManager.deployment
     ]
+    // The latest targets, including from this deployment.
     const targets2 = getTargetsFromEvents(
         deployments
             .map(d => d.events)
             .flat())
+    
+    // The address resolver stores:
+    // (target name -> proxy address)
     const names = Object.keys(targets2.user).map(ethers.utils.formatBytes32String)
     const destinations = Object.keys(targets2.user).map(target => {
         const proxy = targets2.system[`Proxy${target}`]
@@ -769,18 +814,17 @@ export async function deploy(argv: DeployArgs) {
     console.log(`4. Rebuilding MixinResolver caches...`)
     console.log()
 
-    // 4.1 Caches for implementations.
-    /*
-     * It's important that we map all past impls, as a user might delete a target,
-     * but it's addressresolver cache still needs to be updated.
-     * 
-     * I learnt this at my time at Synthetix, when working on the CollateralEth bug.
-    */
-    for (let target of getAllImplementations(deployments
-        .map(d => d.events)
-        .flat()))
-    {
-        const i = new ethers.Contract(target.address, target.abi, signer)
+    // 4.1 Caches for proxies.
+    for (let target of Object.values(targets2.system)) {
+        if (target.target == "AddressResolver") {
+            continue
+        }
+
+        const MixinResolverABI = [
+            'function isResolverCached() external view returns (bool)',
+            'function rebuildCache() external'
+        ]
+        const i = new ethers.Contract(target.address, MixinResolverABI, signer)
 
         // Log the version as well, since we might be rebuilding the cache of multiple versions.
         const fullyUniqueId = `${target.target} (v${target.version})`
@@ -792,18 +836,206 @@ export async function deploy(argv: DeployArgs) {
         }
 
         console.log(`Rebuilding cache for ${chalk.yellow(fullyUniqueId)}`)
-        // console.debug(chalk.gray(`Address: ${target.address}`))
         const gasParams = await gasEstimator()
         const tx = await i.rebuildCache(gasParams)
         logTx(tx)
         await tx.wait(1)
     }
+
+    // 4.1 Caches for implementations.
+    /*
+     * It's important that we map all past impls, as a user might delete a target,
+     * but it's addressresolver cache still needs to be updated.
+     * 
+     * I learnt this at my time at Synthetix, when working on the CollateralEth bug.
+    */
+    // for (let target of getAllImplementations(deployments
+    //     .map(d => d.events)
+    //     .flat()))
+    // {
+    //     const i = new ethers.Contract(target.address, target.abi, signer)
+
+    //     // Log the version as well, since we might be rebuilding the cache of multiple versions.
+    //     const fullyUniqueId = `${target.target} (v${target.version})`
+        
+    //     const fresh = await i.isResolverCached()
+    //     if (fresh) {
+    //         console.log(chalk.gray(`Skipping ${chalk.yellow(fullyUniqueId)} - cache is fresh`))
+    //         continue
+    //     }
+
+    //     console.log(`Rebuilding cache for ${chalk.yellow(fullyUniqueId)}`)
+    //     // console.debug(chalk.gray(`Address: ${target.address}`))
+    //     const gasParams = await gasEstimator()
+    //     const tx = await i.rebuildCache(gasParams)
+    //     logTx(tx)
+    //     await tx.wait(1)
+    // }
     
     console.log()
-    console.log('Done rebuilding caches.')
+    console.log(chalk.gray('Done rebuilding caches.'))
     console.log()
 
+    // 4.2 Initialize contracts.
+    console.log(`5. Running initialize script...`)
+    console.log()
+    // Iterate over all the contracts, and initialize them if they aren't already initialized.
+    if (initializeScript) {
+        // Each contract in this list uses the proxy's address, and the target's ABI.
+        const contracts = Object.keys(targets2.user)
+            .map(target => {
+                const proxy = targets2.system[`Proxy${target}`]
+                if (!proxy) {
+                    throw new Error(`No proxy found for ${target}`)
+                }
+                if (!proxy.address) {
+                    throw new Error(`No address found for proxy ${target}`)
+                }
+
+                const abi = targets2.user[target].abi
+                const address = proxy.address
+                const contract = new ethers.Contract(address, abi, signer) as EthersContractMod
+                contract._name = target
+
+                return contract
+            })
+            .reduce((acc, contract) => {
+                acc[contract._name] = contract
+                return acc
+            }, {} as Record<string, EthersContractMod>)
+
+
+        const stringifyParams = (params: any[]) => params.map(p => JSON.stringify(p)).join(', ')
+        const stringifyCall = (contract: EthersContractMod, method: string, params: any[]) => `${contract._name}.${method}(${stringifyParams(params)})`
+        
+        let stepCounter = 1
+        function logStep(str: any, skipped=false) {
+            let color = skipped ? chalk.gray : (str: string) => str
+            // console.log(color(`(${stepCounter})`), str)
+            console.log(str)
+            stepCounter++
+        }
+
+        async function runStep(args: AllerScriptRunStepArgs) {
+            const gasParams = await gasEstimator()
+
+            // Instantiate contract.
+            const contract = args.contract
+            
+            // Determine if state needs update.
+            // let input
+            // if(args.read == '' || !args.read) {
+            //     input = null
+            // } else {
+            //     input = await args.read
+            // }
+            // const dirty = await args.update(input)
+            // const 
+
+            logStep(stringifyCall(contract, args.write, args.writeArgs))
+            
+            let fresh = false
+            if(args.read) {
+                // callStatic for safety.
+                const value = await contract.callStatic[args.read](...args.readArgs)
+                const stale = await args.stale(value)
+                fresh = !stale
+            }
+            
+            // console.log(value, fresh)
+            // const value = await args.read()
+            // const dirty = await args.expect(value)
+
+            if (!fresh) {
+                console.log(chalk.yellow('Updating...'))
+                // logStep(chalk.yellow(stringifyCall(contract, args.write, args.writeArgs)))
+                const fn = contract[args.write]
+                if (!fn) {
+                    throw new Error(`No method ${args.write} found on contract ${contract._name}`)
+                }
+                const tx = await fn(...args.writeArgs, gasParams)
+                logTx(tx)
+                await tx.wait(1)
+            } else {
+                // logStep(chalk.gray(`${chalk.gray(stringifyCall(contract, args.write, args.writeArgs))} (skipped)`), true)
+                // logStep(chalk.gray(``), true)
+                console.log(chalk.gray(`Skipped.`))
+            }
+
+            console.log()
+        }
+
+        async function initialize(args: AllerScriptInitializeArgs) {
+            // When do we need to initialize a contract?
+            // 1. When a new implementation is deployed.
+            // 2. When the initializer arguments change (JS).
+            // 3. When the initializer function changes (Solidity).
+            // Thankfully, (3) results in new bytecode, which is covered by (1).
+            
+            // Get the target from the contract.
+            const info = targets2.user[args.contract._name]
+            
+            
+            const initializeContractEvent = deployments
+                .map(d => d.events)
+                .flat()
+                .filter(event => event.type == 'initialize_contract')
+                .reverse() // get the last item
+                .find((event: InitializeContractEvent) => event.target == info.target && event.version == info.version) as InitializeContractEvent
+            
+            const contract = args.contract
+            const gasParams = await gasEstimator()
+            const tx = await contract.populateTransaction.initialize(...args.args, gasParams)
+            const calldata = tx.data
+
+            // console.debug(
+            //     deployImplEvent,
+            //     initializeContractEvent,
+            //     initializeContractEvent.calldata,
+            //     calldata
+            // )
+
+            const initialized = 
+                initializeContractEvent != null &&
+                initializeContractEvent.calldata == calldata
+            
+            logStep(`${contract._name}` + `.initialize(${stringifyParams(args.args)})`))
+            // logStep(chalk.yellow(`${contract._name}.initialize(${stringifyParams(args.args)})`))
+            if (!initialized) {
+                console.log(chalk.yellow('Initializing...'))
+                const tx = await contract.initialize(...args.args, gasParams)
+                logTx(tx)
+                await tx.wait(1)
+
+                const event: InitializeContractEvent = {
+                    type: 'initialize_contract',
+                    target: info.target,
+                    version: info.version,
+                    calldata,
+                    tx: tx.hash,
+                }
+                deploymentManager.addEvent(event)
+            } else {
+                console.log(chalk.gray('Skipped.'))
+                // logStep(chalk.gray(`${contract._name}.initialize(${stringifyParams(args.args)})`), true)
+            }
+            console.log()
+        }
+
+        const aller: AllerScriptRuntime = {
+            runStep,
+            initialize,
+            targets: targets2,
+            contracts
+        }
+        
+        await initializeScript(aller)
+    } else {
+        console.log(chalk.gray(`No initialize script found.`))
+    }
+
     // 5. Update manifest.
+    console.log()
     console.log(`5. Saving deployments manifest...`)
     console.log()
 

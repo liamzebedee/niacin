@@ -7,6 +7,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "run": "node build/index.js",
+    "update-contracts": "cd ../contracts && forge build && cd ../cli && ./scripts/sync-contracts.sh && cd ../example-project && npm run sync-aller-contracts",
     "sync-contracts": "./scripts/sync-contracts.sh"
   },
   "bin": {

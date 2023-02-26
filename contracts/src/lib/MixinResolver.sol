@@ -6,25 +6,53 @@ import {IMixinResolver} from "../interfaces/IMixinResolver.sol";
 
 // Inheritance
 import {Owned} from "./Owned.sol";
+import {IConfigurable} from "../interfaces/IConfigurable.sol";
 
 // Internal references
 import {AddressResolver} from "../AddressResolver.sol";
 
 // https://docs.synthetix.io/contracts/source/contracts/mixinresolver
 abstract contract MixinResolver is 
-    IMixinResolver 
+    IMixinResolver,
+    IConfigurable
 {
     AddressResolver public resolver;
-
+    address public proxy;
     mapping(bytes32 => address) private addressCache;
 
-    constructor(address _resolver) {
-        resolver = AddressResolver(_resolver);
+
+    // TODO
+    // 
+    // 
+
+    modifier initializer() {
+        require(msg.sender == proxy || msg.sender == __deployer(), "Only one of (proxy,deployer) can initialize");
+        _;
     }
+
+    // 
+    // 
+    // INDEV
+
+
+
+    // constructor(address _resolver) {
+    //     resolver = AddressResolver(_resolver);
+    // }
 
     /* ========== INTERNAL FUNCTIONS ========== */
 
-    function _initialize(address _resolver) internal {
+    // function _initialize(address _resolver) internal {
+    //     resolver = AddressResolver(_resolver);
+    // }
+
+    function __deployer() internal view returns (address) {
+        return resolver.owner();
+    }
+
+    function __configure(address _proxy, address _resolver) public {
+        require(_proxy != address(0), "ERR_ALREADY_CONFIGURED");
+        proxy = _proxy;
         resolver = AddressResolver(_resolver);
     }
 

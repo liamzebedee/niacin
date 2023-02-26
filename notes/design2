@@ -1,0 +1,181 @@
+here's the flow:
+
+contract -> 
+targets -> 
+proxy, implementation
+
+all contracts deployed using create2
+version string identifies contract
+
+address = create2_predict(deployer_account, proxy_bytecode, concat(target_name, target_version))
+
+requireAndGetAddress("TakeMarket") -> create2_predict(this.deployer, this.proxy_bytecode_hash, concat(targetName, ))
+
+
+
+nah simpler
+
+
+
+deploy implementation
+deploy proxy
+
+import addresses into AddressResolver
+rebuild caches for every contract
+
+now initialize contracts
+for each contract:
+    
+
+
+
+
+
+end state:
+
+    each target:
+        proxy
+        implementation
+        proxy.implementation = implementation
+
+    wired up:
+        
+        addressresolver.cache = {
+            ...targets.map(target => {
+                return { [target.name]: [proxy.address] }
+            })
+        }
+
+        each target:
+            target.cacheFresh = true
+                target.rebuildCache()
+
+    initialize:
+        this could be:
+            - calling initialize() which is once-only per implementation
+            - calling a variety of functions - ie. setParam(var), calculateDebtCache()
+            - calling a function that is only callable by the owner
+        
+        potentially could cut this up as:
+
+        .allerrc.js
+        {
+            state: {
+                'SystemSettings': {
+                    issuanceRatio: '0.1'
+                }
+            }
+        }
+        {
+            state: {
+                'SystemSettings': {
+                    initialize: {
+                        args: []
+                    }
+                }
+            }
+        }
+
+        Script.s.sol:
+            function run() {
+                TakeMarketToken.initialize(rewardsDistributor)
+                SystemSettings.setIssuanceRatio(0.1)
+                FarmingThing.importAccounts(accounts)
+            }
+        
+        script.js:
+            function run(sys) {
+                // TakeMarketToken.initialize(rewardsDistributor)
+                await sys.initialize({
+                    contract: "TakeMarketToken",
+                    args: [rewardsDistributor]
+                })
+
+                // SystemSettings.setIssuanceRatio(0.1)
+                await sys.setProperty({
+                    contract: 'SystemSettings',
+                    name: 'issuanceRatio',
+                    value: '0.1',
+                    action: 'setIssuanceRatio'
+                })
+
+                // FarmingThing.importAccounts()
+                await sys.setValue({
+                    contract: 'FarmingThing',
+                    name: 'importAccounts',
+                    action: 'importAccounts',
+                    value: [...accounts],
+                })
+            }
+                
+        script2.js:
+            function run(sys) {
+                const {
+                    TakeMarketToken,
+                    SystemSettings,
+                    FarmingThing,
+                } = sys.contracts
+
+                await TakeMarketToken.initialize(rewardsDistributor)
+                await SystemSettings.setIssuanceRatio(0.1)
+                await FarmingThing.importAccounts()
+            }
+        
+        script2-with-smart-changes.js:
+            function run(sys) {
+                const {
+                    TakeMarketToken,
+                    SystemSettings,
+                    FarmingThing,
+                } = sys.contracts
+
+                if(!(await TakeMarketShares.initialized())) {
+                    await TakeMarketToken.initialize(rewardsDistributor)
+                }
+
+                // ...
+
+                // Alternatively:
+                await initialize({
+                    contract: TakeMarketToken,
+                    args: [rewardsDistributor],
+                })
+
+                await runStep({
+                    contract: SystemSettings,
+                    read: 'totalSupply',
+                    expected: input => input === '0',
+                    write: 'setTotalSupply',
+                    writeArg: '0',
+                });
+
+                await TakeMarketToken.initialize(rewardsDistributor)
+                await SystemSettings.setIssuanceRatio(0.1)
+                await FarmingThing.importAccounts()
+            }
+        
+        For each of these runStep calls:
+            - read the contract's state
+            - compare it to the expected value
+            - if it's different, run the write function
+            - if it's the same, skip it
+        
+        We could also write an entire solidity block for this.
+        But this would require a smart wallet / AA - ie. to pass the owner checks.
+            await sys.script(async () => {
+                await runStep({
+                    contract: SystemSettings,
+                    read: 'totalSupply',
+                    expected: input => input === '0',
+                    write: 'setTotalSupply',
+                    writeArg: '0',
+                });
+            })
+
+        All of these could be run locally to detect changes in state.
+        could use eth-verifiable-rpc for ethereum
+        This would be harder in the StarkNet example, because there's no library for this rn. 
+
+
+
+ideally an entire deployment would be atomic.

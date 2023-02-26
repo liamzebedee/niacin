@@ -19,8 +19,11 @@ contract MixinResolverStatic is
     IGenericResolver
 {
     AddressResolver public resolver;
+    address public proxy;
 
-    constructor(address _resolver) {
+    function __configure(address _proxy, address _resolver) public {
+        require(_proxy != address(0), "ERR_ALREADY_CONFIGURED");
+        proxy = _proxy;
         resolver = AddressResolver(_resolver);
     }
 

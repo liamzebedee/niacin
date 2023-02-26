@@ -8,6 +8,10 @@ This repo contains the CLI tooling necessary to enable vercel3:
 
 Inspirations: Synthetix v2 deployer, Synthetix v3 Store pattern, tBTC Factories
 
+## Roadmap.
+
+ - [ ] Initialize contracts.
+
 ## Deployer.
 
 The deployer is designed to remove the hassle of smart contract deployments. _Works natively with Foundry_.
@@ -19,6 +23,10 @@ The deployer is designed to remove the hassle of smart contract deployments. _Wo
 **Dependency injection for contracts**. No more manually pasting addresses, you can use the `MixinResolver` in order to resolve dependencies to other contracts in your codebase. It is smart and caches entries, meaning no extra `CALL`'s like a Beacon.
 
 **Deployment data for your Dapp/Subgraph**. Contract deployment information is written to a `manifest.json`, containing the addresses, ABI's, and deployment block number and tx (useful for The Graph).
+
+**Reproducible deployments**. Git metadata (branch, commit) is recorded for each deployment, so you can easily checkout the old source code. Deployer records the RPC and chain ID for each deployment - and checks if you're deploying to the network you intended!
+
+**Helpful features for developers**. Deployer automatically detects if you're deploying to Hardhat/Foundry, and imports the default private keys for these projects. No configuration necessary.
 
 **Factories made easy**. Building contracts that deploy other contracts is easy, but upgrading them is hard. This is sometimes called a Factory, where the factory clones a template contract, often 100's of times. We implement a pattern where you can upgrade all 100's of these templates in one tx. A simple `initialize` function for your parameters, and you can still use dependency injection to lookup your contracts dynamically without passing around extra data.
 
