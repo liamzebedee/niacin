@@ -1,0 +1,76 @@
+https://github.com/wolflo/evm-opcodes/blob/main/gas.md
+
+
+generate an atomic solidity migration
+
+
+gas estimation:
+
+    - 2000 per CALL
+    - 32000 per CREATE/CREATE2
+
+okay so with gas limit of 1.5m
+46 contract deploys at max with no bytecode
+
+
+
+best deploy contracts in a batch
+    proxy
+    new impls
+
+and then migrate in a single tx
+    for target:
+        proxy.setimpl
+        proxy.importaddrs
+    
+    run initialize scripts:
+        initialize
+
+
+
+migrate()
+    event UpsertAddressResolver()    
+    event NewProxy()
+    event Upgrade()
+
+    addressresolver = new AddressResolver() || addressResolver
+
+    addressresolver.beginDeployment(version)
+
+    bytes32[] memory names; 
+    address[] memory destinations;
+
+    // proxies.
+    function deployTarget(code) {
+        proxy = new Proxy(addressresolver)
+        instance = proxy.upgrade(bytecode)
+        
+        // autogenerate dependencies here.
+        this.rebuildCache(
+            names,
+            computeCreate2(this.system, salt, bytecode)
+        )
+
+        // push info.
+    }
+
+    // deploy all targets.
+    for target of targets:
+        deployTarget(target)
+
+    // initialize.
+    // do all script actions here.
+
+    // finalize.
+    addressresolver.endDeployment()
+
+
+
+rebuild caches is unnecessary just with create2
+
+/*
+
+bytecode = type(ContractName).runtimeCode
+require(target) = computeCreate2(this.system, salt, bytecode)
+
+*/

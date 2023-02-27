@@ -51,61 +51,102 @@ aller deploy --project-dir . --project-type foundry --manifest ./manifest-polygo
 ### Example.
 
 ```sh
-(base) ➜  contracts git:(contracts-rewrite-aller) ✗ aller deploy --project-dir . --project-type foundry --manifest ./manifest-polygon2.json --gas-estimator polygon
+(base) ➜  example-project git:(main) aller deploy --project-dir . --project-type foundry --manifest ./manifest-poly.json -y
 Creating new empty manifest...
-Loading configuration: /Users/liamz/Documents/Projects/take.xyz/contracts/.allerrc.js
+Loading configuration: /Users/liamz/Documents/Projects/vercel3/example-project/.allerrc.js
 Loaded .allerrc.js
-Using gas estimator: polygon
+Using gas estimator: default
+
 (1) Build
-Project directory: /Users/liamz/Documents/Projects/take.xyz/contracts
+Project directory: /Users/liamz/Documents/Projects/vercel3/example-project
 Project type: foundry
 
 > forge build
 No files changed, compilation skipped
 
+Git repository detected.
+Recording version control information:
+  branch = main
+  commit = b2fc46fa9a204ddd58aab25671fbc4a8af50463a
+  dirty = false
+
 
 (2) Deploy
+No RPC URL provided. Using default for project type: foundry
+No PRIVATE KEY provided. Using default for project type: foundry
 
-RPC URL: https://polygon-rpc.com
-Deploying from account: 0x913Fd60887e7b99F2EE9115a79F3C5886ad2d47A
+RPC URL: http://localhost:8545
+Deploying from account: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 
-╔════════════════════════════╤═════════╤═════════╤════════╤═══════════════╗
-║ Contract                   │ Version │ Status  │ Action │ Proxy Address ║
-╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
-║ src/HYPE.sol               │ n/a     │ new     │ deploy │               ║
-╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
-║ src/Take.sol               │ n/a     │ new     │ deploy │               ║
-╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
-║ src/TakeMarketSharesV1.sol │ n/a     │ ignored │ none   │               ║
-╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
-║ src/TakeMarketV1.sol       │ n/a     │ ignored │ none   │               ║
-╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
-║ src/TakeRewardsV1.sol      │ n/a     │ new     │ deploy │               ║
-╟────────────────────────────┼─────────┼─────────┼────────┼───────────────╢
-║ src/Test2.sol              │ n/a     │ new     │ deploy │               ║
-╚════════════════════════════╧═════════╧═════════╧════════╧═══════════════╝
+╔══════════════════════════╤═════════╤════════╤════════╤═══════════════╗
+║ Contract                 │ Version │ Status │ Action │ Proxy Address ║
+╟──────────────────────────┼─────────┼────────┼────────┼───────────────╢
+║ src/TakeMarket.sol       │ n/a     │ new    │ deploy │               ║
+╟──────────────────────────┼─────────┼────────┼────────┼───────────────╢
+║ src/TakeMarketShares.sol │ n/a     │ new    │ deploy │               ║
+╚══════════════════════════╧═════════╧════════╧════════╧═══════════════╝
 
 Continue? [y/N]: y
 
 1. Locating AddressResolver...
-deployContract tx=0x262863b24c6acf5fbbdba23ef12793f5138941f80251a8e2e2ce655d933b552b
-AddressResolver is at 0x00B8A57df493830bB833140F0C203d8Fd900603F
+
+tx: 0xec0afea80a34f55c8e0eb553a97dd524fc104a6a8b05fe6d9e7f24a08cdb0dba
+contract: 0xED0626e8Eea7098C1e03B72c1c72B89a43EF4812
+AddressResolver is at 0xED0626e8Eea7098C1e03B72c1c72B89a43EF4812
 
 2. Deploying contracts...
 
-[src/HYPE.sol]
-Creating proxy ProxyHYPE for HYPE
-deployContract tx=0xcab5d6b7998fef8eebefb85df2b42106d24f00686fa49d1a67982026339895ad
-Deploying HYPE v1
-deployContract tx=0x606b79595ce1f9a732580a288a0c40ba53156e2d1a5fdf9d9f3fe74943f09108
-Upgrading ProxyHYPE to implementation v1
+[src/TakeMarket.sol]
+Creating proxy ProxyTakeMarket for TakeMarket
+tx: 0xcb902645d9529d979b557c699607bc65e9f8780df8fde6ab202897153bcf5f71
+contract: 0x4A0a7843BbC7d33e4824cb5bdb531f0E195B64E1
+Deploying TakeMarket v1
+contract: 0x158788351516cB54d692de557936C38427959FC7 (create2)
+Upgrading ProxyTakeMarket to implementation v1
+tx: 0x79a138b7ea93c2183b412e05996deeb610ad9ed12d3d5cf5bce333670e7a0594
 
-[src/Take.sol]
-Creating proxy ProxyTake for Take
-deployContract tx=0xa5623b5a70f65314b6fdd4d3e14b36f7698cf8856cc059ce9bcfda2bd76bb328
-Deploying Take v1
-deployContract tx=0xaee7db06ecb720c0cb7d41cd14a8a7f87f4f4dd6d409c307107d0040e8008123
-Upgrading ProxyTake to implementation v1
+[src/TakeMarketShares.sol]
+Creating proxy ProxyTakeMarketShares for TakeMarketShares
+tx: 0x87e6bad98e22e6f3f10a480c5cb4b388b32c7a6e80e3552433f1ec046831b7ae
+contract: 0xDeCFC2c6dDFf24579d5924484a9033Ce0563DBf4
+Deploying TakeMarketShares v1
+contract: 0x26e89734f2520BEe20f7624801692F5b477EEe00 (create2)
+Upgrading ProxyTakeMarketShares to implementation v1
+tx: 0xe3652446430ca9ec76910456989969b09e4c525d7e9b55309f61b923bf7f112f
+
+3. Importing addresses into AddressResolver...
+
+tx: 0x6cc7f0e7271e820ea24cc6f8fcddbbedc30e94efeb8c630e2d46e13fdcd20e00
+Imported 2 addresses.
+
+4. Rebuilding MixinResolver caches...
+
+Rebuilding cache for TakeMarket (v1)
+tx: 0xf514a04f468e0b96a2316e806c62ae7b715e6032eeecba1d43c57a80b8a62dd9
+Skipping TakeMarketShares (v1) - cache is fresh
+
+Done rebuilding caches.
+
+5. Running initialize script...
+
+TakeMarket.initialize(123123123)
+Initializing...
+tx: 0x65b72a4397b76b42b954d436624663cc57b6a35a379064b4e1d50a5dc0a0c386
+
+TakeMarket.getOrCreateTakeSharesContract("1")
+Updating...
+tx: 0x0eb4940fcb4db87f46f10f7dacb0cd0ad9b5f808c04ebf7b05964d2165b08b1c
+
+TakeMarket.getOrCreateTakeSharesContract("2")
+Updating...
+tx: 0xa1f89a9eb8030d657425980b32559ed1cf3da6596d065593b5d3e4dc25e534c9
+
+TakeMarket.getOrCreateTakeSharesContract("3")
+Updating...
+tx: 0x9e8db520d94d4c325f33559b0f910854b195cbc3563251b8552c9090a4d84a96
+
+
+5. Saving deployments manifest...
 ```
 
 ## `generate-npm-package`

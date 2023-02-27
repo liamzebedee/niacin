@@ -394,7 +394,7 @@ export async function deploy(argv: DeployArgs) {
     const p = resolve(join(projectDir, "/", argv.config))
     // Check the config exists.
     try {
-        const res = fs.accessSync(p, fs.constants.R_OK)
+        fs.accessSync(p, fs.constants.R_OK)
     } catch (err) {
         throw Error(`Can't find .allerrc.js at ${p}: ${err}`)
     }
