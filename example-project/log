@@ -1,0 +1,12 @@
+Loading configuration: /Users/liamz/Documents/Projects/vercel3/example-project/.allerrc.js
+Loaded .allerrc.js
+Using gas estimator: default
+
+(1) Build
+Project directory: /Users/liamz/Documents/Projects/vercel3/example-project
+Project type: foundry
+
+> forge build
+No files changed, compilation skipped
+
+Git repository detected.

@@ -83,6 +83,7 @@ export interface VersionControlInfo {
 }
 
 export interface Deployment {
+    id: number
     deployer: string
     rpcUrl: string
     chainId: string
@@ -129,7 +130,6 @@ export interface UpsertProxyEvent extends GenericContractDeployEvent {
     type: 'upsert_proxy'
     abi: ethers.utils.Fragment[]
     deployTx: any
-    proxy: any // ethers.Contract
     target: string,
     proxyName: string,
     address: string

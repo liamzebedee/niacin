@@ -9,7 +9,8 @@
   },
   "scripts": {
     "sync-aller-contracts": "rm -r node_modules/aller-contracts && cp -R ../contracts node_modules/aller-contracts",
-    "deploy": "npx aller deploy --project-dir . --project-type foundry --manifest ./manifest.json -y",
+    "deploy-local": "source .env.local && npx aller deploy --project-dir . --project-type foundry --manifest ./manifest-local.json -y",
+    "deploy-poly": "POLYGON_PRIORITY_FEE_MULT=2 source .env && npx aller deploy --project-dir . --project-type foundry --manifest ./manifest-poly.json --gas-estimator polygon -y",
     "build": "forge build"
   },
   "keywords": [],

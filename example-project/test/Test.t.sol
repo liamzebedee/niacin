@@ -20,11 +20,11 @@ contract ATest is Test {
         // (2) The implementation.
         Proxy proxy1 = new Proxy(address(resolver));
         TakeMarket takeMarket = new TakeMarket();
-        proxy1.upgrade(address(takeMarket), 1);
+        proxy1.upgrade(type(TakeMarket).creationCode, 1);
         
         Proxy proxy2 = new Proxy(address(resolver));
         TakeMarketShares takeMarketShares = new TakeMarketShares();
-        proxy2.upgrade(address(takeMarketShares), 1);
+        proxy2.upgrade(type(TakeMarketShares).creationCode, 1);
 
         // Import the contracts - (name, proxy) - into the resolver.
         bytes32[] memory names = new bytes32[](2);

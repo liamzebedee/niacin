@@ -1,43 +1,28 @@
-// SPDX-License-Identifier: LGPL-3.0-only
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
 import "./lib/Create2.sol";
 import "./interfaces/IConfigurable.sol";
+import {ProxyStorage} from "./lib/ProxyStorage.sol"; 
 
 // An implementation of a proxy.
 // The proxy forwards all calls to the implementation.
 // The proxy has an admin.
 
-contract ProxyStorage {
-    struct ProxyStore {
-        address admin;
-        address implementation;
-        uint32 version;
-    }
-
-    bytes32 constant STORE_SLOT = bytes32(uint(keccak256("eth.nakamofo.proxy")) - 1);
-
-    function _store() internal pure returns (ProxyStore storage store) {
-        bytes32 s = STORE_SLOT;
-        assembly {
-            store.slot := s
-        }
-    }
-}
-
 contract Proxy is 
     ProxyStorage
 {
+    /* ========== EVENTS ========== */
     event Upgraded(address indexed implementation, uint32 indexed version);
     event AdminChanged(address previousAdmin, address newAdmin);
 
-    address public resolver;
-    bool public configured = false;
-
     constructor(address _resolver) {
         _setProxyAdmin(msg.sender);
-        resolver = _resolver;
+        _store().resolver = _resolver;
+        _store().proxy = address(this);
     }
+
+    /* ========== VIEWS ========== */
 
     function proxyAdmin() public view returns (address) {
         return _store().admin;
@@ -51,29 +36,34 @@ contract Proxy is
         return _store().version;
     }
 
-    function setProxyAdmin(address _admin) public {
-        require(msg.sender == _store().admin, "ERR_UNAUTHORISED");
-        _setProxyAdmin(_admin);
-    }
-
-    function _setProxyAdmin(address _admin) internal {
-        emit AdminChanged(_store().admin, _admin);
-        _store().admin = _admin;
-    }
-
     function computeNewDeploymentSalt(uint32 version) public view returns (bytes32) {
         return keccak256(abi.encodePacked(address(this), version));
     }
 
+    /* ========== RESTRICTED FUNCTIONS ========== */
+
+    function setProxyAdmin(address _admin) public {
+        require(msg.sender == _store().admin, "ERR_UNAUTHORISED");
+
+        _setProxyAdmin(_admin);
+    }
+
     function upgrade(bytes memory _newImplementation, uint32 version) public {
+        require(msg.sender == _store().admin, "ERR_UNAUTHORISED");
+        
         address instance = Create2.deploy(0, computeNewDeploymentSalt(version), _newImplementation);
-        if(!configured) {
-            IConfigurable(instance).__configure(address(this), resolver);
+        IConfigurable(instance).__configure(address(this), _store().resolver);
+
+        if(_store().proxy == address(0)) {
+            IConfigurable(address(this)).__configure(address(this), _store().resolver);
         }
+
         _store().implementation = instance;
         _store().version = version;
         emit Upgraded(instance, version);
     }
+
+    /* ========= PUBLIC FUNCTIONS ========== */
 
     /// @dev Fallback function forwards all transactions and returns all received return data.
     function _fallback() internal {
@@ -116,6 +106,13 @@ contract Proxy is
      */
     receive () external payable {
         _fallback();
+    }
+
+    /* ========== INTERNAL FUNCTIONS ========== */
+
+    function _setProxyAdmin(address _admin) internal {
+        emit AdminChanged(_store().admin, _admin);
+        _store().admin = _admin;
     }
 }
 

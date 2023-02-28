@@ -5,12 +5,16 @@ import { resolve } from 'path'
 import { ethers } from 'ethers'
 import * as shell from 'shelljs'
 import { Manifest, MANIFEST_VERSIONS, EMPTY_MANIFEST, DeployImplEvent, UpsertProxyEvent, ContractInfo, UpsertAddressResolver, DeploymentEvent, Targets, DeploymentNamespace, Deployment, EVMBuildArtifact, AllerArtifact, AllerConfig, VersionControlInfo, AllerScriptRuntime, AllerScriptRunStepArgs, AllerScriptInitializeArgs, InitializeScript, InitializeContractEvent, EthersContractMod } from '../types'
-import { addressResolver_Artifact, systemContracts } from '../contracts'
+import { addressResolver_Artifact } from '../contracts'
 import { proxy_Artifact } from '../contracts'
 import chalk from 'chalk'
 import { table } from 'table'
+import { compileSolidity } from '../utils'
 const prompts = require('prompt-sync')({ sigint: true });
+import fetch from 'node-fetch'
+import { inspect } from 'util'
 
+// We keep log of extra transaction information on the ethers.Contract at this key.
 const DEPLOY_TRANSACTION_KEY = 'deployTransaction2'
 
 const logTx = (tx: ethers.Transaction) => {
@@ -207,34 +211,68 @@ interface DeployFuncArgs {
 }
 
 
-const getGasParametersForTx = async () => {
-    // TODO: use the provider.getFeeData()
+const polygonGasEstimator = async () => {
     const feeData = await (await fetch(`https://gasstation-mainnet.matic.network/v2`)).json()
 
     const { safeLow, standard, fast, estimatedBaseFee } = feeData
+    const config = fast
 
-    // safeLow.maxFee = convertFloatToUint256(safeLow.maxFee)
-    // safeLow.maxPriorityFee = convertFloatToUint256(safeLow.maxPriorityFee)
+    let maxFeePerGas = ethers.utils.parseUnits(config.maxFee.toString().split('.')[0], "gwei")
+    let maxPriorityFeePerGas = ethers.utils.parseUnits(config.maxPriorityFee.toString().split('.')[0], "gwei")
 
-    // standard.maxFee = convertFloatToUint256(standard.maxFee)
-    // standard.maxPriorityFee = convertFloatToUint256(standard.maxPriorityFee)
+    let { PRIORITY_FEE_MULT } = process.env
+    let priorityFeeMultiplier = PRIORITY_FEE_MULT ? parseFloat(PRIORITY_FEE_MULT) : 1.5
 
-    // fast.maxFee = convertFloatToUint256(fast.maxFee)
-    // fast.maxPriorityFee = convertFloatToUint256(fast.maxPriorityFee)
+    maxFeePerGas = multiplyGwei(maxFeePerGas, priorityFeeMultiplier * 1.1)
+    maxPriorityFeePerGas = multiplyGwei(maxPriorityFeePerGas, priorityFeeMultiplier)
 
     return {
-        maxFeePerGas: ethers.utils.parseUnits(fast.maxFee.toString().split('.')[0], "gwei"),
-        maxPriorityFeePerGas: ethers.utils.parseUnits(fast.maxPriorityFee.toString().split('.')[0], "gwei"),
+        maxFeePerGas,
+        maxPriorityFeePerGas
     }
 }
 
+// TODO: code smell.
+// - used by gas estimator.
+let provider: ethers.providers.Provider
+
+
+function multiplyGwei(gweiBN: ethers.BigNumber, amount: number) {
+    // Convert to wei.
+    const weiDecimalPlaces = 9;
+    let wei = ethers.utils.parseUnits(gweiBN.toString(), weiDecimalPlaces);
+
+    wei = wei.mul(ethers.utils.parseEther(amount.toString()))
+    wei = wei.div(ethers.utils.parseUnits('1', 18))
+
+    const gwei = wei.div(ethers.utils.parseUnits('1', 9))
+    return gwei
+}
+
 const defaultGasEstimator = async () => {
-    return {}
+    let {
+        maxFeePerGas,
+        maxPriorityFeePerGas
+    } = await provider.getFeeData()
+
+    if(!maxFeePerGas) {
+        // Not EIP-1559 Type 2 tx.
+        return {}
+    }
+
+    // https://hackmd.io/@tvanepps/1559-wallets
+    maxFeePerGas = multiplyGwei(maxFeePerGas, 2)
+    maxPriorityFeePerGas = multiplyGwei(maxPriorityFeePerGas, 2)
+
+    return {
+        maxFeePerGas,
+        maxPriorityFeePerGas
+    }
 }
 
 const gasEstimators = {
     'default': defaultGasEstimator,
-    'polygon': getGasParametersForTx
+    'polygon': polygonGasEstimator
 }
 
 let gasEstimator = defaultGasEstimator
@@ -247,6 +285,7 @@ const deployContract = async (args: DeployFuncArgs) => {
     const contract = await Contract.deploy(...args.constructorArgs, gasInfo)
     logTx(contract.deployTransaction)
 
+    await contract.deployed()
     await contract.deployTransaction.wait()
     const rx = await args.signer.provider.getTransactionReceipt(contract.deployTransaction.hash)
     contract.deployTransaction.blockNumber = rx.blockNumber
@@ -273,6 +312,7 @@ class DeploymentManager {
 
     constructor(public manifestPath: string, public manifest: Manifest, private revision: VersionControlInfo, private deployer: string, private rpcUrl: string, private chainId: string) {
         this.deployment = {
+            id: manifest.deployments.length ? manifest.deployments[manifest.deployments.length - 1].id + 1 : 1,
             events: [],
             time: +new Date,
             rpcUrl,
@@ -313,7 +353,7 @@ class DeploymentManager {
             )
         } catch (err) {
             console.error("Error writing manifest")
-            console.error(this.manifest)
+            console.log(inspect(this.manifest, false, 10))
             console.error(err)
         }
     }
@@ -619,7 +659,8 @@ export async function deploy(argv: DeployArgs) {
 
     console.log()
     console.log(chalk.gray('RPC URL:'), chalk.green(rpcUrl))
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrl)
+    // TODO: code smell
+    provider = new ethers.providers.JsonRpcProvider(rpcUrl)
     const signer = new ethers.Wallet(privateKey, provider)
     const account = signer.address
     const chainId = String(await (await provider.getNetwork()).chainId)
@@ -655,6 +696,33 @@ export async function deploy(argv: DeployArgs) {
         return console.log(`Aborting.`)
     }
     console.log()
+
+    // 
+    // Generate solidity migrations.
+    // 
+
+    //     const contractName = `Migration_${deploymentManager.deployment.id}`
+    //     const solcode = `
+    // // SPDX-License-Identifier: UNLICENSED
+    // pragma solidity ^0.8.9;
+
+    // contract ${contractName} {
+    //     function migrate() public {
+
+    //     }
+    // }
+    //     `
+        
+    //     const obj = compileSolidity(contractName, solcode)
+    //     console.log(obj.contracts[contractName][contractName].evm.bytecode)
+
+    //     // _code = migrationCode
+    //     // _data = Migration.encodeTransaction.run()
+    //     // DSProxy.execute(code, _data);
+
+    //     return
+
+
 
     // 1. AddressResolver
     console.log(`1. Locating AddressResolver...`)
@@ -717,7 +785,6 @@ export async function deploy(argv: DeployArgs) {
         deploymentManager.addEvent(
             { 
                 type: "upsert_proxy", 
-                proxy,
                 address: proxy.address,
                 target: artifact.contractName, 
                 proxyName,
@@ -746,7 +813,6 @@ export async function deploy(argv: DeployArgs) {
         deploymentManager.addEvent(
             {
                 type: "deploy_impl",
-                impl,
                 version: nextVersion,
                 target: artifact.contractName,
                 abi: artifact.abi,
@@ -762,7 +828,7 @@ export async function deploy(argv: DeployArgs) {
         // 2.3 Upgrade the proxy to new version.
         console.log(`Upgrading ${chalk.yellow(proxyName)} to implementation v${nextVersion}`)
         const gasParams = await gasEstimator()
-        const tx = await proxy.upgrade2(artifact.bytecode.object, nextVersion, gasParams)
+        const tx = await proxy.upgrade(artifact.bytecode.object, nextVersion, gasParams)
         logTx(tx)
         await tx.wait(1)
     }
@@ -841,36 +907,6 @@ export async function deploy(argv: DeployArgs) {
         logTx(tx)
         await tx.wait(1)
     }
-
-    // 4.1 Caches for implementations.
-    /*
-     * It's important that we map all past impls, as a user might delete a target,
-     * but it's addressresolver cache still needs to be updated.
-     * 
-     * I learnt this at my time at Synthetix, when working on the CollateralEth bug.
-    */
-    // for (let target of getAllImplementations(deployments
-    //     .map(d => d.events)
-    //     .flat()))
-    // {
-    //     const i = new ethers.Contract(target.address, target.abi, signer)
-
-    //     // Log the version as well, since we might be rebuilding the cache of multiple versions.
-    //     const fullyUniqueId = `${target.target} (v${target.version})`
-        
-    //     const fresh = await i.isResolverCached()
-    //     if (fresh) {
-    //         console.log(chalk.gray(`Skipping ${chalk.yellow(fullyUniqueId)} - cache is fresh`))
-    //         continue
-    //     }
-
-    //     console.log(`Rebuilding cache for ${chalk.yellow(fullyUniqueId)}`)
-    //     // console.debug(chalk.gray(`Address: ${target.address}`))
-    //     const gasParams = await gasEstimator()
-    //     const tx = await i.rebuildCache(gasParams)
-    //     logTx(tx)
-    //     await tx.wait(1)
-    // }
     
     console.log()
     console.log(chalk.gray('Done rebuilding caches.'))
@@ -975,7 +1011,6 @@ export async function deploy(argv: DeployArgs) {
             // Get the target from the contract.
             const info = targets2.user[args.contract._name]
             
-            
             const initializeContractEvent = deployments
                 .map(d => d.events)
                 .flat()
@@ -999,7 +1034,7 @@ export async function deploy(argv: DeployArgs) {
                 initializeContractEvent != null &&
                 initializeContractEvent.calldata == calldata
             
-            logStep(`${contract._name}` + `.initialize(${stringifyParams(args.args)})`))
+            logStep(`${contract._name}` + `.initialize(${stringifyParams(args.args)})`)
             // logStep(chalk.yellow(`${contract._name}.initialize(${stringifyParams(args.args)})`))
             if (!initialized) {
                 console.log(chalk.yellow('Initializing...'))

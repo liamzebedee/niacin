@@ -3,8 +3,7 @@ pragma solidity ^0.8.13;
 
 import "./interfaces/ITakeMarketShares.sol";
 import "@aller/lib/Clones.sol";
-import "@aller/lib/MixinResolver.sol";
-import "@aller/lib/Initialized.sol";
+import {MixinResolver} from "@aller/lib/MixinResolver.sol";
 
 contract TakeMarket is 
     MixinResolver
@@ -16,7 +15,7 @@ contract TakeMarket is
     }
 
     function initialize(uint _a) public initializer {
-        a = 1;
+        a = _a;
     }
 
     function setHello(string memory message) public {
@@ -57,7 +56,7 @@ contract TakeMarket is
             // Instantiate template. This permissions only TakeMarket to initialize.
             i.configureInstance(takeMarket());
             // Initialize.
-            i.initialize(address(resolver), takeId);
+            i.initialize(address(__resolver()), takeId);
         }
         return ITakeMarketShares(instance);
     }

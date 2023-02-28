@@ -5,54 +5,78 @@ import {IGenericResolver} from "../interfaces/IGenericResolver.sol";
 import {IMixinResolver} from "../interfaces/IMixinResolver.sol";
 
 // Inheritance
-import {Owned} from "./Owned.sol";
 import {IConfigurable} from "../interfaces/IConfigurable.sol";
 
 // Internal references
 import {AddressResolver} from "../AddressResolver.sol";
+import {ProxyStorage} from "./ProxyStorage.sol";
 
 abstract contract MixinResolver is 
     IMixinResolver,
-    IConfigurable
+    IConfigurable,
+    ProxyStorage
 {
-    AddressResolver public resolver;
-    address public proxy;
-    mapping(bytes32 => address) private addressCache;
+    /* ========== MODIFIERS ========== */
 
-
-    // TODO
-    // 
-    // 
-
+    // Allows only the proxy/deployer to initialize the instance.
     modifier initializer() {
-        require(msg.sender == proxy || msg.sender == __deployer(), "Only one of (proxy,deployer) can initialize");
+        require(msg.sender == _store().proxy || msg.sender == __deployer(), "Only one of (proxy,deployer) can initialize");
         _;
     }
 
-    // 
-    // 
-    // INDEV
+    /* ========== VIRTUAL FUNCTIONS ========== */
 
+    function resolverAddressesRequired() public virtual override view returns (bytes32[] memory addresses) {}
 
+    /* ========== PUBLIC FUNCTIONS ========== */
 
-    // constructor(address _resolver) {
-    //     resolver = AddressResolver(_resolver);
-    // }
+    // Configures the instance so it can only be initialized by the proxy/resolver.
+    function __configure(address _proxy, address _resolver) public {
+        require(_store().proxy == address(0), "ERR_ALREADY_CONFIGURED");
+        _store().proxy = _proxy;
+        _store().resolver = _resolver;
+    }
+
+    function rebuildCache() public override {
+        bytes32[] memory requiredAddresses = resolverAddressesRequired();
+        // The resolver must call this function whenver it updates its state
+        for (uint i = 0; i < requiredAddresses.length; i++) {
+            bytes32 name = requiredAddresses[i];
+            // Note: can only be invoked once the resolver has all the targets needed added
+            address destination =
+                addressResolver().requireAndGetAddress(name, string(abi.encodePacked("Resolver missing target: ", name)));
+            _store().addressCache[name] = destination;
+            emit CacheUpdated(name, destination);
+        }
+    }
+
+    /* ========== VIEWS ========== */
+
+    function __resolver() public view returns (address) {
+        return _store().resolver;
+    }
+
+    function __deployer() public view returns (address) {
+        return AddressResolver(_store().resolver).owner();
+    }
+
+    function isResolverCached() external view override returns (bool) {
+        bytes32[] memory requiredAddresses = resolverAddressesRequired();
+        for (uint i = 0; i < requiredAddresses.length; i++) {
+            bytes32 name = requiredAddresses[i];
+            // false if our cache is invalid or if the resolver doesn't have the required address
+            if (addressResolver().getAddress(name) != _store().addressCache[name] || _store().addressCache[name] == address(0)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /* ========== INTERNAL FUNCTIONS ========== */
 
-    // function _initialize(address _resolver) internal {
-    //     resolver = AddressResolver(_resolver);
-    // }
-
-    function __deployer() internal view returns (address) {
-        return resolver.owner();
-    }
-
-    function __configure(address _proxy, address _resolver) public {
-        require(_proxy != address(0), "ERR_ALREADY_CONFIGURED");
-        proxy = _proxy;
-        resolver = AddressResolver(_resolver);
+    function addressResolver() internal view returns (AddressResolver) {
+        return AddressResolver(_store().resolver);
     }
 
     function combineArrays(bytes32[] memory first, bytes32[] memory second)
@@ -71,48 +95,13 @@ abstract contract MixinResolver is
         }
     }
 
-    /* ========== PUBLIC FUNCTIONS ========== */
-
-    // Note: this function is public not external in order for it to be overridden and invoked via super in subclasses
-    function resolverAddressesRequired() public virtual override view returns (bytes32[] memory addresses) {}
-
-    function rebuildCache() public override {
-        bytes32[] memory requiredAddresses = resolverAddressesRequired();
-        // The resolver must call this function whenver it updates its state
-        for (uint i = 0; i < requiredAddresses.length; i++) {
-            bytes32 name = requiredAddresses[i];
-            // Note: can only be invoked once the resolver has all the targets needed added
-            address destination =
-                resolver.requireAndGetAddress(name, string(abi.encodePacked("Resolver missing target: ", name)));
-            addressCache[name] = destination;
-            emit CacheUpdated(name, destination);
-        }
-    }
-
-    /* ========== VIEWS ========== */
-
-    function isResolverCached() external view override returns (bool) {
-        bytes32[] memory requiredAddresses = resolverAddressesRequired();
-        for (uint i = 0; i < requiredAddresses.length; i++) {
-            bytes32 name = requiredAddresses[i];
-            // false if our cache is invalid or if the resolver doesn't have the required address
-            if (resolver.getAddress(name) != addressCache[name] || addressCache[name] == address(0)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /* ========== INTERNAL FUNCTIONS ========== */
-
     function requireAndGetAddress(bytes32 name) internal view override returns (address) {
-        address _foundAddress = addressCache[name];
+        address _foundAddress = _store().addressCache[name];
         require(_foundAddress != address(0), string(abi.encodePacked("Missing address: ", name)));
         return _foundAddress;
     }
 
     function getAddress(bytes32 name) internal view override returns (address) {
-        return addressCache[name];
+        return _store().addressCache[name];
     }
 }

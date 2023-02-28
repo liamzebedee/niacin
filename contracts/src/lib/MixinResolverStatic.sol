@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import {IGenericResolver} from "../interfaces/IGenericResolver.sol";
 
 // Inheritance
-import {Owned} from "./Owned.sol";
+// import {Owned} from "./Owned.sol";
 
 // Internal references
 import {AddressResolver} from "../AddressResolver.sol";
