@@ -5,7 +5,10 @@ import { ethers } from 'ethers'
 import { join, resolve } from 'path'
 import * as shell from 'shelljs'
 import { table } from 'table'
-import { addressResolver_Artifact, proxy_Artifact } from '../contracts'
+import { 
+    addressResolver_Artifact, 
+    proxy_Artifact 
+} from '../contracts'
 import { 
     AllerConfig, 
     AllerScriptRuntime, 
@@ -20,7 +23,11 @@ import {
     VersionControlInfo 
 } from '../types'
 import { logTx, promptConfirmation } from '../utils'
-import { findArtifacts, findTargets, getNewTargets } from '../utils/build'
+import { 
+    findArtifacts, 
+    findTargets, 
+    getNewTargets 
+} from '../utils/build'
 import { getContract } from '../utils/contracts'
 import { DeploymentManager } from '../utils/deployment'
 import { GasEstimator, getGasEstimator } from '../utils/gas'
