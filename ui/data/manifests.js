@@ -1,5 +1,5 @@
 
 export const manifests = {
-    "manifest-local.json": require('../../example-project/manifest-local.json'),
-    "manifest-poly.json": require('../../example-project/manifest-poly.json'),
+    "local.json": require('../../example-project/deployments/local.json'),
+    "poly.json": require('../../example-project/deployments/poly.json'),
 }

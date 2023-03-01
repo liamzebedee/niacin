@@ -65,12 +65,12 @@ export const getNewTargets = (inputManifest: Manifest, artifacts: EVMBuildArtifa
             const shouldUpgrade = isModified
 
             artifact.contractName = contractName
-            artifact.hasPreviousVersion = hasPreviousVersion
-            artifact.shouldUpgrade = shouldUpgrade
-            artifact.previousDeployment = previousDeployment
-            artifact.isModified = isModified
-            artifact.isNew = isNew
             artifact.proxyIdentity = proxyIdentity
+            artifact.hasPreviousVersion = hasPreviousVersion
+            artifact.previousDeployment = previousDeployment
+            artifact.isNew = isNew
+            artifact.isModified = isModified
+            artifact.shouldUpgrade = shouldUpgrade
 
             // We deploy if there is no previous deployment, or if we should upgrade.
             artifact.shouldDeploy = !hasPreviousVersion || shouldUpgrade

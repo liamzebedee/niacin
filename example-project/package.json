@@ -9,8 +9,8 @@
   },
   "scripts": {
     "sync-aller-contracts": "rm -r node_modules/aller-contracts && cp -R ../contracts node_modules/aller-contracts",
-    "deploy-local": "source .env.local && npx aller deploy --project-dir . --project-type foundry --manifest ./manifest-local.json -y",
-    "deploy-poly": "POLYGON_PRIORITY_FEE_MULT=2 source .env && npx aller deploy --project-dir . --project-type foundry --manifest ./manifest-poly.json --gas-estimator polygon -y",
+    "deploy-local": "source .env.local && npx aller deploy --project-dir . --project-type foundry --manifest ./deployments/local.json -y",
+    "deploy-poly": "POLYGON_PRIORITY_FEE_MULT=2 source .env && npx aller deploy --project-dir . --project-type foundry --manifest ./deployments/poly.json --gas-estimator polygon -y",
     "build": "forge build"
   },
   "keywords": [],
