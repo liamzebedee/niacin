@@ -7,6 +7,7 @@ import { ethers } from 'ethers'
 import { useState } from 'react'
 import { getChainName, getProviderForChainId } from '@/lib'
 import { manifests } from '@/data/manifests'
+import Link from 'next/link'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -25,13 +26,13 @@ export default function Interact() {
     const manifest = manifests[manifestName]
 
     return (
-        <Body manifest={manifest} namespace={namespace} id={id} />
+        <Body manifest={manifest} manifestName={manifestName} namespace={namespace} id={id} />
     )
 
 }
 
 
-const Body = ({ manifest, id, namespace }: any) => {
+const Body = ({ manifest, manifestName, id, namespace }: any) => {
     
     // Find target.
     let address
@@ -75,7 +76,7 @@ const Body = ({ manifest, id, namespace }: any) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main className={styles.main}>
-                <h3>Deployments / {networkName} / Contract</h3>
+                <h3><Link href="/">Deployments</Link> / <Link href={`/deployments/${manifestName}`}>{networkName}</Link> / Contract</h3>
                 <h1>Interact: {id}</h1>
 
                 <pre>

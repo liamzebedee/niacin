@@ -10,7 +10,6 @@ export const CONFIG_VERSIONS = [
 ]
 
 
-
 export interface AllerConfig {
     version: string
     ignore: string[]
@@ -19,13 +18,9 @@ export interface AllerConfig {
     }
 }
 
-
-
-
 // 
 // Aller Script Runtime.
 // 
-// TODO: extract into separate types.
 export interface InitializeScript {
     (runtime: AllerScriptRuntime): Promise<void>
 }
@@ -99,11 +94,6 @@ export interface Deployment {
 }
 
 export type DeploymentEvent = UpsertAddressResolver | UpsertProxyEvent | DeployImplEvent | ImportAddressesEvent | RebuildCacheEvent | InitializeContractEvent
-
-// {
-//     type: 'upsert_proxy' | 'deploy_impl' | 'upgrade_to_impl' | 'import_addresses' | 'rebuild_cache'
-//     event: 
-// }
 
 interface GenericContractDeployEvent {
     address: string

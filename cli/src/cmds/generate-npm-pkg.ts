@@ -2,6 +2,7 @@ const glob = require('glob')
 const fs = require('node:fs')
 import { join } from 'path'
 import { resolve } from 'path'
+import { exportDeployments } from '../utils/manifest'
 import { Manifest } from '../types'
 
 
@@ -15,21 +16,7 @@ export async function generateNPMPackage(argv: GenerateNPMPackageArgs) {
     const manifest = require(resolve(manifestPath)) as Manifest
 
     // TODO check version.
-
-    const entries = Object.values(manifest.targets.user).reduce((acc, entry) => {
-        const { version, abi, address } = entry
-
-        acc = {
-            ...acc,
-            [entry.target]: {
-                version,
-                abi,
-                address,
-                deployBlock: entry.deployTx.blockNumber,
-            }
-        }
-        return acc
-    }, {})
+    const entries = exportDeployments(manifest)
 
     // Write to index.js
     const outfilePath = resolve(join(argv.out))

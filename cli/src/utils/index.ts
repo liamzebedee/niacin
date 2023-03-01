@@ -1,47 +1,32 @@
-const solc = require('solc')
+// 
+// General utility functions.
+// 
+import chalk from "chalk";
+import { ethers } from "ethers";
+const prompts = require('prompt-sync')({ sigint: true });
 
-const solcInput = (contractName: string, content: string) => ({
-    language: 'Solidity',
-    sources: {
-        [contractName]: {
-            content: content
-        },
-        // If more contracts were to be compiled, they should have their own entries here
-    },
-    settings: {
-        optimizer: {
-            enabled: true,
-            runs: 200,
-        },
-        evmVersion: 'petersburg',
-        outputSelection: {
-            '*': {
-                '*': ['abi', 'evm.bytecode'],
-            },
-        },
-    },
-})
+export function multiplyGwei(gweiBN: ethers.BigNumber, amount: number) {
+    // Convert to wei.
+    const weiDecimalPlaces = 9;
+    let wei = ethers.utils.parseUnits(gweiBN.toString(), weiDecimalPlaces);
 
-export function compileSolidity(contractName: string, content: string) {
-    const input = solcInput(contractName, content)
-    const output = JSON.parse(solc.compile(JSON.stringify(input)))
+    wei = wei.mul(ethers.utils.parseEther(amount.toString()))
+    wei = wei.div(ethers.utils.parseUnits('1', 18))
 
-    let compilationFailed = false
+    const gwei = wei.div(ethers.utils.parseUnits('1', 9))
+    return gwei
+}
 
-    if (output.errors) {
-        for (const error of output.errors) {
-            if (error.severity === 'error') {
-                console.error(error.formattedMessage)
-                compilationFailed = true
-            } else {
-                console.warn(error.formattedMessage)
-            }
-        }
+export const promptConfirmation = (msg: string, yes: boolean): boolean => {
+    if (yes) {
+        console.log(`${msg} [y/N]: y`)
+        return true
+    } else {
+        const answer = prompts(`${msg} [y/N]: `)
+        return answer == "y"
     }
+}
 
-    if (compilationFailed) {
-        return undefined
-    }
-
-    return output
+export const logTx = (tx: ethers.Transaction) => {
+    console.debug(chalk.gray(`tx: ${tx.hash}`))
 }

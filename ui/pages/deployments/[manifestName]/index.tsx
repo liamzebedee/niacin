@@ -13,22 +13,22 @@ import { useRouter } from 'next/router'
 export default function DeploymentsWrapper() {
     // Get id from URL
     const router = useRouter()
-    const id = router.query.manifestName as string
+    const manifestName = router.query.manifestName as string
     // const id = router.query['id'] as string;
     // console.log(id)
-    if (!id) return <></>
+    if (!manifestName) return <></>
     
     // @ts-ignore
-    const manifest = manifests[id]
+    const manifest = manifests[manifestName]
 
     return (
-        <Deployments manifest={manifest} />
+        <Deployments manifest={manifest} manifestName={manifestName} />
     )
 
 }
 
 
-export function Deployments({ manifest }: any) {
+export function Deployments({ manifest, manifestName }: any) {
     const deployment = manifest.deployments[0]
     const networkName = getChainName(deployment.chainId)
 
@@ -41,7 +41,7 @@ export function Deployments({ manifest }: any) {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main className={styles.main}>
-                <h3>Deployments / {networkName}</h3>
+                <h3><Link href="/">Deployments</Link> / <Link href={`/deployments/${manifestName}`}>{networkName}</Link></h3>
                 <h1>Contracts</h1>
 
                 <pre>
