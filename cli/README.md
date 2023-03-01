@@ -26,7 +26,7 @@ The deployer is designed to remove the hassle of smart contract deployments. _Wo
 
 **Deployment data for your Dapp/Subgraph**. Generate an ultra-lightweight `index.js` from your deployment manifest.json, containing the addresses, ABI's, and deployment tx and block number (useful for The Graph).
 
-**Reproducible deployments**. Git metadata (branch, commit) is recorded for each deployment, so you can easily checkout the old source code. Deployer records the RPC and chain ID for each deployment - and checks if you're deploying to the network you intended!
+**All the logs you wanted**. Git metadata (branch, commit) is recorded for each deployment, so you can easily checkout the old source code. Deployer records the RPC and chain ID for each deployment - and checks if you're deploying to the network you intended!
 
 **Helpful features for developers**. Deployer automatically detects if you're deploying to Hardhat/Foundry, and imports the default private keys for these projects. No configuration necessary.
 

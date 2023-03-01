@@ -371,20 +371,20 @@ export async function deploy(argv: DeployArgs) {
 
     // Build the signer, provider, system contracts.
     if(!rpcUrl) {
-        console.log(chalk.gray(`No RPC URL provided. Using default for project type: ${projectType}`))
+        console.log(chalk.gray(`No RPC_URL provided. Using default for project type: ${projectType}`))
         if (projectType == 'foundry' || projectType == 'hardhat') {
             rpcUrl = 'http://localhost:8545'
         } else {
-            throw new Error("No RPC URL provided.")
+            throw new Error("No RPC_URL provided.")
         }
     }
 
     if(!privateKey) {
-        console.log(chalk.gray(`No PRIVATE KEY provided. Using default for project type: ${projectType}`))
+        console.log(chalk.gray(`No PRIVATE_KEY provided. Using default for project type: ${projectType}`))
         if (projectType == 'foundry' || projectType == 'hardhat') {
             privateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
         } else {
-            throw new Error("No PRIVATE KEY provided.")
+            throw new Error("No PRIVATE_KEY provided.")
         }
     }
 
@@ -650,7 +650,7 @@ export async function deploy(argv: DeployArgs) {
     console.log(chalk.gray('Done rebuilding caches.'))
     console.log()
 
-    // 4.2 Initialize contracts.
+    // 5. Initialize contracts.
     console.log(`5. Running initialize script...`)
     console.log()
     // Iterate over all the contracts, and initialize them if they aren't already initialized.

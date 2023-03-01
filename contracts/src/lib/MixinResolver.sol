@@ -18,7 +18,9 @@ abstract contract MixinResolver is
 {
     /* ========== MODIFIERS ========== */
 
-    // Allows only the proxy/deployer to initialize the instance.
+    // Contracts MUST NOT use constructors, as they don't work with the proxy ugprade architecture.
+    // Instead, write an initializer function that uses this modifier.
+    // ie. function initialize(...) public initializer {}
     modifier initializer() {
         require(msg.sender == _store().proxy || msg.sender == __deployer(), "Only one of (proxy,deployer) can initialize");
         _;
@@ -30,9 +32,25 @@ abstract contract MixinResolver is
 
     /* ========== PUBLIC FUNCTIONS ========== */
 
-    // Configures the instance so it can only be initialized by the proxy/resolver.
+    // Configures the instance so it can only be initialized by the proxy/deployer.
     function __configure(address _proxy, address _resolver) public {
-        require(_store().proxy == address(0), "ERR_ALREADY_CONFIGURED");
+        // This function has two permission flows:
+        // a. The instance is not configured. Anyone may call __configure. 
+        // b. The instance is configured. Only the proxy or deployer may call __configure.
+
+        if(_store().proxy != address(0)) {
+            // (b) The instance is configured. Only the proxy or deployer may call __configure.
+            require(msg.sender == _store().proxy || msg.sender == __deployer(), "Only one of (proxy,deployer) can re-configure");
+        } else {
+            // (a) The instance is not configured. Anyone may call __configure, but only once.
+            // NOTE: This remains secure so long as the contract is deployed via the proxy in `Proxy.upgrade`.
+            // The proxy deploys the contract, and configures it in the next line. 
+            // Hence, no other party can call __configure.
+            require(_store().proxy == address(0), "ERR_ALREADY_CONFIGURED");
+            require(_proxy != address(0), "ERR_PROXY_NULL");
+            require(_resolver != address(0), "ERR_RESOLVER_NULL");
+        }
+        
         _store().proxy = _proxy;
         _store().resolver = _resolver;
     }

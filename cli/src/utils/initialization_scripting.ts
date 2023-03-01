@@ -42,10 +42,8 @@ export class AllerScriptEnvironment implements AllerScriptRuntime {
         // 3. When the initializer function changes (Solidity).
         // Thankfully, (3) results in new bytecode, which is covered by (1).
 
-        // Get the target from the contract.
-        const info = this.targets.user[args.contract._name]
-
         // Determine if this contract version has been initialized before.
+        const info = this.targets.user[args.contract._name]
         const initializeContractEvent = this._deployments
             .map(d => d.events)
             .flat()
@@ -106,7 +104,8 @@ export class AllerScriptEnvironment implements AllerScriptRuntime {
         // Determine if we need to perform the write.
         let fresh = false
         if (args.read) {
-            // callStatic for safety.
+            // Perform the read function, and determine if it's stale.
+            // NOTE: uses callStatic for safety.
             const value = await contract.callStatic[args.read](...args.readArgs)
             const stale = await args.stale(value)
             fresh = !stale

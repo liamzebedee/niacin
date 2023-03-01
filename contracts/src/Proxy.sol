@@ -52,11 +52,20 @@ contract Proxy is
         require(msg.sender == _store().admin, "ERR_UNAUTHORISED");
         
         address instance = Create2.deploy(0, computeNewDeploymentSalt(version), _newImplementation);
-        IConfigurable(instance).__configure(address(this), _store().resolver);
 
+        // We configure the target so only the system can call the initializer.
+        
+        // (1) Configure the target in context of the proxy's storage.
+        // This only happens once.
         if(_store().proxy == address(0)) {
             IConfigurable(address(this)).__configure(address(this), _store().resolver);
         }
+
+        // (2) Configure the target in context of the implementation's storage.
+        // This prevents the implementation from being initialized by anyone but the system.
+        // It's not necessary, since users will only interact with the Proxy, which acts in the context of its own storage,
+        // but it's a good practice to prevent the implementation from being initialized by anyone.
+        IConfigurable(instance).__configure(address(this), _store().resolver);
 
         _store().implementation = instance;
         _store().version = version;

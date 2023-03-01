@@ -58,6 +58,6 @@ contract TakeMarket is
 {
 	uint public a = 2;
 
-    constructor(address _resolver) MixinResolver(_resolver) {
+    constructor() {
     }
 ```
