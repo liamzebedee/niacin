@@ -6,9 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "sync-local": "cp ../example-project/manifest-local.json public/manifest.json",
-    "sync-poly": "cp ../example-project/manifest-poly.json public/manifest.json"
+    "lint": "next lint"
   },
   "volta": {
     "node": "16.19.1"

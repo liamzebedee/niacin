@@ -130,13 +130,15 @@ interface DeployArgs {
 // 
 // From the deployment events, we can determine the targets, with their names, versions, and addresses.
 // And we can generate a lightweight JS package, which can be used to easily access the deployed targets.
+// We can also autogenerate deployment documentations, with built-in contract UI's, for multichain deployments.
 // 
 // ADDITIONAL NOTES:
 // - the block number a contract is deployed at is essential for indexers. This is stored.
 // - contracts which are deleted from a codebase still need to resolve other contracts, which may still be maintained.
 //   as such, we need to keep the old versions of the contracts in the manifest, which are injected with the new targets
 //   when they are deployed.
-// - the manifest contains deployments for a single chain. Multichain deployments can be done by using separate manifest files.
+// - the manifest contains deployments for a single chain. Multichain deployments can be done by using separate manifest files, 
+//   quite easily.
 // 
 // COMPARISON:
 // - Diamond Standard. What a fucking shitshow.

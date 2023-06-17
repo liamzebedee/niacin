@@ -22,9 +22,9 @@ export const eventToContractInfo = (event: UpsertAddressProvider | DeployImplEve
 
 // Computes latest targets from the deployment events.
 export const getTargetsFromEvents = (events: DeploymentEvent[]): Targets => {
-    let addressResolver: any = events.find(event => event.type == "upsert_address_provider") as UpsertAddressProvider
-    if (addressResolver) {
-        addressResolver = eventToContractInfo(addressResolver)
+    let addressProvider: any = events.find(event => event.type == "upsert_address_provider") as UpsertAddressProvider
+    if (addressProvider) {
+        addressProvider = eventToContractInfo(addressProvider)
     }
 
     const proxies = events
@@ -53,8 +53,8 @@ export const getTargetsFromEvents = (events: DeploymentEvent[]): Targets => {
     // Namespaces
     const targets = {
         system: {
-            ['AddressResolver']: {
-                ...addressResolver,
+            ['AddressProvider']: {
+                ...addressProvider,
             },
             ...proxies,
         },

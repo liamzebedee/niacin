@@ -68,7 +68,7 @@ Deployer: ${manifest.deployments[0].deployer}`}
                             return <TargetRow manifest={manifest} target={target} namespace="system" />
                         })}
 
-                        {/* {([manifest.targets.system.AddressResolver]).map((target: any) => {
+                        {/* {([manifest.targets.system.AddressProvider]).map((target: any) => {
               return <TargetRow target={target} namespace="system" />
             })} */}
                     </tbody>
@@ -90,7 +90,7 @@ const TargetRow = ({ manifest, target, namespace }: any) => {
     if (namespace == 'system') {
         address = target.address
 
-        if (target.target != 'AddressResolver') {
+        if (target.target != 'AddressProvider') {
             name = `Proxy${target.target}`
         } else {
             name = target.target
@@ -105,7 +105,7 @@ const TargetRow = ({ manifest, target, namespace }: any) => {
 
     function findDeployment(target: any) {
         let eventType = 'deploy_impl'
-        if (target.target == 'AddressResolver') {
+        if (target.target == 'AddressProvider') {
             return manifest.deployments[0]
         }
 

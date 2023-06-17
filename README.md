@@ -1,6 +1,6 @@
 # /
 
-Continuous deployment for Solidity.
+A chainops framework for Ethereum smart contracts.
 
  * Zero config. All contracts are deployed with upgradeability built-in. Built-in dependency injection for contracts. Tracks Git metadata.
  * Instant tracking of deployment artifacts in the `manifest.json`.
