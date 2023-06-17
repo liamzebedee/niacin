@@ -33,14 +33,10 @@ To use Aller, each contract must be wrapped in the `MixinResolver`, which provid
 import "@aller/lib/MixinResolver.sol";
 
 contract TakeMarket is 
-    MixinResolver 
+    MixinResolver
 {
-    // Initialize the resolver.
-    constructor(address _resolver) MixinResolver(_resolver) {
-    }
-
     // Define your dependencies.
-    function resolverAddressesRequired() public override pure returns (bytes32[] memory addresses) {
+    function getDependencies() public override pure returns (bytes32[] memory addresses) {
         bytes32[] memory requiredAddresses = new bytes32[](2);
         requiredAddresses[0] = bytes32("TakeMarketShares");
         requiredAddresses[1] = bytes32("TakeMarket");
@@ -49,16 +45,18 @@ contract TakeMarket is
 
     // Get your dependencies.
     function takeMarketShares() internal view returns (address) {
-        return requireAndGetAddress(bytes32("TakeMarketShares"));
+        return requireAddress(bytes32("TakeMarketShares"));
     }
 ```
 
 ### Deploying the project.
 
 ```sh
-# Runs the `aller` CLI.
-# Read package.json for more.
-npm run deploy
+# start an anvil node.
+anvil
+
+# deploy
+aller deploy --project-dir . --project-type foundry -y
 ```
 
 ### Generating an NPM package from the contracts.

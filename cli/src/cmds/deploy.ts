@@ -6,7 +6,7 @@ import { join, resolve } from 'path'
 import * as shell from 'shelljs'
 import { table } from 'table'
 import { 
-    addressResolver_Artifact, 
+    addressProvider_Artifact, 
     proxy_Artifact 
 } from '../contracts'
 import { 
@@ -18,7 +18,7 @@ import {
     InitializeScript, 
     Manifest, 
     MANIFEST_VERSIONS, 
-    UpsertAddressResolver, 
+    UpsertAddressProvider, 
     UpsertProxyEvent, 
     VersionControlInfo 
 } from '../types'
@@ -109,7 +109,7 @@ interface DeployArgs {
 // Deploys a set of smart contracts to a blockchain. 
 // 
 // Each contract is "wrapped" in a proxy contract, which allows us to upgrade the contract later. Every contract 
-// has access to the AddressResolver, which allows contracts to look up other contracts by name.
+// has access to the AddressProvider, which allows contracts to look up other contracts by name.
 // 
 // The deployer tool searches the project directory for contracts, and filters them into a set of targets.
 // Non-targets include libraries, interfaces, and abstract contracts (WIP).
@@ -122,7 +122,7 @@ interface DeployArgs {
 // a string that is incremented every time the contract is deployed. 
 // 
 // The deployer will deploy each target, including its implementation and proxy, and perform upgrades.
-// Then it will update the AddressResolver with the latest version of each target.
+// Then it will update the AddressProvider with the latest version of each target.
 // 
 // The entire history of the deployment, including the ABI's of previous versions of each target, is stored in
 // a manifest file. This allows us to easily refer to previous versions of a target, and to easily access their
@@ -436,9 +436,9 @@ export async function deploy(argv: DeployArgs) {
 
 
     // 
-    // (WIP) 
+    // (WIP)
     // Generate solidity migrations.
-    // 
+    //
 
     //     const contractName = `Migration_${deploymentManager.deployment.id}`
     //     const solcode = `
@@ -451,7 +451,7 @@ export async function deploy(argv: DeployArgs) {
     //     }
     // }
     //     `
-        
+
     //     const obj = compileSolidity(contractName, solcode)
     //     console.log(obj.contracts[contractName][contractName].evm.bytecode)
 
@@ -463,29 +463,29 @@ export async function deploy(argv: DeployArgs) {
 
 
 
-    // 1. AddressResolver
-    console.log(`1. Locating AddressResolver...`)
+    // 1. AddressProvider
+    console.log(`1. Locating AddressProvider...`)
     console.log()
-    const addressResolver = await getOrCreate({
+    const addressProvider = await getOrCreate({
         manifest: manifest,
         deploymentNamespace: "system",
-        name: 'AddressResolver',
-        abi: addressResolver_Artifact.abi as any,
-        bytecode: addressResolver_Artifact.bytecode.object,
+        name: 'AddressProvider',
+        abi: addressProvider_Artifact.abi as any,
+        bytecode: addressProvider_Artifact.bytecode.object,
         constructorArgs: [account],
         signer: signer,
     })
-    console.log(chalk.gray(`${chalk.yellow('AddressResolver')} is at ${addressResolver.address}`))
+    console.log(chalk.gray(`${chalk.yellow('AddressProvider')} is at ${addressProvider.address}`))
 
-    if (manifest.targets.system.AddressResolver == null) {
-        const event: UpsertAddressResolver = {
-            type: "upsert_address_resolver",
-            address: addressResolver.address,
-            bytecode: addressResolver_Artifact.bytecode,
-            metadata: addressResolver_Artifact.metadata,
-            target: 'AddressResolver',
-            abi: addressResolver_Artifact.abi as any,
-            deployTx: addressResolver.deployTransaction,
+    if (manifest.targets.system.AddressProvider == null) {
+        const event: UpsertAddressProvider = {
+            type: "upsert_address_provider",
+            address: addressProvider.address,
+            bytecode: addressProvider_Artifact.bytecode,
+            metadata: addressProvider_Artifact.metadata,
+            target: 'AddressProvider',
+            abi: addressProvider_Artifact.abi as any,
+            deployTx: addressProvider.deployTransaction,
         }
         deploymentManager.addEvent(event)
     }
@@ -517,7 +517,7 @@ export async function deploy(argv: DeployArgs) {
             name: proxyName,
             abi: proxy_Artifact.abi as any,
             bytecode: proxy_Artifact.bytecode.object,
-            constructorArgs: [addressResolver.address],
+            constructorArgs: [addressProvider.address],
             signer: signer,
         })
 
@@ -543,7 +543,7 @@ export async function deploy(argv: DeployArgs) {
         const initCodeHash = ethers.utils.keccak256(artifact.bytecode.object);
         const implAddress = ethers.utils.getCreate2Address(
             proxy.address,
-            await proxy.computeNewDeploymentSalt(nextVersion),
+            await proxy._computeNewDeploymentSalt(nextVersion),
             initCodeHash,
         );
         const impl = new ethers.Contract(implAddress, artifact.abi, signer)
@@ -551,9 +551,9 @@ export async function deploy(argv: DeployArgs) {
 
         console.log(`Upgrading ${chalk.yellow(proxyName)} to implementation v${nextVersion}`)
         const gasParams = await gasEstimator()
-        const tx = await proxy.upgrade(artifact.bytecode.object, nextVersion, gasParams)
-        logTx(tx)
-        await tx.wait(1)
+        const deployTx = await proxy.upgradeImplementation(artifact.bytecode.object, nextVersion, gasParams)
+        logTx(deployTx)
+        await deployTx.wait(1)
 
         deploymentManager.addEvent(
             {
@@ -561,7 +561,7 @@ export async function deploy(argv: DeployArgs) {
                 version: nextVersion,
                 target: artifact.contractName,
                 abi: artifact.abi,
-                deployTx: impl[DEPLOY_TRANSACTION_KEY],
+                deployTx: deployTx,
                 from_impl: previous ? previous.address : ethers.constants.AddressZero,
                 to_impl: impl.address,
                 address: impl.address,
@@ -575,7 +575,7 @@ export async function deploy(argv: DeployArgs) {
     // 
 
     console.log()
-    console.log(`3. Importing addresses into AddressResolver...`)
+    console.log(`3. Importing addresses into AddressProvider...`)
     console.log()
     const deployments = [
         ...manifest.deployments,
@@ -587,7 +587,7 @@ export async function deploy(argv: DeployArgs) {
             .map(d => d.events)
             .flat())
     
-    // The address resolver stores:
+    // The address provider stores:
     // (target name -> proxy address)
     const names = Object.keys(targets2.user).map(ethers.utils.formatBytes32String)
     const destinations = Object.keys(targets2.user).map(target => {
@@ -601,11 +601,11 @@ export async function deploy(argv: DeployArgs) {
 
         return proxy.address
     })
-    const fresh = await addressResolver.areAddressesImported(names, destinations)
+    const fresh = await addressProvider.areAddressesImported(names, destinations)
     // console.debug(names, destinations)
     if (!fresh) {
         const gasParams = await gasEstimator()
-        const tx = await addressResolver.importAddresses(names, destinations, gasParams)
+        const tx = await addressProvider.importAddresses(names, destinations, gasParams)
         logTx(tx)
         await tx.wait(1)
         console.log(`Imported ${names.length} addresses.`)
@@ -620,20 +620,21 @@ export async function deploy(argv: DeployArgs) {
 
     // 4.1 Caches for proxies.
     for (let target of Object.values(targets2.system)) {
-        if (target.target == "AddressResolver") {
+        if (target.target == "AddressProvider") {
             continue
         }
 
         const MixinResolverABI = [
-            'function isResolverCached() external view returns (bool)',
-            'function rebuildCache() external'
+            'function isAddressCacheFresh() external view returns (bool)',
+            'function rebuildAddressCache() external'
         ]
         const i = new ethers.Contract(target.address, MixinResolverABI, signer)
 
         // Log the version as well, since we might be rebuilding the cache of multiple versions.
-        const fullyUniqueId = `${target.target} (v${target.version})`
+        const fullyUniqueId = `Proxy${target.target} (v${target.version})`
+        console.log(fullyUniqueId)
         
-        const fresh = await i.isResolverCached()
+        const fresh = await i.isAddressCacheFresh()
         if (fresh) {
             console.log(chalk.gray(`Skipping ${chalk.yellow(fullyUniqueId)} - cache is fresh`))
             continue
@@ -641,7 +642,7 @@ export async function deploy(argv: DeployArgs) {
 
         console.log(`Rebuilding cache for ${chalk.yellow(fullyUniqueId)}`)
         const gasParams = await gasEstimator()
-        const tx = await i.rebuildCache(gasParams)
+        const tx = await i.rebuildAddressCache(gasParams)
         logTx(tx)
         await tx.wait(1)
     }

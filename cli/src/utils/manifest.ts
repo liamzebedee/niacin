@@ -1,14 +1,13 @@
 //
 // Tools for using the manifest file and deployment events.
 // 
-import { Manifest, UpsertProxyEvent } from "../types"
+import { Manifest, UpsertAddressProvider, UpsertProxyEvent } from "../types"
 import { Targets } from "../types"
 import { DeploymentEvent } from "../types"
 import { ContractInfo } from "../types"
 import { DeployImplEvent } from "../types"
-import { UpsertAddressResolver } from "../types"
 
-export const eventToContractInfo = (event: UpsertAddressResolver | DeployImplEvent | UpsertProxyEvent): ContractInfo => {
+export const eventToContractInfo = (event: UpsertAddressProvider | DeployImplEvent | UpsertProxyEvent): ContractInfo => {
     const version = event.type == 'deploy_impl' ? event.version : 1
     return {
         target: event.target,
@@ -23,7 +22,7 @@ export const eventToContractInfo = (event: UpsertAddressResolver | DeployImplEve
 
 // Computes latest targets from the deployment events.
 export const getTargetsFromEvents = (events: DeploymentEvent[]): Targets => {
-    let addressResolver: any = events.find(event => event.type == "upsert_address_resolver") as UpsertAddressResolver
+    let addressResolver: any = events.find(event => event.type == "upsert_address_provider") as UpsertAddressProvider
     if (addressResolver) {
         addressResolver = eventToContractInfo(addressResolver)
     }

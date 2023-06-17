@@ -3,13 +3,7 @@ module.exports = {
         "version": 1,
         "abi": [
             {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_resolver",
-                        "type": "address"
-                    }
-                ],
+                "inputs": [],
                 "stateMutability": "nonpayable",
                 "type": "constructor"
             },
@@ -46,6 +40,32 @@ module.exports = {
                 "type": "function"
             },
             {
+                "inputs": [],
+                "name": "getDependencies",
+                "outputs": [
+                    {
+                        "internalType": "bytes32[]",
+                        "name": "addresses",
+                        "type": "bytes32[]"
+                    }
+                ],
+                "stateMutability": "pure",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getMessage",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
                 "inputs": [
                     {
                         "internalType": "uint256",
@@ -56,114 +76,38 @@ module.exports = {
                 "name": "getOrCreateTakeSharesContract",
                 "outputs": [
                     {
-                        "internalType": "contract TakeMarketShares",
+                        "internalType": "contract ITakeMarketShares",
                         "name": "",
                         "type": "address"
                     }
                 ],
                 "stateMutability": "nonpayable",
                 "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "isResolverCached",
-                "outputs": [
-                    {
-                        "internalType": "bool",
-                        "name": "",
-                        "type": "bool"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "rebuildCache",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "resolver",
-                "outputs": [
-                    {
-                        "internalType": "contract AddressResolver",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "resolverAddressesRequired",
-                "outputs": [
-                    {
-                        "internalType": "bytes32[]",
-                        "name": "addresses",
-                        "type": "bytes32[]"
-                    }
-                ],
-                "stateMutability": "pure",
-                "type": "function"
-            }
-        ],
-        "address": "0xa98b9f2D8426DF201F4732947635C52841b04a25",
-        "deployBlock": 1247
-    },
-    "TakeMarketShares": {
-        "version": 1,
-        "abi": [
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_resolver",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "nonpayable",
-                "type": "constructor"
             },
             {
                 "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "__factory",
-                        "type": "address"
-                    }
-                ],
-                "name": "configureInstance",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "id",
-                "outputs": [
                     {
                         "internalType": "uint256",
-                        "name": "",
+                        "name": "takeId",
                         "type": "uint256"
                     }
                 ],
+                "name": "getTakeSharesContract",
+                "outputs": [
+                    {
+                        "internalType": "contract ITakeMarketShares",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
                 "stateMutability": "view",
                 "type": "function"
             },
             {
                 "inputs": [
                     {
-                        "internalType": "address",
-                        "name": "_resolver",
-                        "type": "address"
-                    },
-                    {
                         "internalType": "uint256",
-                        "name": "_id",
+                        "name": "_a",
                         "type": "uint256"
                     }
                 ],
@@ -174,7 +118,7 @@ module.exports = {
             },
             {
                 "inputs": [],
-                "name": "isResolverCached",
+                "name": "isAddressCacheFresh",
                 "outputs": [
                     {
                         "internalType": "bool",
@@ -182,32 +126,57 @@ module.exports = {
                         "type": "bool"
                     }
                 ],
-                "stateMutability": "pure",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "rebuildCache",
-                "outputs": [],
-                "stateMutability": "pure",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "resolver",
-                "outputs": [
-                    {
-                        "internalType": "contract AddressResolver",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
                 "stateMutability": "view",
                 "type": "function"
             },
             {
                 "inputs": [],
-                "name": "resolverAddressesRequired",
+                "name": "rebuildAddressCache",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "message",
+                        "type": "string"
+                    }
+                ],
+                "name": "setHello",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ],
+        "address": "0x53bE928dECDBBAbe3bbeC80272f4d00ca0691BB4"
+    },
+    "TakeMarketShares": {
+        "version": 1,
+        "abi": [
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "bytes32",
+                        "name": "name",
+                        "type": "bytes32"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "address",
+                        "name": "destination",
+                        "type": "address"
+                    }
+                ],
+                "name": "CacheUpdated",
+                "type": "event"
+            },
+            {
+                "inputs": [],
+                "name": "getDependencies",
                 "outputs": [
                     {
                         "internalType": "bytes32[]",
@@ -217,9 +186,28 @@ module.exports = {
                 ],
                 "stateMutability": "view",
                 "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "isAddressCacheFresh",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "rebuildAddressCache",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
             }
         ],
-        "address": "0xe6cFc17053c64838Fd7bb55BD4A2cb5b207A71ed",
-        "deployBlock": 1250
+        "address": "0xdC558a88977D15F398Faa6C84b6740EF2BFC7108"
     }
 }

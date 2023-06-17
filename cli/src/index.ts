@@ -22,7 +22,7 @@ yargs(hideBin(process.argv))
             .option('manifest', {
                 type: 'string',
                 description: 'The manifest.json of previous deployments. The new manifest is written to this file.',
-                default: '.vercel3',
+                default: 'manifest.json',
             })
             .option('config', {
                 type: 'string',

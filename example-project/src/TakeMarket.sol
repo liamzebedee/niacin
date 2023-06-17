@@ -3,10 +3,14 @@ pragma solidity ^0.8.13;
 
 import "./interfaces/ITakeMarketShares.sol";
 import "@aller/lib/Clones.sol";
-import {MixinResolver} from "@aller/lib/MixinResolver.sol";
+import {MixinResolver} from "@aller/mixins/MixinResolver.sol";
+import {MixinInitializable} from "@aller/mixins/MixinInitializable.sol";
+import {ImplStorage} from "@aller/ProxyStorage.sol";
 
 contract TakeMarket is 
-    MixinResolver
+    ImplStorage,
+    MixinResolver,
+    MixinInitializable
 {
     uint public a;
     string public getMessage;
@@ -22,7 +26,7 @@ contract TakeMarket is
         getMessage = message;
     }
 
-    function resolverAddressesRequired() public override pure returns (bytes32[] memory addresses) {
+    function getDependencies() public override pure returns (bytes32[] memory addresses) {
         bytes32[] memory requiredAddresses = new bytes32[](2);
         requiredAddresses[0] = bytes32("TakeMarketShares");
         requiredAddresses[1] = bytes32("TakeMarket");
@@ -30,11 +34,11 @@ contract TakeMarket is
     }
 
     function takeMarketShares() internal view returns (address) {
-        return requireAndGetAddress(bytes32("TakeMarketShares"));
+        return requireAddress(bytes32("TakeMarketShares"));
     }
 
     function takeMarket() internal view returns (address) {
-        return requireAndGetAddress(bytes32("TakeMarket"));
+        return requireAddress(bytes32("TakeMarket"));
     }
 
     function getTakeSharesContract(uint256 takeId) public view returns (ITakeMarketShares) {
@@ -56,7 +60,7 @@ contract TakeMarket is
             // Instantiate template. This permissions only TakeMarket to initialize.
             i.configureInstance(takeMarket());
             // Initialize.
-            i.initialize(address(__resolver()), takeId);
+            i.initialize(_implStore().addressProvider, takeId);
         }
         return ITakeMarketShares(instance);
     }

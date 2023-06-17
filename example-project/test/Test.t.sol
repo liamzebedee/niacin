@@ -2,9 +2,9 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "@aller/Proxy.sol";
-import "@aller/lib/Clones.sol";
-import "@aller/AddressResolver.sol";
+import {Proxy} from "@aller/Proxy.sol";
+import {Clones} from "@aller/lib/Clones.sol";
+import {AddressProvider} from "@aller/AddressProvider.sol";
 import {TakeMarket} from "../src/TakeMarket.sol";
 import {TakeMarketShares} from "../src/TakeMarketShares.sol";
 
@@ -13,18 +13,18 @@ contract ATest is Test {
 
     function setUp() public {
         // Deploy the address resolver, which stores all contract deployments.
-        AddressResolver resolver = new AddressResolver(address(this));
+        AddressProvider addressProvider = new AddressProvider(address(this));
         
         // Deploy each contract:
         // (1) The proxy - the stable identity.
         // (2) The implementation.
-        Proxy proxy1 = new Proxy(address(resolver));
+        Proxy proxy1 = new Proxy(address(addressProvider));
         TakeMarket takeMarket = new TakeMarket();
-        proxy1.upgrade(type(TakeMarket).creationCode, 1);
+        proxy1.upgradeImplementation(type(TakeMarket).creationCode, 1);
         
-        Proxy proxy2 = new Proxy(address(resolver));
+        Proxy proxy2 = new Proxy(address(addressProvider));
         TakeMarketShares takeMarketShares = new TakeMarketShares();
-        proxy2.upgrade(type(TakeMarketShares).creationCode, 1);
+        proxy2.upgradeImplementation(type(TakeMarketShares).creationCode, 1);
 
         // Import the contracts - (name, proxy) - into the resolver.
         bytes32[] memory names = new bytes32[](2);
@@ -34,14 +34,17 @@ contract ATest is Test {
         names[1] = bytes32("TakeMarketShares");
         destinations[1] = address(proxy2);
         
-        resolver.importAddresses(names, destinations);
+        addressProvider.importAddresses(names, destinations);
 
         // Rebuild caches.
-        takeMarket.rebuildCache();
-        takeMarketShares.rebuildCache();
+        addressProvider.requireAddress(bytes32("TakeMarket"), "TakeMarket not found");
+        addressProvider.requireAddress(bytes32("TakeMarketShares"), "TakeMarketShares not found");
+        
+        TakeMarket(address(proxy1)).rebuildAddressCache();
+        // takeMarketShares.rebuildAddressCache();
 
         // Now test creating a new take shares market.
-        takeMarket.getOrCreateTakeSharesContract(2);
+        TakeMarket(address(proxy1)).getOrCreateTakeSharesContract(2);
     }
 
     function testNumberIs42() public {

@@ -93,7 +93,7 @@ export interface Deployment {
     _complete: boolean
 }
 
-export type DeploymentEvent = UpsertAddressResolver | UpsertProxyEvent | DeployImplEvent | ImportAddressesEvent | RebuildCacheEvent | InitializeContractEvent
+export type DeploymentEvent = UpsertAddressProvider | UpsertProxyEvent | DeployImplEvent | ImportAddressesEvent | RebuildCacheEvent | InitializeContractEvent
 
 interface GenericContractDeployEvent {
     address: string
@@ -108,9 +108,9 @@ interface GenericContractDeployEvent {
     metadata: any
 }
 
-export interface UpsertAddressResolver extends GenericContractDeployEvent {
-    type: 'upsert_address_resolver'
-    target: 'AddressResolver'
+export interface UpsertAddressProvider extends GenericContractDeployEvent {
+    type: 'upsert_address_provider'
+    target: 'AddressProvider'
     address: string
     abi: ethers.utils.Fragment[]
     deployTx: any

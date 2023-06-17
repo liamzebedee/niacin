@@ -49,6 +49,10 @@ contract Proxy is
     //     return _store().version;
     // }
 
+    function _computeNewDeploymentSalt(uint32 version) public view returns (bytes32) {
+        return keccak256(abi.encodePacked(address(this), version));
+    }
+
     /* ========== RESTRICTED FUNCTIONS ========== */
 
     function setProxyAdmin(
@@ -129,10 +133,6 @@ contract Proxy is
     function _setAdmin(address _admin) internal {
         emit AdminChanged(_proxyStore().admin, _admin);
         _proxyStore().admin = _admin;
-    }
-
-    function _computeNewDeploymentSalt(uint32 version) internal view returns (bytes32) {
-        return keccak256(abi.encodePacked(address(this), version));
     }
 }
 

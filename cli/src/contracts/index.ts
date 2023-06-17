@@ -1,11 +1,11 @@
 // 
 // System contracts used by the deployment pipeline.
 // 
-import AddressResolverArtifact from './artifacts/AddressResolver.json'
+import AddressProviderArtifact from './artifacts/AddressProvider.json'
 import ProxyArtifact from './artifacts/Proxy.json'
 
 const proxy_Artifact = ProxyArtifact
-const addressResolver_Artifact = AddressResolverArtifact
+const addressProvider_Artifact = AddressProviderArtifact
 
 // import DSProxyFactoryArtifact from './artifacts/DSProxyFactory.json'
 // import DSProxyArtifact from './artifacts/DSProxy.json'
@@ -14,7 +14,7 @@ const addressResolver_Artifact = AddressResolverArtifact
 
 export {
     proxy_Artifact,
-    addressResolver_Artifact,
+    addressProvider_Artifact,
     // dsProxyFactory_Artifact,
     // dsProxy_Artifact
 }
