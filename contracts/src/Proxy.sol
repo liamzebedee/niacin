@@ -1,74 +1,81 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "./lib/Create2.sol";
-import "./interfaces/IConfigurable.sol";
-import {ProxyStorage} from "./lib/ProxyStorage.sol"; 
+import {Create2} from "./lib/Create2.sol";
+import {ProxyStorage, ImplStorage} from "./ProxyStorage.sol"; 
 
 // An implementation of a proxy.
 // The proxy forwards all calls to the implementation.
 // The proxy has an admin.
 
 contract Proxy is 
-    ProxyStorage
+    ProxyStorage,
+    ImplStorage
 {
     /* ========== EVENTS ========== */
     event Upgraded(address indexed implementation, uint32 indexed version);
     event AdminChanged(address previousAdmin, address newAdmin);
 
-    constructor(address _resolver) {
-        _setProxyAdmin(msg.sender);
-        _store().resolver = _resolver;
-        _store().proxy = address(this);
+    modifier onlyAdmin {
+        _onlyAdmin();
+        _;
+    }
+
+    function _onlyAdmin() private view {
+        require(msg.sender == _proxyStore().admin, "Only the contract admin may perform this action");
+    }
+
+    constructor(address _addressProvider) {
+        // Proxy storage.
+        _setAdmin(msg.sender);
+        _proxyStore().implementation = address(0);
+        _proxyStore().version = 0;
+        // Impl storage.
+        _implStore().addressProvider = _addressProvider;
+        _implStore().proxy = address(this);
     }
 
     /* ========== VIEWS ========== */
 
-    function proxyAdmin() public view returns (address) {
-        return _store().admin;
-    }
+    // function getAdmin() public view returns (address) {
+    //     return _store().admin;
+    // }
 
-    function implementation() public view returns (address) {
-        return _store().implementation;
-    }
+    // function getImplementation() public view returns (address) {
+    //     return _store().implementation;
+    // }
 
-    function implementationVersion() public view returns (uint32) {
-        return _store().version;
-    }
-
-    function computeNewDeploymentSalt(uint32 version) public view returns (bytes32) {
-        return keccak256(abi.encodePacked(address(this), version));
-    }
+    // function getImplementationVersion() public view returns (uint32) {
+    //     return _store().version;
+    // }
 
     /* ========== RESTRICTED FUNCTIONS ========== */
 
-    function setProxyAdmin(address _admin) public {
-        require(msg.sender == _store().admin, "ERR_UNAUTHORISED");
-
-        _setProxyAdmin(_admin);
+    function setProxyAdmin(
+        address _admin
+    ) 
+        public 
+        onlyAdmin 
+    {
+        _setAdmin(_admin);
     }
 
-    function upgrade(bytes memory _newImplementation, uint32 version) public {
-        require(msg.sender == _store().admin, "ERR_UNAUTHORISED");
-        
-        address instance = Create2.deploy(0, computeNewDeploymentSalt(version), _newImplementation);
+    function upgradeImplementation(
+        bytes memory _newImplementation,
+        uint32 version
+    ) 
+        public 
+        onlyAdmin
+    {   
+        // Deploy the new implementation.
+        address instance = Create2.deploy(
+            0, 
+            _computeNewDeploymentSalt(version), 
+            _newImplementation
+        );
 
-        // We configure the target so only the system can call the initializer.
-        
-        // (1) Configure the target in context of the proxy's storage.
-        // This only happens once.
-        if(_store().proxy == address(0)) {
-            IConfigurable(address(this)).__configure(address(this), _store().resolver);
-        }
-
-        // (2) Configure the target in context of the implementation's storage.
-        // This prevents the implementation from being initialized by anyone but the system.
-        // It's not necessary, since users will only interact with the Proxy, which acts in the context of its own storage,
-        // but it's a good practice to prevent the implementation from being initialized by anyone.
-        IConfigurable(instance).__configure(address(this), _store().resolver);
-
-        _store().implementation = instance;
-        _store().version = version;
+        _proxyStore().implementation = instance;
+        _proxyStore().version = version;
         emit Upgraded(instance, version);
     }
 
@@ -76,7 +83,7 @@ contract Proxy is
 
     /// @dev Fallback function forwards all transactions and returns all received return data.
     function _fallback() internal {
-        address _implementation = _store().implementation;
+        address _implementation = _proxyStore().implementation;
         assembly {
             // Copy msg.data. We take full control of memory in this inline assembly
             // block because it will not return to Solidity code. We overwrite the
@@ -119,9 +126,13 @@ contract Proxy is
 
     /* ========== INTERNAL FUNCTIONS ========== */
 
-    function _setProxyAdmin(address _admin) internal {
-        emit AdminChanged(_store().admin, _admin);
-        _store().admin = _admin;
+    function _setAdmin(address _admin) internal {
+        emit AdminChanged(_proxyStore().admin, _admin);
+        _proxyStore().admin = _admin;
+    }
+
+    function _computeNewDeploymentSalt(uint32 version) internal view returns (bytes32) {
+        return keccak256(abi.encodePacked(address(this), version));
     }
 }
 

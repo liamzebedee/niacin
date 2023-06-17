@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.13;
 
-import {IGenericResolver} from "../interfaces/IGenericResolver.sol";
+import {IMixinResolver} from "../interfaces/IMixinResolver.sol";
 
 // Inheritance
 // import {Owned} from "./Owned.sol";
 
 // Internal references
-import {AddressResolver} from "../AddressResolver.sol";
+import {AddressProvider} from "../AddressProvider.sol";
 
 // A version of the resolver mixin which doesn't have a cache. Instead, it just calls out dynamically
 // to the resolver for every resolution of a dependency.
@@ -16,22 +16,22 @@ import {AddressResolver} from "../AddressResolver.sol";
 // contracts deployed, it becomes costly and infeasible to update their caches. Instead, they can
 // just call out to the resolver directly.
 contract MixinResolverStatic is
-    IGenericResolver
+    IMixinResolver
 {
-    AddressResolver public resolver;
+    AddressProvider public addressProvider;
     address public proxy;
 
-    function __configure(address _proxy, address _resolver) public {
-        require(_proxy != address(0), "ERR_ALREADY_CONFIGURED");
-        proxy = _proxy;
-        resolver = AddressResolver(_resolver);
-    }
+    // function configure(address _proxy, address _resolver) public {
+    //     require(_proxy != address(0), "ERR_ALREADY_CONFIGURED");
+    //     proxy = _proxy;
+    //     addressProvider = AddressProvider(_resolver);
+    // }
 
     /* ========== INTERNAL FUNCTIONS ========== */
 
-    function _initialize(address _resolver) internal {
-        resolver = AddressResolver(_resolver);
-    }
+    // function _initialize(address _resolver) internal {
+    //     addressProvider = AddressProvider(_resolver);
+    // }
 
     function combineArrays(bytes32[] memory first, bytes32[] memory second)
         internal
@@ -51,27 +51,27 @@ contract MixinResolverStatic is
 
     /* ========== PUBLIC FUNCTIONS ========== */
 
-    function resolverAddressesRequired() external view override returns (bytes32[] memory addresses) {}
+    function getDependencies() external view override returns (bytes32[] memory addresses) {}
 
     // rebuildCache is implemented so we can detect if we're using a static resolver.
-    function rebuildCache() pure public {
+    function rebuildAddressCache() pure override public {
         revert("ERR_STATIC_RESOLVER");
     }
 
-    function isResolverCached() pure public returns (bool) {
+    function isAddressCacheFresh() pure override public returns (bool) {
         return true;
     }
 
     /* ========== INTERNAL FUNCTIONS ========== */
 
-    function requireAndGetAddress(bytes32 name) internal view override returns (address) {
+    function requireAddress(bytes32 name) internal view override returns (address) {
         address _foundAddress =
-                resolver.requireAndGetAddress(name, string(abi.encodePacked("Resolver missing target: ", name)));
+                addressProvider.requireAddress(name, string(abi.encodePacked("Resolver missing target: ", name)));
         require(_foundAddress != address(0), string(abi.encodePacked("Missing address: ", name)));
         return _foundAddress;
     }
 
     function getAddress(bytes32 name) internal view override returns (address) {
-        return resolver.getAddress(name);
+        return addressProvider.getAddress(name);
     }
 }
