@@ -6,7 +6,7 @@ struct OwnerStore {
 }
 
 contract OwnerStorage {
-    bytes32 constant STORE_SLOT = bytes32(uint(keccak256("eth.nakamofo.owner.v1")) - 1);
+    bytes32 constant STORE_SLOT = bytes32(uint(keccak256("eth.nakamofo.niacin.v1.owner")) - 1);
 
     function _ownerStore() internal pure returns (OwnerStore storage store) {
         bytes32 s = STORE_SLOT;

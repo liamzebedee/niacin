@@ -1,0 +1,62 @@
+write desired system state:
+
+
+System on Optimism:
+    chainId: 420000
+    rpcURL: rpc.optimism.io
+    name: optimism mainnet
+    
+    deployer: 0x123123213
+
+    system:
+        version: 1
+        targets:
+        - SNXToken
+        - FuturesMarket
+        - FuturesMarketFactory
+        - OptimismReceiverBridge
+    
+System on ETH L1:
+    chainId: 1
+    rpcURL: rpc.infura.io/mainnet
+    name: ethereum mainnet
+
+    deployer: 0x123123213
+
+    contracts:
+    - SNXToken
+    - FuturesMarket
+    - FuturesMarketFactory
+    - BridgeToOptimism
+
+
+niacin deploy TakeMarket --network optimism
+
+- deploys the takemarket contract, with a proxy
+- rebuilds the resolution cache if takemarket inherits from mixinresolver
+
+
+const system = {
+    chainId: 1,
+    rpcURL,
+    name: "ethereum mainnet",
+    deployer: 0x123123,
+    contracts: {
+        TakeMarket: {
+            upgradeable: false,
+            bytecode: 0x,
+            address: 0xcreate2
+        },
+        SNXToken: {
+            upgradeable: true,
+            bytecode: 0x,
+            address: 0xcreate2
+        },
+        BridgeToOptimism: {
+            upgradeable: false,
+            bytecode: 0x,
+            address: 0xcreate2
+        }
+    }
+}
+

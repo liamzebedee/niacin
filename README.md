@@ -4,11 +4,23 @@
 
 Niacin is a tool for smart contract deployment, aka chain ops.
 
- * Zero config. All contracts are deployed with upgradeability built-in. Built-in dependency injection for contracts. Tracks Git metadata.
- * Instant tracking of deployment artifacts in the `manifest.json`.
- * Manage multichain deployments easily.
- * Automatically generate website for deployment details, with built-in contract interaction.
- * Automatically generate a JS module containing deployment info/abi's, for use in frontends/subgraphs.
+ * a standard deployment format - addresses, ABI's, deploy metadata.
+ * `delegatecall` proxies for upgradeable contracts, that are implemented safely and securely.
+ * onchain dependency linking with `MixinResolver`, with a resolution cache (much cheaper than a beacon).
+ * centralized address registry in the `AddressProvider`.
+ * a drop-in CLI for upgradeable contracts - just `niacin deploy xyz`.
+ * simple ergonomic patterns:
+   * zero-config upgradeable contracts
+   * zero-config dependency injection
+   * migration scripts that only run if values change
+   * one file with all your deployment info
+ * useful tools:
+   * vendoring - one command to import contracts from Etherscan, and generate *.sol types for them.
+   * NPM package generator - generate an NPM package for your subgraphs and frontends.
+   * deployment docs generator - generate a website for your deployments, including an interactive UI.
+ * well-designed:
+   * automatically keeps track of git metadata, so you can revert easily
+   * automatically tracks the deploy block, so you don't have to copy-paste that into the subgraph
 
 [![asciicast](https://asciinema.org/a/555957.svg)](https://asciinema.org/a/555957)
 

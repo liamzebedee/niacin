@@ -15,6 +15,7 @@ import {
     DeployImplEvent, 
     DeploymentNamespace, 
     EMPTY_MANIFEST, 
+    EVMBuildArtifact, 
     InitializeScript, 
     Manifest, 
     MANIFEST_VERSIONS, 
@@ -98,6 +99,8 @@ const deployContract = async (args: DeployFuncArgs) => {
 
 
 interface DeployArgs {
+    _: string[] // argv
+    a: boolean // deploy all?
     projectType: string
     projectDir: string
     manifest: string
@@ -156,7 +159,6 @@ interface DeployArgs {
 let gasEstimator: GasEstimator
 
 export async function deploy(argv: DeployArgs) {
-    console.log(argv)
     let { RPC_URL: rpcUrl, PRIVATE_KEY: privateKey } = process.env
     const {
         projectType,
@@ -190,16 +192,7 @@ export async function deploy(argv: DeployArgs) {
     let initializeScript: InitializeScript = async (runtime: AllerScriptRuntime) => {}
     if(allerrc.scripts.initialize) {
         initializeScript = allerrc.scripts.initialize
-        // const scriptName = 'initialize'
-        // const scriptPath = resolve(join(projectDir, "/", allerrc.scripts.initialize))
-        // try {
-        //     const script = require(scriptPath)
-        //     initializeScript = script.default || script
-        // } catch(err) {
-        //     throw new Error(`Couldn't load "${scriptName}" script: ` + err)
-        // }
     }
-
 
     const ignoredFiles = allerrc.ignore || []
     
@@ -219,12 +212,98 @@ export async function deploy(argv: DeployArgs) {
     }
     console.debug()
     
-    const allTargets = findTargets()
-    const targets = allTargets
-        .filter(path => !ignoredFiles.includes(path))
+    // Identify contracts for deployment.
+    function findContractsForDeployment() {
+        if(argv.a) {
+            console.log(chalk.yellow(`Searching for all contracts to deploy...`))
+            const allTargets = findTargets()
+            const targets = allTargets
+                .filter(path => !ignoredFiles.includes(path))
 
-    const artifacts = findArtifacts(targets)
-    let targetsForDeployment = getNewTargets(manifest, artifacts)
+            const artifacts = findArtifacts(targets)
+            let targetsForDeployment = getNewTargets(manifest, artifacts)
+
+            return {
+                allTargets,
+                artifacts,
+                targetsForDeployment
+            }
+            
+        } else {
+            const targetNames = argv._.slice(1) // ignore first argument, which is `deploy`
+            console.log(chalk.yellow(`Deploying contracts: ${targetNames.join(', ')}`))
+
+            // The out/ directory is structured as:
+            // out/
+            //   Contract.sol/            <-- contract source file
+            //     Contract.json          <-- Contract.sol:Contract
+            //     ContractStorage.json   <-- Contract.sol:ContractStorage
+            
+            // Contract files (.sol) can contain multiple contracts.
+            const glob = require('glob')
+            const pattern = 'out/**/*.json'
+            const allArtifactFiles = glob.sync(pattern)
+            const allContracts = allArtifactFiles.map((path: string) => {
+                // get the filename
+                const filename = path.split('/').pop()
+                // remove the extension
+                const contractName = filename.split('.').shift()
+                return [contractName, path]
+            })
+
+            let artifactPaths = []
+
+            // Now check the names we're given.
+            for(let name of targetNames) {
+                // Verify it exists.
+                const contract = allContracts.find(c => c[0] == name)
+                if (!contract) {
+                    throw new Error(`Contract not found: ${name}`)
+                }
+
+                // There could be multiple contracts with the same name.
+                // Verify we have a non-ambiguous ID.
+                const contracts = allContracts.filter(c => c[0] == name)
+                if (contracts.length > 1) {
+                    console.error(contracts)
+                    throw new Error(`There are multiple build artifacts for the contract: ${name}, please specify the full path to the contract.`)
+                }
+
+                // Add the path to the artifact.
+                artifactPaths.push(contract[1])
+            }
+
+            // Now load the artifacts.
+            const artifacts = artifactPaths.map(path => {
+                const artifact = shell.cat(path)
+                const artifactJson = JSON.parse(artifact) as EVMBuildArtifact
+                return artifactJson
+            })
+
+            let targetsForDeployment = getNewTargets(manifest, artifacts)
+
+            const allTargets = artifacts.map(artifact => {
+                const aa = artifact as any
+                // "compilationTarget": {
+                //     "node_modules/niacin-contracts/src/lib/Owned.sol": "OwnerStorage"
+                // },
+                // return "node_modules/niacin-contracts/src/lib/Owned.sol"
+                return Object.keys(aa.metadata.settings.compilationTarget)[0]
+            })
+
+            return {
+                artifacts,
+                allTargets,
+                targetsForDeployment
+            }
+        }
+    }
+
+    const {
+        artifacts,
+        allTargets,
+        targetsForDeployment
+    } = findContractsForDeployment()
 
     const deploymentSummaryInfo = allTargets.map(target => {
         // Lookup from targetsForDeployment.
@@ -314,7 +393,7 @@ export async function deploy(argv: DeployArgs) {
             return fields
         }))
 
-    targetsForDeployment = targetsForDeployment
+    const targetsStaged = targetsForDeployment
         .filter(artifact => artifact.shouldDeploy)
 
 
@@ -498,11 +577,11 @@ export async function deploy(argv: DeployArgs) {
     
     console.log()
     console.log(`2. Deploying contracts...`)
-    if (targetsForDeployment.length == 0) {
+    if (targetsStaged.length == 0) {
         console.log()
         console.log(chalk.gray(`No new contracts to deploy.`))
     }
-    for (let artifact of targetsForDeployment) {
+    for (let artifact of targetsStaged) {
         console.log()
 
         console.log(chalk.yellow(`[${artifact.ast.absolutePath}]`))
@@ -557,6 +636,9 @@ export async function deploy(argv: DeployArgs) {
         const deployTx = await proxy.upgradeImplementation(artifact.bytecode.object, nextVersion, gasParams)
         logTx(deployTx)
         await deployTx.wait(1)
+        
+        const rx = await signer.provider.getTransactionReceipt(deployTx.hash)
+        deployTx.blockNumber = rx.blockNumber
 
         deploymentManager.addEvent(
             {
@@ -687,7 +769,8 @@ export async function deploy(argv: DeployArgs) {
             ...manifest.deployments,
             completedDeployment
         ],
-        targets: targets2
+        targets: targets2,
+        vendor: manifest.vendor,
     }
 
     try {

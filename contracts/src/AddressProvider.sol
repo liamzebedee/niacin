@@ -13,7 +13,7 @@ struct AddressProviderStore {
 }
 
 contract AddressProviderStorage {
-    bytes32 constant private STORE_SLOT = bytes32(uint(keccak256("eth.nakamofo.addressprovider.v1")) - 1);
+    bytes32 constant private STORE_SLOT = bytes32(uint(keccak256("eth.nakamofo.niacin.v1.addressprovider")) - 1);
 
     function _store() internal pure returns (AddressProviderStore storage store) {
         bytes32 s = STORE_SLOT;

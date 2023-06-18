@@ -21,7 +21,7 @@ struct ImplStore {
 }
 
 contract ProxyStorage {
-    bytes32 constant private STORE_SLOT = bytes32(uint(keccak256("eth.nakamofo.proxy")) - 1);
+    bytes32 constant private STORE_SLOT = bytes32(uint(keccak256("eth.nakamofo.niacin.v1.proxy")) - 1);
 
     function _proxyStore() internal pure returns (ProxyStore storage store) {
         bytes32 s = STORE_SLOT;
@@ -32,7 +32,7 @@ contract ProxyStorage {
 }
 
 contract ImplStorage {
-    bytes32 constant private STORE_SLOT = bytes32(uint(keccak256("eth.nakamofo.impl")) - 1);
+    bytes32 constant private STORE_SLOT = bytes32(uint(keccak256("eth.nakamofo.niacin.v1.impl")) - 1);
 
     function _implStore() internal pure returns (ImplStore storage store) {
         bytes32 s = STORE_SLOT;

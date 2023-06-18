@@ -1,5 +1,0 @@
-TODO 
-Hype token proxy doesn't actually return data
-
-
-ETH_RPC_URL="https://polygon-rpc.com" cast call $(ETH_RPC_URL="https://polygon-rpc.com" cast call 0xfa2847A863bE3D70b726C71a47f4A23cab105EF2 "implementation()(address)") "symbol()(string)"

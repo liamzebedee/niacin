@@ -62,6 +62,7 @@ export interface Manifest {
     version: string
     targets: Targets
     deployments: Deployment[]
+    vendor: Record<string, VendoredContractInfo>
 }
 
 export interface Targets {
@@ -167,6 +168,7 @@ export const EMPTY_MANIFEST: Manifest = {
         system: {},
         user: {}
     },
+    vendor: {},
     deployments: []
 }
 
@@ -182,6 +184,12 @@ export interface ContractInfo {
     }
     metadata: any
     deployTx: ethers.Transaction & { blockNumber: number }
+}
+
+export interface VendoredContractInfo {
+    target: string
+    address: string
+    abi: ethers.utils.Fragment[]
 }
 
 export interface EVMBuildArtifact {

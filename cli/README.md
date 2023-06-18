@@ -8,10 +8,6 @@ This repo contains the CLI tooling necessary to enable vercel3:
 
 Inspirations: Synthetix v2 deployer, Synthetix v3 Store pattern, tBTC Factories
 
-## Roadmap.
-
- - [ ] Initialize contracts.
-
 ## Deployer.
 
 The deployer is designed to remove the hassle of smart contract deployments. _Works natively with Foundry_.
@@ -33,10 +29,6 @@ The deployer is designed to remove the hassle of smart contract deployments. _Wo
 **Factories made easy**. Building contracts that deploy other contracts is easy, but upgrading them is hard. This is sometimes called a Factory, where the factory clones a template contract, often 100's of times. We implement a pattern where you can upgrade all 100's of these templates in one tx. A simple `initialize` function for your parameters, and you can still use dependency injection to lookup your contracts dynamically without passing around extra data.
 
 **Built from reputable code**. The smart contracts are derived from the Synthetix v2 deployer, OpenZeppelin clone helpers, and the tBTC Factories.
-
-Coming soon:
-
- - [ ] System-wide pausing for contracts.
 
 ### Usage.
 
@@ -166,3 +158,26 @@ const TakeMarketShares = new ethers.Contract(
 ```
 
 ![Imgur](https://imgur.com/MwcEVbR)
+
+
+## Using the deployment manifest with 3rd party contracts.
+
+**Add a 3rd party contract from Etherscan**:
+
+```sh
+# Vendor the WETH9 wrapped ETH contract on Optimism. (Solidity)
+niacin add-vendor --manifest manifest.json --name WETH --fetch-from-etherscan https://optimistic.etherscan.io/token/0x4200000000000000000000000000000000000006
+
+# Vendor the Curve.fi 3pool on Optimism. (Vyper)
+niacin add-vendor --manifest manifest.json --name Curve3Pool --fetch-from-etherscan https://optimistic.etherscan.io/address/0x1337BedC9D22ecbe766dF105c9623922A27963EC
+```
+
+**Generate .sol interfaces from any Etherscan URL, automatically**:
+
+```sh
+# Solidity dependencies.
+niacin generate-sol-interface --manifest manifest.json --name WETH > src/vendor/WETH.sol
+
+# Vyper dependencies.
+niacin generate-sol-interface --manifest manifest.json --name Curve3Pool > src/vendor/Curve3Pool.sol
+```

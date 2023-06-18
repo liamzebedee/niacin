@@ -9,10 +9,25 @@
     aller deploy Collateral Loans etc. --chain optimism --manifest optimism.json
     aller deploy OptimismConfiguration --chain optimism --manifest optimism.json
 
+    
+
 
     add option -a
     accept the argv of contracts before options
     remove the ignore from the .allerrc.js
+
+
+
+- can you deploy any foundry artifact?
+
+    - don't have to inherit from mixinresolver
+    - just vendor other artifacts?
+        like uniswap
+
+        niacin util generate-npm-package
+
+        niacin vendor add --manifest manifest.json --name WETH --artifact out/WETH.sol/WETH.json --instance 0x123123213123213
+
 
 
 - fix the tool so it is able to read the entire forge output files, not based on filename by based on contract name
@@ -23,3 +38,78 @@ ideally the tool would work like this:
    (contract abi's, RPC endpoint, manifest.json) 
 -> (a set of unsigned txs to apply)
 -> (new manifest.json)
+
+
+-> (desired system state)
+
+
+desired system state:
+    chain id
+    contracts
+        - name
+        - bytecode
+        - abi
+    address provider
+
+identify steps to ameliorate state:
+- address resolver
+- deploy proxy/contract
+- upgrade contract (manifest)
+
+generate actions / transactoins to apply
+- EVM messages (from, to, data)
+
+use smart contract account to execute actions in a batch
+- convert actions into a single solidity script
+
+
+
+there are essentially two models based on two different casual flows;
+
+1. declare the system state, and then apply to get to that
+
+2. imperatively construct the system state, and then construct a view based on what we have
+
+
+as an example for Synthetix:
+
+
+System on Optimism:
+    chainId: 420000
+    rpcURL: rpc.optimism.io
+    name: optimism mainnet
+    
+    deployer: 0x123123213
+
+    system:
+        version: 1
+        targets:
+        - SNXToken
+        - FuturesMarket
+        - FuturesMarketFactory
+        - OptimismReceiverBridge
+    
+
+    
+
+
+System on ETH L1:
+    chainId: 1
+    rpcURL: rpc.infura.io/mainnet
+    name: ethereum mainnet
+
+    deployer: 0x123123213
+
+    contracts:
+    - SNXToken
+    - FuturesMarket
+    - FuturesMarketFactory
+    - BridgeToOptimism
+
+
+
+
+    
+
+
+    

@@ -89,5 +89,18 @@ export const exportDeployments = (manifest: Manifest) => {
         return acc
     }, {})
 
-    return entries
+    const vendorEntries = Object.values(manifest.vendor).reduce((acc, entry) => {
+        const { abi, address } = entry
+
+        acc = {
+            ...acc,
+            [entry.target]: {
+                abi,
+                address,
+            }
+        }
+        return acc
+    }, {})
+
+    return Object.assign({}, entries, vendorEntries)
 }

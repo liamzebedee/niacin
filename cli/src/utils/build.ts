@@ -26,6 +26,9 @@ export const findTargets: () => string[] = () => {
         if (path.includes('interfaces/')) {
             return false
         }
+        if (path.includes('vendor/')) {
+            return false
+        }
         return true
     })
     return contracts
