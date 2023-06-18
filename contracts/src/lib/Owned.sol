@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 struct OwnerStore {
     address owner;
+    address nominee;
 }
 
 contract OwnerStorage {
@@ -32,10 +33,18 @@ contract Owned is OwnerStorage {
         require(msg.sender == _ownerStore().owner, "Only the contract owner may perform this action");
     }
 
-    function setOwner(address _owner) external onlyOwner {
-        require(_owner != address(0), "Owner address cannot be 0");
-        emit OwnerChanged(_ownerStore().owner, _owner);
-        _ownerStore().owner = _owner;
+    function nominateOwner(address _newOwner) external onlyOwner {
+        require(_newOwner != address(0), "Owner address cannot be 0");
+        _ownerStore().nominee = _newOwner;
+        emit OwnerNominated(_newOwner);
+    }
+
+    function acceptOwnership() external {
+        address nominee = _ownerStore().nominee;
+        require(msg.sender == nominee, "You must be nominated before you can accept ownership");
+        emit OwnerChanged(_ownerStore().owner, nominee);
+        _ownerStore().owner = nominee;
+        _ownerStore().nominee = address(0);
     }
 
     function owner() external view returns (address) {
@@ -43,4 +52,5 @@ contract Owned is OwnerStorage {
     }
 
     event OwnerChanged(address oldOwner, address newOwner);
+    event OwnerNominated(address newOwner);
 }
