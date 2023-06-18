@@ -2,9 +2,9 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import {Proxy} from "@aller/Proxy.sol";
-import {Clones} from "@aller/lib/Clones.sol";
-import {AddressProvider} from "@aller/AddressProvider.sol";
+import {Proxy} from "@niacin/Proxy.sol";
+import {Clones} from "@niacin/lib/Clones.sol";
+import {AddressProvider} from "@niacin/AddressProvider.sol";
 import {TakeMarket} from "../src/TakeMarket.sol";
 import {TakeMarketShares} from "../src/TakeMarketShares.sol";
 

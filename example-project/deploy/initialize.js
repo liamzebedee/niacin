@@ -1,7 +1,7 @@
-module.exports = async function(aller) {
-    const { TakeMarket } = aller.contracts
+module.exports = async function (niacin) {
+    const { TakeMarket } = niacin.contracts
 
-    await aller.initialize({
+    await niacin.initialize({
         contract: TakeMarket,
         args: [1111]
     })
@@ -9,7 +9,7 @@ module.exports = async function(aller) {
     const markets = ['1', '2', '3']
     for (const market of markets) {
         // Create a market.
-        await aller.runStep({
+        await niacin.runStep({
             contract: TakeMarket,
             read: 'getTakeSharesContract',
             readArgs: [market],

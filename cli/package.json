@@ -1,5 +1,5 @@
 {
-  "name": "aller-cli",
+  "name": "niacin-cli",
   "version": "1.2.0",
   "description": "",
   "main": "build/index.js",
@@ -7,11 +7,11 @@
     "build": "tsc",
     "watch": "tsc -w",
     "run": "node build/index.js",
-    "update-contracts": "cd ../contracts && forge build && cd ../cli && npm run sync-contracts && cd ../example-project && npm run sync-aller-contracts",
+    "update-contracts": "cd ../contracts && forge build && cd ../cli && npm run sync-contracts && cd ../example-project && npm run sync-niacin-contracts",
     "sync-contracts": "./scripts/sync-contracts.sh"
   },
   "bin": {
-    "aller": "bin/aller.js"
+    "niacin": "bin/niacin.js"
   },
   "keywords": [],
   "author": "",

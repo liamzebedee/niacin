@@ -2,8 +2,8 @@
 pragma solidity ^0.8.13;
 
 // import {TakeMarketSharesFactoryAuthority} from "./lib/TakeMarketSharesFactoryAuthority.sol";
-// import {MixinResolverStatic} from "@aller/lib/MixinResolverStatic.sol";
-import {MixinResolver} from "@aller/mixins/MixinResolver.sol";
+// import {MixinResolverStatic} from "@niacin/lib/MixinResolverStatic.sol";
+import {MixinResolver} from "@niacin/mixins/MixinResolver.sol";
 
 contract TakeMarketShares is MixinResolver {
 

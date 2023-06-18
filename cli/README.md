@@ -22,7 +22,7 @@ The deployer is designed to remove the hassle of smart contract deployments. _Wo
 
 **Dependency injection for contracts**. No more manually pasting addresses, you can use the `MixinResolver` in order to resolve dependencies to other contracts in your codebase. It is smart and caches entries, meaning no extra `CALL`'s like a Beacon.
 
-**Simple migration scripting**. Aller supports an initialize script, written in JS/TS. You can initialize your smart contracts from JS, and apply new settings. It has intelligent helpers, meaning it will only call `setFeeRate` if your fee rate has changed. See [`example-project/deploy/initialize.js`](../example-project/deploy/initialize.js) for an example.
+**Simple migration scripting**. niacin supports an initialize script, written in JS/TS. You can initialize your smart contracts from JS, and apply new settings. It has intelligent helpers, meaning it will only call `setFeeRate` if your fee rate has changed. See [`example-project/deploy/initialize.js`](../example-project/deploy/initialize.js) for an example.
 
 **Deployment data for your Dapp/Subgraph**. Generate an ultra-lightweight `index.js` from your deployment manifest.json, containing the addresses, ABI's, and deployment tx and block number (useful for The Graph).
 
@@ -42,19 +42,19 @@ Coming soon:
 
 ```sh
 npm i
-# install `aller` binary
+# install `niacin` binary
 npm link
 
-aller deploy --project-dir . --project-type foundry --manifest ./manifest-polygon2.json --gas-estimator polygon
+niacin deploy --project-dir . --project-type foundry --manifest ./manifest-polygon2.json --gas-estimator polygon
 ```
 
 ### Example.
 
 ```sh
-(base) ➜  example-project git:(main) aller deploy --project-dir . --project-type foundry --manifest ./manifest-poly.json -y
+(base) ➜  example-project git:(main) niacin deploy --project-dir . --project-type foundry --manifest ./manifest-poly.json -y
 Creating new empty manifest...
-Loading configuration: /Users/liamz/Documents/Projects/vercel3/example-project/.allerrc.js
-Loaded .allerrc.js
+Loading configuration: /Users/liamz/Documents/Projects/vercel3/example-project/.niacinrc.js
+Loaded .niacinrc.js
 Using gas estimator: default
 
 (1) Build
@@ -154,7 +154,7 @@ tx: 0x9e8db520d94d4c325f33559b0f910854b195cbc3563251b8552c9090a4d84a96
 Autogenerate an `index.js` which is importable in Next.js (since JSON loading isn't supported by default), and usable in other tooling (Telegram bots).
 
 ```sh
-aller generate-npm-pkg --manifest-path contracts/.vercel3/deployments/localhost/manifest.json --out index.js
+niacin generate-npm-pkg --manifest-path contracts/.vercel3/deployments/localhost/manifest.json --out index.js
 ```
 
 ```js

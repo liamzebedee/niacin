@@ -1,32 +1,25 @@
-- standardise function naming convention
-- refactoring the names
-    AddressResolver
-    MixinResolver
-    resolverAddressesRequired
-    resolver()
-    __configure
-    requireAndGetAddress
-    getAddress
-    rebuildCache
-    isResolverCached
+- how to deploy contract to only one chain?
+    maybe we can rewrite the aller deployer
 
-    get/set
-        getImplementation
-        get
-- refactor to be more straightforward/more secure
-- refactor errors
-- minimise / simplify the design even further.
-- adding simple semver
-    each contract references the version it was deployed for.
-    encoding semver using a base 10 decimal system:
-    a.b.c = a: u16, b: u16, c: u16
-- store the contract hashes with JS package.
-    sanity check we are using the right ones.
+    instead of assuming the contracts to deploy, it just takes a set of targets (names)
+    and then we can deploy them to each chain
+
+    ie. 
+
+    aller deploy Collateral Loans etc. --chain optimism --manifest optimism.json
+    aller deploy OptimismConfiguration --chain optimism --manifest optimism.json
 
 
+    add option -a
+    accept the argv of contracts before options
+    remove the ignore from the .allerrc.js
 
 
-- refactoring the names 
+- fix the tool so it is able to read the entire forge output files, not based on filename by based on contract name
 
-    AddressProvider
-        Contains the 
+
+ideally the tool would work like this:
+
+   (contract abi's, RPC endpoint, manifest.json) 
+-> (a set of unsigned txs to apply)
+-> (new manifest.json)

@@ -1,6 +1,8 @@
-# /
+# niacin.
 
-A chainops framework for Ethereum smart contracts.
+*it's time to deploy*.
+
+Niacin is a tool for smart contract deployment, aka chain ops.
 
  * Zero config. All contracts are deployed with upgradeability built-in. Built-in dependency injection for contracts. Tracks Git metadata.
  * Instant tracking of deployment artifacts in the `manifest.json`.
@@ -25,14 +27,14 @@ docs/                              # Documentation on the deployer.
 
 Steps:
 
- 1. Install the `aller` contracts into your Forge project - 
+ 1. Install the `niacin` contracts into your Forge project - 
  
  ```sh
- cp -R contracts/ your-foundry-project/lib/aller
- echo "@aller=./lib/aller/src/" >> remappings.txt
+ cp -R contracts/ your-foundry-project/lib/niacin
+ echo "@niacin=./lib/niacin/src/" >> remappings.txt
  ```
 
- 2. Install the `aller` command -
+ 2. Install the `niacin` command -
  
  ```sh
  cd cli
@@ -44,14 +46,14 @@ Steps:
  
  ```sh
  # You can set ETH_RPC_URL and PRIVATE_KEY as environment variables.
- # If they are unset, aller assumes local deployment and loads the default Hardhat/Founry private key for you.
- aller deploy --project-dir . --project-type foundry --manifest ./manifest.json
+ # If they are unset, niacin assumes local deployment and loads the default Hardhat/Founry private key for you.
+ niacin deploy --project-dir . --project-type foundry --manifest ./manifest.json
  ```
 
 **NOTE**: contracts must inherit the address resolver mixin as follows:
 
 ```
-import "@aller/lib/MixinResolver.sol";
+import "@niacin/lib/MixinResolver.sol";
 
 contract TakeMarket is 
     MixinResolver 

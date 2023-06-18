@@ -156,6 +156,7 @@ interface DeployArgs {
 let gasEstimator: GasEstimator
 
 export async function deploy(argv: DeployArgs) {
+    console.log(argv)
     let { RPC_URL: rpcUrl, PRIVATE_KEY: privateKey } = process.env
     const {
         projectType,

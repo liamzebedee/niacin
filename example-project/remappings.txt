@@ -1,1 +1,1 @@
-@aller=./node_modules/aller-contracts/src/
+@niacin=./node_modules/niacin-contracts/src/

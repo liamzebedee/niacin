@@ -2,10 +2,10 @@
 pragma solidity ^0.8.13;
 
 import "./interfaces/ITakeMarketShares.sol";
-import "@aller/lib/Clones.sol";
-import {MixinResolver} from "@aller/mixins/MixinResolver.sol";
-import {MixinInitializable} from "@aller/mixins/MixinInitializable.sol";
-import {ImplStorage} from "@aller/ProxyStorage.sol";
+import "@niacin/lib/Clones.sol";
+import {MixinResolver} from "@niacin/mixins/MixinResolver.sol";
+import {MixinInitializable} from "@niacin/mixins/MixinInitializable.sol";
+import {ImplStorage} from "@niacin/ProxyStorage.sol";
 
 contract TakeMarket is 
     ImplStorage,
