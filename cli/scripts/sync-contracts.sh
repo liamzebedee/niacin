@@ -12,6 +12,10 @@ mkdir -p ./src/contracts/artifacts/
 
 sync "AddressProvider"
 sync "Proxy"
+sync "MixinResolver"
+sync "MixinInitializable"
+
+
 # sync "DSProxy"
 # sync "DSProxyFactory"
 # sync "DSProxyCache"

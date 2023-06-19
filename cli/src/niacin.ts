@@ -13,6 +13,7 @@ const { hideBin } = require('yargs/helpers')
 yargs(hideBin(process.argv))
     .scriptName("niacin")
     .usage('$0 <cmd> [args]')
+    .coerce('_', (arg: any) => arg)
     // @ts-ignore
     .command('deploy', 'deploy the contracts', (yargs) => {
         return yargs
@@ -58,15 +59,21 @@ yargs(hideBin(process.argv))
             // .demandOption(['project-dir', 'manifest'], '')
             .demandOption(['manifest'], '')
     }, deploy)
-    .command("call", "call a contract", (yargs) => {
-        return yargs
+    .command({
+        command: "call", 
+        describe: "call a contract", 
+        builder: (yargs) => {
+            return yargs
             .option('manifest', {
                 type: 'string',
                 description: 'The manifest.json of previous deployments. The new manifest is written to this file.',
                 default: DEFAULT_MANIFEST_FILE,
             })
+            .coerce('_', (arg: any) => arg)
             .demandOption(['manifest'], '')
-    }, callContract)
+        },
+        handler: callContract
+    })
     .command('status', 'get the status of a smart contract system', (yargs) => {
         return yargs
             .option('project-dir', {
@@ -140,7 +147,7 @@ yargs(hideBin(process.argv))
         return yargs
             .option('out', {
                 type: 'string',
-                description: 'The output path for the .allerrc.js file',
+                description: 'The output path for the .niacinrc.js file',
                 default: DEFAULT_CONFIG_FILE,
             })
     }, initializeProject)

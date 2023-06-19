@@ -9,11 +9,6 @@ Niacin is a tool for smart contract deployment, aka chain ops.
  * onchain dependency linking with `MixinResolver`, with a resolution cache (much cheaper than a beacon).
  * centralized address registry in the `AddressProvider`.
  * a drop-in CLI for upgradeable contracts - just `niacin deploy xyz`.
- * simple ergonomic patterns:
-   * zero-config upgradeable contracts
-   * zero-config dependency injection
-   * migration scripts that only run if values change
-   * one file with all your deployment info
  * useful tools:
    * vendoring - one command to import contracts from Etherscan, and generate *.sol types for them.
    * NPM package generator - generate an NPM package for your subgraphs and frontends.
@@ -22,20 +17,7 @@ Niacin is a tool for smart contract deployment, aka chain ops.
    * automatically keeps track of git metadata, so you can revert easily
    * automatically tracks the deploy block, so you don't have to copy-paste that into the subgraph
 
-[![asciicast](https://asciinema.org/a/555957.svg)](https://asciinema.org/a/555957)
-
-## Layout.
-
-```sh
-cli/                               # Deployer CLI tooling.
-example-project/                   # An example project using the deployer.
-contracts/                         # Contracts for continuous deployment.
-docs/                              # Documentation on the deployer.
-```
-
 ## Tutorial (WIP).
-
-**DO NOT USE THIS IN PRODUCTION, STILL HEAVILY INDEV AND ALPHA CODE**
 
 Steps:
 
@@ -59,19 +41,5 @@ Steps:
  ```sh
  # You can set ETH_RPC_URL and PRIVATE_KEY as environment variables.
  # If they are unset, niacin assumes local deployment and loads the default Hardhat/Founry private key for you.
- niacin deploy --project-dir . --project-type foundry --manifest ./manifest.json
+ niacin deploy
  ```
-
-**NOTE**: contracts must inherit the address resolver mixin as follows:
-
-```
-import "@niacin/lib/MixinResolver.sol";
-
-contract TakeMarket is 
-    MixinResolver 
-{
-	uint public a = 2;
-
-    constructor() {
-    }
-```

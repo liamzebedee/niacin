@@ -11,7 +11,7 @@ export interface GasEstimator {
 // ethers.js gas estimation for Polygon does not work.
 // Custom gas estimation is required.
 export const polygonGasEstimator: GasEstimator = async () => {
-    const feeData = await (await fetch(`https://gasstation-mainnet.matic.network/v2`)).json()
+    const feeData = await (await fetch(`https://gasstation.polygon.technology/v2`)).json()
 
     const { safeLow, standard, fast, estimatedBaseFee } = feeData
     const config = fast
@@ -20,7 +20,7 @@ export const polygonGasEstimator: GasEstimator = async () => {
     let maxPriorityFeePerGas = ethers.utils.parseUnits(config.maxPriorityFee.toString().split('.')[0], "gwei")
 
     let { PRIORITY_FEE_MULT } = process.env
-    let priorityFeeMultiplier = PRIORITY_FEE_MULT ? parseFloat(PRIORITY_FEE_MULT) : 1.5
+    let priorityFeeMultiplier = PRIORITY_FEE_MULT ? parseFloat(PRIORITY_FEE_MULT) : 3
 
     maxFeePerGas = multiplyGwei(maxFeePerGas, priorityFeeMultiplier * 1.1)
     maxPriorityFeePerGas = multiplyGwei(maxPriorityFeePerGas, priorityFeeMultiplier)

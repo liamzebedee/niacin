@@ -77,12 +77,14 @@ export const exportDeployments = (manifest: Manifest) => {
     const entries = Object.values(manifest.targets.user).reduce((acc, entry) => {
         const { version, abi, address } = entry
 
+        const proxy = manifest.targets.system[`Proxy`+entry.target]
+
         acc = {
             ...acc,
             [entry.target]: {
                 version,
                 abi,
-                address,
+                address: proxy.address,
                 deployBlock: entry.deployTx.blockNumber,
             }
         }

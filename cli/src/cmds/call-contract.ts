@@ -3,37 +3,10 @@ const fs = require('node:fs')
 import chalk from 'chalk'
 import { ethers } from 'ethers'
 import { join, resolve } from 'path'
-import * as shell from 'shelljs'
-import { table } from 'table'
 import {
-    addressProvider_Artifact,
-    proxy_Artifact
-} from '../contracts'
-import {
-    AllerConfig,
-    AllerScriptRuntime,
-    DeployImplEvent,
-    DeploymentNamespace,
-    EMPTY_MANIFEST,
-    EVMBuildArtifact,
-    InitializeScript,
-    Manifest,
-    MANIFEST_VERSIONS,
-    UpsertAddressProvider,
-    UpsertProxyEvent,
-    VersionControlInfo
+    EMPTY_MANIFEST, Manifest
 } from '../types'
-import { logTx, promptConfirmation } from '../utils'
-import {
-    findArtifacts,
-    findTargets,
-    getNewTargets
-} from '../utils/build'
 import { getContract } from '../utils/contracts'
-import { DeploymentManager } from '../utils/deployment'
-import { GasEstimator, getGasEstimator } from '../utils/gas'
-import { AllerScriptEnvironment } from '../utils/initialization_scripting'
-import { getTargetsFromEvents } from '../utils/manifest'
 import { getRpc } from '../utils/rpc'
 
 
@@ -67,12 +40,23 @@ export async function callContract(argv: CallContractArgs) {
     const [contractName, methodName] = argv._.slice(1)
     
     // Load the target from the manifest.
+    const { AddressProvider } = manifest.targets.system
+    const systemNamespace = {
+        AddressProvider,
+    }
+    const userNamespace = Object.entries(manifest.targets.user).map(([contractName, target]) => {
+        target.address = manifest.targets.system[`Proxy${contractName}`].address
+        return {
+            [contractName]: target,
+        }
+    })
+        .reduce((acc, x) => ({ ...acc, ...x }), {})
+
     const namespaces = [
-        manifest.targets.system,
-        manifest.targets.user,
+        systemNamespace,
+        userNamespace,
         manifest.vendor,
     ]
-
     if (!contractName) {
         const usage = `
     Usage: 
@@ -84,13 +68,14 @@ export async function callContract(argv: CallContractArgs) {
     }
 
     let target
-    while(!target) {
+    while (!target) {
         const namespace = namespaces.pop()
         if (!namespace) {
-            throw new Error(`Could not find contract ${contractName} in manifest`)
+            break
         }
         target = namespace[contractName]
     }
+    
 
     // Load the contract.
     const contract = await getContract({
@@ -108,6 +93,8 @@ export async function callContract(argv: CallContractArgs) {
     const usage = `
     Usage: 
       niacin call <contract> <method> [<arg0>] [<arg1>] ...\n
+    Contract: ${chalk.yellow(contractName)}
+    Address: ${chalk.gray(target.address)}
     Available methods: \n- ${Object.keys(contract.interface.functions).map(x => chalk.yellow(x)).join('\n- ')}
     `.split('\n').map(x=>x.trim()).join('\n')
     if (argv._.length < 3) {
@@ -122,19 +109,20 @@ export async function callContract(argv: CallContractArgs) {
     }
 
     // Parse any argument that contain decimals.
-    const args = process.argv.slice(5)
+    const fn = Object.entries(contract.interface.functions).find(([fn]) => fn.startsWith(methodName))[1]
+    // const args = process.argv.slice(5)
+    const args = argv._.slice(3)
     // console.log(process.argv)
     // console.log(argv)
     // console.log(args)
+    // console.log(fn)
 
-    const fn = Object.entries(contract.interface.functions).find(([fn]) => fn.startsWith(methodName))[1]
     let args2 = []
-    for (let i = 0; i < args.length; i++) {
-        const arg = args[i]
+    for(let arg of argv._.slice(3)) {
         // if arg contains only numbers, and a decimal point, then we parse it as
         // a decimal with 18 places.
-        if (arg.match(/^[0-9]*\.[0-9]*$/)) {
-            args2.push(ethers.utils.parseEther(arg))
+        if (arg.toString().match(/^[0-9]*\.[0-9]*$/)) {
+            args2.push(ethers.utils.parseEther(arg.toString()))
         } else {
             args2.push(arg)
         }
@@ -154,6 +142,11 @@ export async function callContract(argv: CallContractArgs) {
         console.log(tx.hash)
     } else {
         const res = await contract[methodName](...args2)
-        console.log(res)
+        // if res is a bignum, convert to string and format.
+        if (res._isBigNumber) {
+            console.log(ethers.utils.formatEther(res))
+        } else {
+            console.log(res)
+        }
     }
 }

@@ -25,7 +25,7 @@ abstract contract MixinResolver is
             bytes32 name = deps[i];
             // Note: can only be invoked once the resolver has all the targets needed added
             address destination =
-                addressProvider().requireAddress(name, string(abi.encodePacked("Resolver missing target: ", name)));
+                addressProvider().requireAddress(name, string(abi.encodePacked("niacin: resolver missing target: ", name)));
             _implStore().addressCache[name] = destination;
             emit CacheUpdated(name, destination);
         }
@@ -54,7 +54,7 @@ abstract contract MixinResolver is
 
     function requireAddress(bytes32 name) internal view override returns (address) {
         address _foundAddress = _implStore().addressCache[name];
-        require(_foundAddress != address(0), string(abi.encodePacked("Missing address: ", name)));
+        require(_foundAddress != address(0), string(abi.encodePacked("niacin: missing address: ", name)));
         return _foundAddress;
     }
 

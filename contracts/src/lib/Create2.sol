@@ -36,9 +36,23 @@ library Create2 {
         require(bytecode.length != 0, "Create2: bytecode length is zero");
         /// @solidity memory-safe-assembly
         assembly {
+            let ptr := mload(0x40) // Get free memory pointer
             addr := create2(amount, add(bytecode, 0x20), mload(bytecode), salt)
+
+            // Check if the CREATE2 operation reverted
+            if iszero(addr) {
+                let size := returndatasize()
+                returndatacopy(ptr, 0, size)
+
+                // Check if the revert reason exists
+                if size {
+                    revert(ptr, size)
+                }
+                revert(ptr, 32) // Default error message if no revert reason is provided
+            }
         }
-        require(addr != address(0), "Create2: Failed on deploy");
+
+        // require(addr != address(0), "Create2: Failed on deploy");
     }
 
     /**

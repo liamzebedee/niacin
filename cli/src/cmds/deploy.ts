@@ -6,6 +6,8 @@ import { join, resolve } from 'path'
 import * as shell from 'shelljs'
 import { table } from 'table'
 import { 
+    MixinInitializableArtifact,
+    MixinResolverArtifact,
     addressProvider_Artifact, 
     proxy_Artifact 
 } from '../contracts'
@@ -182,10 +184,10 @@ export async function deploy(argv: DeployArgs) {
     try {
         fs.accessSync(p, fs.constants.R_OK)
     } catch (err) {
-        throw Error(`Can't find .allerrc.js at ${p}: ${err}`)
+        throw Error(`Can't find .niacinrc.js at ${p}: ${err}`)
     }
     console.log(`Loading configuration: ${p}`)
-    console.log(`Loaded .allerrc.js`)
+    console.log(`Loaded .niacinrc.js`)
     const allerrc = require(p) as AllerConfig
     
     // Load configuration scripts.
@@ -304,6 +306,47 @@ export async function deploy(argv: DeployArgs) {
         allTargets,
         targetsForDeployment
     } = findContractsForDeployment()
+
+    // Process the artifacts.
+    // Check the version of the Niacin contracts the user is importing.
+    const NIACIN_CONTRACTS_PATH = `node_modules/niacin-contracts/src/`
+    const contractsDep: Record<string, { keccak256: string }> = {};
+    ([
+        MixinResolverArtifact,
+        MixinInitializableArtifact,
+    ]).map((artifact) => {
+        Object.entries(
+            artifact.metadata.sources
+        )
+            // The `path` we get from these artifacts is from the niacin-contracts project, so these
+            // contracts are all first-class paths under src/.
+            // In user projects, these paths will feature node_modules/niacin-contracts prefix.
+            .filter(([path, info]) => path.startsWith(`src/`))
+            .forEach(([path, info]) => {
+                contractsDep[`node_modules/niacin-contracts/${path}`] = info
+            })
+    })
+    // console.log(contractsDep)
+    
+    for(let artifact of artifacts) {
+        const niacinDeps = 
+            Object.entries(
+                artifact.metadata.sources
+            )
+            .filter(([path, info]) => path.startsWith(NIACIN_CONTRACTS_PATH))
+        
+        for(let [path, info] of niacinDeps) {
+            const dep = contractsDep[path]
+            if(!dep) {
+                console.warn(`Can't find dependency for ${path}`)
+                continue
+            }
+            if(dep.keccak256 != info.keccak256) {
+                const { version } = (require('niacin-contracts/package.json') as any)
+                throw new Error(`niacin-cli built for ` + chalk.yellow(`niacin-contracts v${version}`) + `, but your project uses a different version.`)
+            }
+        }
+    }
 
     const deploymentSummaryInfo = allTargets.map(target => {
         // Lookup from targetsForDeployment.
@@ -632,7 +675,20 @@ export async function deploy(argv: DeployArgs) {
         console.log(chalk.gray(`contract: ${impl.address} (create2)`))
 
         console.log(`Upgrading ${chalk.yellow(proxyName)} to implementation v${nextVersion}`)
+        
+        // Check if impl already exists.
+        // console.log('impl ; ',implAddress)
+        // const implExists = await provider.getCode(implAddress)
+        // if (implExists != '0x') {
+        //     console.log(chalk.gray(`Implementation already exists at ${implAddress}. Skipping.`))
+        //     throw 2
+        // }
+        // TODO.
+
         const gasParams = await gasEstimator()
+        // estimate gas on this deploytx
+        // const gasExp = await proxy.estimateGas.upgradeImplementation(artifact.bytecode.object, nextVersion, gasParams)
+        // console.log('gasExp', gasExp)
         const deployTx = await proxy.upgradeImplementation(artifact.bytecode.object, nextVersion, gasParams)
         logTx(deployTx)
         await deployTx.wait(1)
@@ -719,7 +775,14 @@ export async function deploy(argv: DeployArgs) {
         const fullyUniqueId = `Proxy${target.target} (v${target.version})`
         console.log(fullyUniqueId)
         
-        const fresh = await i.isAddressCacheFresh()
+        let fresh 
+        try {
+            fresh = await i.isAddressCacheFresh()
+        } catch(err) {
+            console.log(chalk.red(`Error checking cache for ${chalk.yellow(fullyUniqueId)}: ${err}`))
+            continue
+        }
+
         if (fresh) {
             console.log(chalk.gray(`Skipping ${chalk.yellow(fullyUniqueId)} - cache is fresh`))
             continue

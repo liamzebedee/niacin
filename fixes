@@ -1,0 +1,2 @@
+- fix the `call` command loading namespaces
+- auto check the contract hashes of niacin-contracts deps to see if they match with cli

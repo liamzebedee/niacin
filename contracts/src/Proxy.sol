@@ -32,7 +32,6 @@ contract Proxy is
         _proxyStore().version = 0;
         // Impl storage.
         _implStore().addressProvider = _addressProvider;
-        _implStore().proxy = address(this);
     }
 
     /* ========== VIEWS ========== */

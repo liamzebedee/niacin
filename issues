@@ -1,0 +1,4 @@
+- doesnt work with take constructor
+- errors not informative enough
+- need to handle if contract inherits from mixinresolver
+- need to fucking deal with polygon gas

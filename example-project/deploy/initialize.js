@@ -1,10 +1,10 @@
 module.exports = async function (niacin) {
     const { TakeMarket } = niacin.contracts
 
-    await niacin.initialize({
-        contract: TakeMarket,
-        args: [1111]
-    })
+    // await niacin.initialize({
+    //     contract: TakeMarket,
+    //     args: [1111]
+    // })
 
     const markets = ['1', '2', '3']
     for (const market of markets) {

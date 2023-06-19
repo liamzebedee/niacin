@@ -1,39 +1,16 @@
 
 const fs = require('node:fs')
 import chalk from 'chalk'
-import { ethers } from 'ethers'
 import { join, resolve } from 'path'
-import * as shell from 'shelljs'
 import { table } from 'table'
 import {
-    addressProvider_Artifact,
-    proxy_Artifact
-} from '../contracts'
-import {
-    AllerConfig,
-    AllerScriptRuntime,
-    DeployImplEvent,
-    DeploymentNamespace,
-    EMPTY_MANIFEST,
-    EVMBuildArtifact,
-    InitializeScript,
-    Manifest,
-    MANIFEST_VERSIONS,
-    UpsertAddressProvider,
-    UpsertProxyEvent,
-    VersionControlInfo
+    EMPTY_MANIFEST, Manifest
 } from '../types'
-import { logTx, promptConfirmation } from '../utils'
 import {
     findArtifacts,
     findTargets,
     getNewTargets
 } from '../utils/build'
-import { getContract } from '../utils/contracts'
-import { DeploymentManager } from '../utils/deployment'
-import { GasEstimator, getGasEstimator } from '../utils/gas'
-import { AllerScriptEnvironment } from '../utils/initialization_scripting'
-import { getTargetsFromEvents } from '../utils/manifest'
 
 
 interface GetStatusArgs {

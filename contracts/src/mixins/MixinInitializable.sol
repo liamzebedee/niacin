@@ -14,10 +14,10 @@ abstract contract MixinInitializable is
     // Instead, write an initializer function that uses this modifier.
     // ie. function initialize(...) public initializer {}
     modifier initializer() {
-        require(_implStore().proxy != address(0), "Module is not configured");
+        require(_implStore().addressProvider != address(0), "niacin: proxy is not configured");
         require(
             msg.sender == _deployer(), 
-            "Only deployer can (re)-initialize"
+            "niacin: only deployer can (re)-initialize"
         );
         _;
     }
