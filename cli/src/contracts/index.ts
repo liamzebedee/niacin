@@ -7,6 +7,9 @@ import ProxyArtifact from './artifacts/Proxy.json'
 import MixinInitializableArtifact from './artifacts/MixinInitializable.json'
 import MixinResolverArtifact from './artifacts/MixinResolver.json'
 
+import DSProxyCacheArtifact from './artifacts/DSProxyCache.json'
+import DSProxyArtifact from './artifacts/DSProxy.json'
+
 const proxy_Artifact = ProxyArtifact
 const addressProvider_Artifact = AddressProviderArtifact
 
@@ -20,6 +23,9 @@ export {
     addressProvider_Artifact,
     MixinResolverArtifact,
     MixinInitializableArtifact,
+
+    DSProxyCacheArtifact,
+    DSProxyArtifact
     // dsProxyFactory_Artifact,
     // dsProxy_Artifact
 }

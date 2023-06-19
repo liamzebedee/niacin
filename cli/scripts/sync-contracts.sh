@@ -15,10 +15,12 @@ sync "Proxy"
 sync "MixinResolver"
 sync "MixinInitializable"
 
-
+cp ../contracts/out/DSProxy.sol/DSProxy.json src/contracts/artifacts/DSProxy.json
+cp ../contracts/out/DSProxy.sol/DSProxyCache.json src/contracts/artifacts/DSProxyCache.json
 # sync "DSProxy"
-# sync "DSProxyFactory"
 # sync "DSProxyCache"
+
+# sync "DSProxyFactory"
 
 # cp ../contracts/out/AddressResolver.sol/AddressResolver.json src/contracts/artifacts/AddressResolver.json
 # cp ../contracts/out/AddressResolver.sol/AddressResolver.json src/contracts/artifacts/AddressResolver.json

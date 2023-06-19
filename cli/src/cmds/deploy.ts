@@ -6,6 +6,8 @@ import { join, resolve } from 'path'
 import * as shell from 'shelljs'
 import { table } from 'table'
 import { 
+    DSProxyArtifact,
+    DSProxyCacheArtifact,
     MixinInitializableArtifact,
     MixinResolverArtifact,
     addressProvider_Artifact, 
@@ -36,7 +38,11 @@ import { DeploymentManager } from '../utils/deployment'
 import { GasEstimator, getGasEstimator } from '../utils/gas'
 import { AllerScriptEnvironment } from '../utils/initialization_scripting'
 import { getTargetsFromEvents } from '../utils/manifest'
+import { compileSolidity } from '../utils/solidity'
 
+// @ts-ignore
+import prettierSolidity from "prettier-plugin-solidity";
+const prettier = require("prettier");
 
 interface GetOrCreateArgs {
     manifest: Manifest
@@ -560,32 +566,33 @@ export async function deploy(argv: DeployArgs) {
 
 
 
+
+
+
     // 
     // (WIP)
     // Generate solidity migrations.
     //
 
-    //     const contractName = `Migration_${deploymentManager.deployment.id}`
-    //     const solcode = `
-    // // SPDX-License-Identifier: UNLICENSED
-    // pragma solidity ^0.8.9;
+    const dsProxyCache = await getOrCreate({
+        manifest: manifest,
+        deploymentNamespace: "system",
+        name: 'DSProxyCache',
+        abi: DSProxyCacheArtifact.abi as any,
+        bytecode: DSProxyCacheArtifact.bytecode.object,
+        constructorArgs: [],
+        signer: signer,
+    })
 
-    // contract ${contractName} {
-    //     function migrate() public {
-
-    //     }
-    // }
-    //     `
-
-    //     const obj = compileSolidity(contractName, solcode)
-    //     console.log(obj.contracts[contractName][contractName].evm.bytecode)
-
-    //     // _code = migrationCode
-    //     // _data = Migration.encodeTransaction.run()
-    //     // DSProxy.execute(code, _data);
-
-    //     return
-
+    const dsProxy = await getOrCreate({
+        manifest: manifest,
+        deploymentNamespace: "system",
+        name: 'DSProxy',
+        abi: DSProxyArtifact.abi as any,
+        bytecode: DSProxyArtifact.bytecode.object,
+        constructorArgs: [dsProxyCache.address],
+        signer: signer,
+    })
 
 
     // 1. AddressProvider
@@ -597,9 +604,10 @@ export async function deploy(argv: DeployArgs) {
         name: 'AddressProvider',
         abi: addressProvider_Artifact.abi as any,
         bytecode: addressProvider_Artifact.bytecode.object,
-        constructorArgs: [account],
+        constructorArgs: [dsProxy.address],
         signer: signer,
     })
+
     console.log(chalk.gray(`${chalk.yellow('AddressProvider')} is at ${addressProvider.address}`))
 
     if (manifest.targets.system.AddressProvider == null) {
@@ -614,6 +622,145 @@ export async function deploy(argv: DeployArgs) {
         }
         deploymentManager.addEvent(event)
     }
+
+
+
+    const contractName = `Migration_${deploymentManager.deployment.id}`
+    const hexToSolHex = (str: string) => `hex"${str.slice(2)}"`
+    const proxyInitcode = (new ethers.ContractFactory(proxy_Artifact.abi, proxy_Artifact.bytecode.object)).getDeployTransaction(addressProvider.address).data
+    
+    let solcode_createProxies = ``
+    let solcode_upgradeImpls = ``
+    let solcode_importAddresses = ``
+    let solcode_importAddressesDecs = `
+    // For AddressProvider.importAddresses.
+    bytes32[] memory names = new bytes32[](1);
+    address[] memory destinations = new address[](1);
+    `
+
+    for (let artifact of targetsStaged) {
+        const name = artifact.contractName
+        const previous = manifest.targets.user[name]
+        if(!previous) {
+            if(solcode_createProxies.length == 0) {
+                solcode_createProxies += `bytes32 salt;\naddress a;\nbytes memory ___proxyCode = ${hexToSolHex(proxyInitcode)};\n`;
+                solcode_createProxies += "\n";
+            }
+            solcode_createProxies += `//\n`
+            solcode_createProxies += `// ${name}\n`
+            solcode_createProxies += `//\n`
+            solcode_createProxies += `// Deploy proxy.\n`
+            solcode_createProxies += `salt = keccak256(abi.encodePacked("${name}"));\n`
+            solcode_createProxies += `a = deploy(0, salt, ___proxyCode);\n`
+            solcode_createProxies += `// Upgrade.\n`
+            solcode_createProxies += `IProxy(a).upgradeImplementation(${hexToSolHex(artifact.bytecode.object)}, 1);\n`
+            solcode_createProxies += `// AddressProvider import\n`
+            // solcode_createProxies += `names.push(abi.encodePacked("${name}")); destinations.push(a);\n`
+            solcode_createProxies += `names[0] = bytes32("${name}"); destinations[0] = a;\n`
+            solcode_createProxies += `IAddressProvider(${addressProvider.address}).importAddresses(names, destinations);`
+            solcode_createProxies += "\n";
+        } else {
+            const proxy = manifest.targets.system[`Proxy${name}`]
+            solcode_createProxies += `//\n`
+            solcode_createProxies += `// ${name}\n`
+            solcode_createProxies += `//\n`
+            solcode_createProxies += `// Deploy proxy.\n`
+            solcode_upgradeImpls += `IProxy(${proxy.address}).upgradeImplementation(${hexToSolHex(artifact.bytecode.object)}, 1);\n`
+        }
+    }
+
+    // solcode_importAddresses += `IAddressProvider(${addressProvider.address}).importAddresses(names, destinations);`
+
+    let solcode = `
+    // SPDX-License-Identifier: UNLICENSED
+    pragma solidity ^0.8.9;
+
+    interface IProxy {
+        function upgradeImplementation(
+            bytes memory _newImplementation,
+            uint32 version
+        ) external;
+    }
+
+    interface IAddressProvider {
+        function importAddresses(
+            bytes32[] calldata names, 
+            address[] calldata destinations
+        ) 
+            external;
+    }
+
+    contract ${contractName} {
+        function migrate() public {
+            ${solcode_importAddressesDecs}
+
+            // Deploy proxies and implementations.
+            ${solcode_createProxies}
+
+            // Upgrade implementations.
+            ${solcode_upgradeImpls}
+
+            // Import addresses.
+            ${solcode_importAddresses}
+
+            // // rebuild caches
+            // proxyAAA.rebuildCache()
+            // deploy(0, salt, ____code);
+        }
+
+        function deploy(
+            uint256 amount,
+            bytes32 salt,
+            bytes memory bytecode
+        ) internal returns (address addr) {
+            require(address(this).balance >= amount, "Create2: insufficient balance");
+            require(bytecode.length != 0, "Create2: bytecode length is zero");
+            /// @solidity memory-safe-assembly
+            assembly {
+                let ptr := mload(0x40) // Get free memory pointer
+                addr := create2(amount, add(bytecode, 0x20), mload(bytecode), salt)
+
+                // Check if the CREATE2 operation reverted
+                if iszero(addr) {
+                    let size := returndatasize()
+                    returndatacopy(ptr, 0, size)
+
+                    // Check if the revert reason exists
+                    if size {
+                        revert(ptr, size)
+                    }
+                    revert(ptr, 32) // Default error message if no revert reason is provided
+                }
+            }
+
+            //require(addr != address(0), "Create2: Failed on deploy");
+        }
+    }`
+
+    solcode = prettier.format(solcode, {
+        plugins: [prettierSolidity],
+        parser: "solidity-parse",
+    });
+
+    console.log(solcode)
+
+    const obj = compileSolidity(contractName, solcode)
+    const i = new ethers.utils.Interface(
+        [
+            "function migrate() public"
+        ]
+    )
+
+    const tx222 = await dsProxy['execute(bytes,bytes)'](
+        "0x"+obj.contracts[contractName][contractName].evm.bytecode.object, 
+        // cast sig "function migrate() public"
+        "0x8fd3ab80"
+        // i.encodeFunctionData(i.functions.migrate, [])
+    )
+
+    logTx(tx222)
+
+
 
     // 2. Deploy contracts.
     // 
@@ -746,9 +893,9 @@ export async function deploy(argv: DeployArgs) {
     // console.debug(names, destinations)
     if (!fresh) {
         const gasParams = await gasEstimator()
-        const tx = await addressProvider.importAddresses(names, destinations, gasParams)
-        logTx(tx)
-        await tx.wait(1)
+        // const tx = await addressProvider.importAddresses(names, destinations, gasParams)
+        // logTx(tx)
+        // await tx.wait(1)
         console.log(`Imported ${names.length} addresses.`)
     } else {
         console.log(chalk.gray(`No addresses to import.`))

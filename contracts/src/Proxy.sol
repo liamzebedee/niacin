@@ -22,7 +22,7 @@ contract Proxy is
     }
 
     function _onlyAdmin() private view {
-        require(msg.sender == _proxyStore().admin, "Only the contract admin may perform this action");
+        require(msg.sender == _proxyStore().admin, "niacin: only contract admin may perform this action");
     }
 
     constructor(address _addressProvider) {
