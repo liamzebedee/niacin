@@ -205,13 +205,13 @@ export async function deploy(argv: DeployArgs) {
     console.log(chalk.gray(`Project type:`), `${projectType}`)
     // console.log(`Input manifest: `)
     console.log()
-    console.log(`> forge build`)
+    // console.log(`> forge build`)
 
     // Run `forge build`.
-    if (shell.exec('forge build').code !== 0) {
-        shell.echo('Error: Forge build failed');
-        shell.exit(1);
-    }
+    // if (shell.exec('forge build').code !== 0) {
+    //     shell.echo('Error: Forge build failed');
+    //     shell.exit(1);
+    // }
     console.debug()
     
     // Identify contracts for deployment.
