@@ -40,9 +40,9 @@ contract Proxy is
     //     return _store().admin;
     // }
 
-    // function getImplementation() public view returns (address) {
-    //     return _store().implementation;
-    // }
+    function getImplementation() public view returns (address) {
+        return _proxyStore().implementation;
+    }
 
     // function getImplementationVersion() public view returns (uint32) {
     //     return _store().version;

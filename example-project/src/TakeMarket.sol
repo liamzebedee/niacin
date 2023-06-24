@@ -6,6 +6,7 @@ import "@niacin/lib/Clones.sol";
 import {MixinResolver} from "@niacin/mixins/MixinResolver.sol";
 import {MixinInitializable} from "@niacin/mixins/MixinInitializable.sol";
 import {ImplStorage} from "@niacin/ProxyStorage.sol";
+import {TakeMarketShares} from "./TakeMarketShares.sol";
 
 contract TakeMarket is 
     ImplStorage,
@@ -15,8 +16,12 @@ contract TakeMarket is
     uint public a;
     string public getMessage;
 
-    constructor() {
+    struct TakeData {
+        uint256 id;
+        address sharesToken;
     }
+
+    mapping(uint256 => TakeData) public takes;
 
     function initialize(uint _a) public initializer {
         a = _a;
@@ -33,8 +38,8 @@ contract TakeMarket is
         return requiredAddresses;
     }
 
-    function takeMarketShares() internal view returns (address) {
-        return requireAddress(bytes32("TakeMarketShares"));
+    function takeMarketShares() internal view returns (TakeMarketShares) {
+        return TakeMarketShares(requireAddress(bytes32("TakeMarketShares")));
     }
 
     function takeMarket() internal view returns (address) {
@@ -50,18 +55,27 @@ contract TakeMarket is
         return ITakeMarketShares(instance);
     }
 
-    function getOrCreateTakeSharesContract(uint256 takeId) public returns (ITakeMarketShares) {
-        bytes32 salt = keccak256(abi.encodePacked(takeId));
-        address instance = Clones.predictDeterministicAddress(takeMarketShares(), salt, address(this));
-        if(instance.code.length == 0) {
-            // Deploy.
-            instance = Clones.cloneDeterministic(takeMarketShares(), salt);
-            ITakeMarketShares i = ITakeMarketShares(instance);
-            // Instantiate template. This permissions only TakeMarket to initialize.
-            i.configureInstance(takeMarket());
-            // Initialize.
-            i.initialize(_implStore().addressProvider, takeId);
-        }
-        return ITakeMarketShares(instance);
+    function create(uint256 takeId) public returns (ITakeMarketShares) {
+        TakeData storage take = takes[takeId];
+        require(take.id == 0, "TakeMarket: take already exists");
+
+        take.id = takeId;
+        take.sharesToken = takeMarketShares().createInstance();
+        
+        return take.sharesToken;
     }
+
+    // function getOrCreateTakeSharesContract(uint256 takeId) public returns (ITakeMarketShares) {
+    //     // address instance = Clones.predictDeterministicAddress(takeMarketShares(), salt, address(this));
+    //     // if(instance.code.length == 0) {
+    //     //     // Deploy.
+    //     //     instance = Clones.cloneDeterministic(takeMarketShares(), salt);
+    //     //     ITakeMarketShares i = ITakeMarketShares(instance);
+    //     //     // Instantiate template. This permissions only TakeMarket to initialize.
+    //     //     i.configureInstance(takeMarket());
+    //     //     // Initialize.
+    //     //     i.initialize(_implStore().addressProvider, takeId);
+    //     // }
+    //     // return ITakeMarketShares(instance);
+    // }
 }
