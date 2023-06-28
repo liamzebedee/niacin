@@ -69,9 +69,10 @@ contract Proxy is
     ) 
         public 
         onlyAdmin
+        returns (address instance)
     {   
         // Deploy the new implementation.
-        address instance = Create2.deploy(
+        instance = Create2.deploy(
             0, 
             _computeNewDeploymentSalt(version), 
             _newImplementation

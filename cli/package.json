@@ -19,6 +19,7 @@
   "dependencies": {
     "abi-to-sol": "^0.8.0",
     "chalk": "^4.1.2",
+    "ejs": "^3.1.9",
     "glob": "^8.1.0",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.9",
