@@ -29,6 +29,7 @@ yargs(hideBin(process.argv))
             })
             .option('manifest', {
                 type: 'string',
+                alias: '-m',
                 description: 'The manifest.json of previous deployments. The new manifest is written to this file.',
                 default: DEFAULT_MANIFEST_FILE,
             })

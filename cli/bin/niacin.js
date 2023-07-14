@@ -1,2 +1,3 @@
 #!/usr/bin/env node
-require('../build/niacin')
+if(process.env.DEV) require('../build/niacin')
+else require('../dist/niacin')
