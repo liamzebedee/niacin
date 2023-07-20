@@ -202,6 +202,7 @@ export interface EVMBuildArtifact {
         linkReferences: any
     }
     abi: ethers.utils.Fragment[]
+    metadata: any
 }
 
 // TODO refactor this, it's temporary
@@ -216,5 +217,4 @@ export interface AllerArtifact extends EVMBuildArtifact {
 
     // We deploy if there is no previous deployment, or if we should upgrade.
     shouldDeploy: boolean
-    metadata: any
 }

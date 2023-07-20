@@ -24,6 +24,7 @@ const solcInput = (contractName: string, content: string) => ({
     },
 })
 
+const NO_WARN = true
 export function compileSolidity(contractName: string, content: string) {
     const input = solcInput(contractName, content)
     const output = JSON.parse(solc.compile(JSON.stringify(input)))
@@ -35,7 +36,7 @@ export function compileSolidity(contractName: string, content: string) {
             if (error.severity === 'error') {
                 console.error(error.formattedMessage)
                 compilationFailed = true
-            } else {
+            } else if (!NO_WARN) {
                 console.warn(error.formattedMessage)
             }
         }
