@@ -14,6 +14,7 @@ import {
     proxy_Artifact 
 } from '../contracts'
 import { 
+    AllerArtifact,
     AllerConfig, 
     AllerScriptRuntime, 
     DeployImplEvent, 
@@ -44,6 +45,8 @@ import { compileSolidity } from '../utils/solidity'
 import prettierSolidity from "prettier-plugin-solidity";
 // import { generateSolMigration, generateSolRebuildCaches } from '../utils/migrations'
 import { generateSolMigration, generateSolRebuildCaches } from '../utils/migrator2'
+import { computeDependencies } from '../utils/evm'
+import { getCreate2Address } from 'ethers/lib/utils'
 const prettier = require("prettier");
 
 interface GetOrCreateArgs {
@@ -168,6 +171,8 @@ interface DeployArgs {
 
 let gasEstimator: GasEstimator
 
+
+
 export async function deploy(argv: DeployArgs) {
     let { RPC_URL: rpcUrl, PRIVATE_KEY: privateKey } = process.env
     const {
@@ -213,17 +218,14 @@ export async function deploy(argv: DeployArgs) {
     console.log(chalk.gray(`Project type:`), `${projectType}`)
     // console.log(`Input manifest: `)
     console.log()
-    console.log(`> forge build`)
-
-    // Run `forge build`.
-    if (shell.exec('forge build').code !== 0) {
-        shell.echo('Error: Forge build failed');
-        shell.exit(1);
-    }
-    console.debug()
     
     // Identify contracts for deployment.
-    function findContractsForDeployment() {
+    interface FindContractsForDeploymentOutput {
+        allTargets: string[]
+        artifacts: EVMBuildArtifact[]
+        targetsForDeployment: AllerArtifact[]
+    }
+    function findContractsForDeployment(): FindContractsForDeploymentOutput {
         if(argv.a) {
             console.log(chalk.yellow(`Searching for all contracts to deploy...`))
             const allTargets = findTargets()
@@ -334,7 +336,6 @@ export async function deploy(argv: DeployArgs) {
                 contractsDep[`node_modules/niacin-contracts/${path}`] = info
             })
     })
-    // console.log(contractsDep)
     
     for(let artifact of artifacts) {
         const niacinDeps = 
@@ -349,6 +350,7 @@ export async function deploy(argv: DeployArgs) {
                 console.warn(`Can't find dependency for ${path}`)
                 continue
             }
+            // @ts-ignore
             if(dep.keccak256 != info.keccak256) {
                 const { version } = (require('niacin-contracts/package.json') as any)
                 throw new Error(`niacin-cli built for ` + chalk.yellow(`niacin-contracts v${version}`) + `, but your project uses a different version.`)
@@ -596,6 +598,48 @@ export async function deploy(argv: DeployArgs) {
         signer: signer,
     })
 
+    let desiredSystem = []
+    for (let [name, target] of Object.entries(manifest.targets.user)) {
+        desiredSystem.push({
+            abi: target.abi,
+            bytecode: target.bytecode.object,
+            contractName: name,
+            name
+        })
+    }
+    for (let target of targetsStaged) {
+        desiredSystem.push({
+            abi: target.abi,
+            bytecode: target.bytecode.object,
+            contractName: target.contractName
+        })
+    }
+    const dependencies = await computeDependencies(targetsStaged)
+    console.log(dependencies)
+    
+    // Now compute the addresses of all target implementations in the desired system.
+    const desiredAddresses: Record<string,string> = {}
+    for(let target of desiredSystem) {
+        // let address = getCreate2Address(account, ethers.utils.formatBytes32String(target.contractName), 
+        const initCodeHash = ethers.utils.keccak256(target.bytecode);
+        const deploySalt = ethers.utils.formatBytes32String(target.contractName)
+        const implAddress = ethers.utils.getCreate2Address(
+            account,
+            deploySalt,
+            initCodeHash,
+        );
+        const proxyAddress = ethers.utils.getCreate2Address(
+            account,
+            ethers.utils.formatBytes32String("Proxy"+target.contractName),
+            ethers.utils.keccak256(proxy_Artifact.bytecode.object),
+        )
+        desiredAddresses[target.contractName] = implAddress
+        desiredAddresses[`Proxy`+target.contractName] = implAddress
+    }
+    console.log(desiredAddresses)
+
+
+
 
     // 1. AddressProvider
     console.log(`1. Locating AddressProvider...`)
@@ -625,61 +669,38 @@ export async function deploy(argv: DeployArgs) {
         deploymentManager.addEvent(event)
     }
 
+    await generateSolMigration(
+        `Migration_${deploymentManager.deployment.id}`,
+        addressProvider,
+        manifest,
+        targetsStaged,
+        dsProxy,
+        desiredAddresses,
+        dependencies,
+        desiredSystem
+    )
+    throw 1;
 
-
-    let toDeploy = [...targetsStaged]
-    const gaslimit = 5_000_000
-    let gasuage = 0
-    let migrations = []
-    let migrationArtifacts = []
-
-    // While there are contracts to deploy, generate migrations.
-    while(toDeploy.length) {
-        const artifact = toDeploy.pop()
-        migrationArtifacts.push(artifact)
-
-        // Compile migration
-        const { bytecode } = await generateSolMigration(
-            `Migration_${deploymentManager.deployment.id}`,
-            addressProvider,
-            manifest,
-            migrationArtifacts,
-        )
-
-        // Estimate gas.
-        const gasUsageBN = await dsProxy.estimateGas['execute(bytes,bytes)'](
-            "0x" + bytecode,
-            // cast sig "function migrate() public"
-            "0x8fd3ab80"
-        )
-
-        const gasUsage = gasUsageBN.toNumber()
-        console.log(`Migration gas usage: ${gasUsage.toLocaleString()} gas for ${migrationArtifacts.length} contracts`)
-
-        // If the gas usage is above the limit, remove the contract from the migration.
-        if (gaslimit < gasUsage) {
-            // Unstage contract.
-            toDeploy.push(migrationArtifacts.pop())
-            // Stage migration.
-            migrations.push(migrationArtifacts)
-            // Reset the migration.
-            migrationArtifacts = []
-        }
-    }
-
-    // Stage migration.
-    if (migrationArtifacts.length) migrations.push(migrationArtifacts)
+    const migrations = await generateMigrations({
+        addressProvider,
+        manifest,
+        targetsStaged,
+        dsProxy,
+        deploymentManager,
+    })
 
     // Run migrations.
     let migration_i = 0
     for(let migration of migrations) {
         migration_i++
         console.log(`Running migration #${migration_i} for ${migration.length} contracts...`)
+        
         const { bytecode, abi } = await generateSolMigration(
             `Migration_${deploymentManager.deployment.id}_${migration_i}`,
             addressProvider,
             manifest,
-            migration,
+            targetsStaged,
+            dsProxy,
         )
 
         const tx = await dsProxy['execute(bytes,bytes)'](
